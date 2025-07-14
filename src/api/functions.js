@@ -1,31 +1,121 @@
-import { base44 } from './base44Client';
+// Mock functions for iframe integration
+// These will communicate with the parent Angular application via postMessage
 
+import { sendToParent } from './entities.js';
 
-export const createLinkToken = base44.functions.createLinkToken;
+// Mock Plaid integration functions
+export const createLinkToken = async () => {
+  sendToParent('plaid:createLinkToken', {});
+  return {
+    linkToken: 'mock-link-token-' + Date.now(),
+    expiresAt: new Date(Date.now() + 3600000).toISOString()
+  };
+};
 
-export const exchangePublicToken = base44.functions.exchangePublicToken;
+export const exchangePublicToken = async (publicToken) => {
+  sendToParent('plaid:exchangePublicToken', { publicToken });
+  return {
+    accessToken: 'mock-access-token-' + Date.now(),
+    itemId: 'mock-item-id-' + Date.now()
+  };
+};
 
-export const plaidWebhook = base44.functions.plaidWebhook;
+export const plaidWebhook = async (webhookData) => {
+  sendToParent('plaid:webhook', { webhookData });
+  return { success: true };
+};
 
-export const removeAccount = base44.functions.removeAccount;
+export const removeAccount = async (accountId) => {
+  sendToParent('accounts:remove', { accountId });
+  return { success: true };
+};
 
-export const removeAllAccounts = base44.functions.removeAllAccounts;
+export const removeAllAccounts = async () => {
+  sendToParent('accounts:removeAll', {});
+  return { success: true };
+};
 
-export const syncTransactions = base44.functions.syncTransactions;
+export const syncTransactions = async (accountId) => {
+  sendToParent('transactions:sync', { accountId });
+  return {
+    success: true,
+    syncedCount: Math.floor(Math.random() * 10) + 1
+  };
+};
 
-export const verifyPlaidIntegration = base44.functions.verifyPlaidIntegration;
+export const verifyPlaidIntegration = async () => {
+  sendToParent('plaid:verify', {});
+  return {
+    verified: true,
+    accounts: [
+      { id: '1', name: 'Checking Account', institution: 'Chase Bank' },
+      { id: '2', name: 'Savings Account', institution: 'Wells Fargo' }
+    ]
+  };
+};
 
-export const triggerWebhookSync = base44.functions.triggerWebhookSync;
+export const triggerWebhookSync = async () => {
+  sendToParent('webhook:sync', {});
+  return { success: true };
+};
 
-export const fetchFromNgrok = base44.functions.fetchFromNgrok;
+export const fetchFromNgrok = async (url) => {
+  sendToParent('ngrok:fetch', { url });
+  return { data: 'mock-ngrok-data' };
+};
 
-export const plaidClient = base44.functions.plaidClient;
+export const plaidClient = {
+  async accountsGet(accessToken) {
+    sendToParent('plaid:accountsGet', { accessToken });
+    return {
+      accounts: [
+        { account_id: '1', name: 'Checking', type: 'depository' },
+        { account_id: '2', name: 'Savings', type: 'depository' }
+      ]
+    };
+  },
+  
+  async transactionsGet(accessToken, startDate, endDate) {
+    sendToParent('plaid:transactionsGet', { accessToken, startDate, endDate });
+    return {
+      transactions: [
+        {
+          transaction_id: '1',
+          amount: -45.67,
+          name: 'Grocery Store',
+          date: new Date().toISOString().split('T')[0]
+        }
+      ]
+    };
+  }
+};
 
-export const generateAccessToken = base44.functions.generateAccessToken;
+export const generateAccessToken = async (userId) => {
+  sendToParent('auth:generateToken', { userId });
+  return {
+    accessToken: 'mock-generated-token-' + Date.now(),
+    expiresAt: new Date(Date.now() + 86400000).toISOString()
+  };
+};
 
-export const revokeAccessToken = base44.functions.revokeAccessToken;
+export const revokeAccessToken = async (tokenId) => {
+  sendToParent('auth:revokeToken', { tokenId });
+  return { success: true };
+};
 
-export const api/v1/accounts = base44.functions.api/v1/accounts;
+// Mock API endpoints
+export const api_v1_accounts = async () => {
+  sendToParent('api:accounts', {});
+  return [
+    { id: '1', name: 'Checking Account', balance: 2500.00 },
+    { id: '2', name: 'Savings Account', balance: 15000.00 }
+  ];
+};
 
-export const api/v1/transactions = base44.functions.api/v1/transactions;
-
+export const api_v1_transactions = async () => {
+  sendToParent('api:transactions', {});
+  return [
+    { id: '1', amount: -45.67, description: 'Grocery Store' },
+    { id: '2', amount: -120.00, description: 'Gas Station' }
+  ];
+}; 
