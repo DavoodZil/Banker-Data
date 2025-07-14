@@ -61,10 +61,10 @@ export const clearAuth = () => {
  */
 export const handleAuthParams = (search) => {
   const searchParams = new URLSearchParams(search);
-  const token = searchParams.get("token");
-  const baseUrl = searchParams.get("baseUrl");
-  console.log("Token:", token);
-  console.log("Base URL:", baseUrl);
+  // const token = searchParams.get("token");
+  // const baseUrl = searchParams.get("baseUrl");
+  const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxMDE5IiwianRpIjoiZDNhY2IyNGJkOGJlYzU3Mzg4MTA0YzM0ZmUyNDNmZmI5N2QxYjA5MDQ2NDNkZjJlN2ZiMjQwYTMyMmUxMTI4YTNlZDZmMDZmOWQxZDcwMTQiLCJpYXQiOjE3NTI0OTkxMTIuMTc2NjQzLCJuYmYiOjE3NTI0OTkxMTIuMTc2NjQ2LCJleHAiOjE3NTI1MzUxMTIuMTYzMjEzLCJzdWIiOiIxMjAxMTEiLCJzY29wZXMiOltdfQ.fa1jhiDMbjLgdNh2i0zVZrfWKu_byzLWm7GTew97muy3QQqQKd_tsCPE-5sA-xHneQIk1ZWjxJSbc-0CDhTSVrakxCKEmSFQPPks3etODVZclg52lYvhYJQmuJFvQMryU-qqtDliw0BOwLH2v5Te7v296XBwCA64GszcINGwbseJHB8vHaHyL7redEj2orHpKpx9lI1iMvHf5lCg_MJPPXqem_Gz0TnAIRBCVeNu3DJuQ3SEfMXUFeGBurmCP-TTg4N6kMUHI9jmMII-Ip6uFF5ZdeRbahZKolw_g1MQ001UfVkgy3gZmDd3IIgrwRVYWG8rORtuYqqtnZDmHZCUy8Zv6cG0Qk3gepMXK12Da8Yw0hMgyz4UqiLl4VGowKqZcZJPFcPdTGk9OA0pCYwewJlSeDKeWlDflOGGngXtNrcvHYj9YAzUyZBmc4HcUhTJhKD9tfL1Un_UUUXfXoXc7JJFXUmwuVRGdK-E1mUOG-XdIkeQAWQrT4iAeUasMpZ9RYvSWMSHOOM3sTIhr5_KY_6Fsw5069IeqcLuZJVjJ5u4D_yXA8eRfFe4IDsjM7a8ARql42ZyCukebFaJLH_1hBMObeSQPIzmtLJWhZXlqONvo3SXedg0kDp5MGifsQdhPrAWOX74QtXGKTcGzqlfndDojc0g_qrDZTD6uqYOOC4"
+  const baseUrl = "https://staging.api.ocw.sebipay.com/api/v4"
   if (token) {
     setAuthToken(token);
     if (baseUrl) {

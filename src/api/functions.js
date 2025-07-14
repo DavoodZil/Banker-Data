@@ -2,6 +2,7 @@
 // These will communicate with the parent Angular application via postMessage
 
 import { sendToParent } from './entities.js';
+import axios from 'axios';
 
 // Mock Plaid integration functions
 export const createLinkToken = async () => {
@@ -12,12 +13,16 @@ export const createLinkToken = async () => {
   };
 };
 
-export const exchangePublicToken = async (publicToken) => {
-  sendToParent('plaid:exchangePublicToken', { publicToken });
-  return {
-    accessToken: 'mock-access-token-' + Date.now(),
-    itemId: 'mock-item-id-' + Date.now()
+export const exchangePublicToken = async ({ linkKey, institution }) => {
+
+  const payload = {
+    public_token: linkKey,
+    key: linkKey,
+    institutionName: institution?.name || null,
+    institutionId: institution?.institution_id || null,
   };
+  const response = await axios.post('https://master.api.ocw-api.sebipay.com/plaid/callback', payload);
+  return response.data;
 };
 
 export const plaidWebhook = async (webhookData) => {
