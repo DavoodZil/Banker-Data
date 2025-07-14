@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator, // Import separator
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 const menuItems = [
   {
@@ -158,6 +159,10 @@ export default function Layout({ children, currentPageName }) {
                          <Bell className="w-4 h-4 mr-2" />
                          Notifications
                        </Link>
+                     </DropdownMenuItem>
+                     <DropdownMenuSeparator />
+                     <DropdownMenuItem>
+                       <LogoutButton />
                      </DropdownMenuItem>
                    </DropdownMenuContent>
                  </DropdownMenu>

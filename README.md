@@ -32,6 +32,44 @@ npm run dev
 - Financial entity management
 - Mock data for demonstration
 
+## Authentication Flow
+
+This application implements a token-based authentication system similar to the virtual-card-maker-app-master project.
+
+### Authentication Features
+
+- **Token-based authentication** using sessionStorage
+- **Protected routes** that require valid tokens
+- **URL parameter handling** for token and baseUrl
+- **Automatic token inclusion** in API requests
+- **Unauthorized page** for invalid access attempts
+- **Logout functionality** to clear authentication
+
+### How Authentication Works
+
+1. **Token Storage**: Authentication tokens are stored in sessionStorage as `app_token`
+2. **Base URL Storage**: API base URLs can be stored as `base_url` in sessionStorage
+3. **URL Parameters**: Tokens and base URLs can be passed via URL parameters
+4. **Route Protection**: All routes except `/unauthorized` require authentication
+5. **API Integration**: Tokens are automatically included in API requests
+
+### URL Parameters
+
+The application accepts the following URL parameters:
+
+- `token`: Authentication token (required for access)
+- `baseUrl`: API base URL (optional)
+
+Example URLs:
+```
+http://localhost:5173/?token=your_token_here
+http://localhost:5173/dashboard?token=your_token&baseUrl=https://api.example.com
+```
+
+### Testing Authentication
+
+Visit `/auth-test` to see the current authentication status and test the flow.
+
 ## Iframe Integration
 
 This application is designed to be embedded as an iframe within an Angular application. It communicates with the parent application using the `postMessage` API.

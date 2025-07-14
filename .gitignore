@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+virtual-card-maker-app-master
 *.local
 
 # Editor directories and files
