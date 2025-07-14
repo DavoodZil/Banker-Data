@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Landmark, Loader2, ShieldCheck, CheckCircle, AlertTriangle } from "lucide-react";
-import { createLinkToken } from '@/api/functions';
 import { exchangePublicToken } from '@/api/functions';
+import { usePlaidLinkToken } from '@/hooks/usePlaidLinkToken';
 
 const StatusDisplay = ({ step, error, isReady }) => (
     <div className="text-center space-y-4 py-8">
@@ -34,11 +34,13 @@ const StatusDisplay = ({ step, error, isReady }) => (
 );
 
 export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
-  const [linkToken, setLinkToken] = useState(null);
   const [step, setStep] = useState('loading');
   const [error, setError] = useState(null);
   const [plaidHandler, setPlaidHandler] = useState(null);
   const [isPlaidScriptLoaded, setIsPlaidScriptLoaded] = useState(!!window.Plaid);
+
+  // Use the Plaid Link Token hook
+  const { linkToken, isLoading: linkTokenLoading, error: linkTokenError, refetch: refetchLinkToken } = usePlaidLinkToken(isOpen);
 
   // Effect to load Plaid's script
   useEffect(() => {
@@ -61,28 +63,22 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
     };
   }, [isPlaidScriptLoaded]);
 
-  // Effect to get the link token from our backend
+  // Effect to handle link token loading and errors
   useEffect(() => {
     if (isOpen) {
       setStep('loading');
       setError(null);
-      const initPlaid = async () => {
-        try {
-          const response = await createLinkToken();
-          if (response.data.link_token) {
-            setLinkToken(response.data.link_token);
-          } else {
-            throw new Error(response.data.error || "Failed to retrieve link token");
-          }
-        } catch (err) {
-          console.error("Plaid init error:", err);
-          setError("Could not connect to Plaid. Please try again later.");
-          setStep('error');
-        }
-      };
-      initPlaid();
     }
   }, [isOpen]);
+
+  // Effect to handle link token errors
+  useEffect(() => {
+    if (linkTokenError) {
+      console.error("Plaid init error:", linkTokenError);
+      setError("Could not connect to Plaid. Please try again later.");
+      setStep('error');
+    }
+  }, [linkTokenError]);
 
   const onSuccess = useCallback(async (public_token, metadata) => {
     setStep('loading');
@@ -99,7 +95,7 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
 
   // Effect to create the Plaid handler once we have the token and script
   useEffect(() => {
-    if (!isOpen || !isPlaidScriptLoaded || !linkToken) {
+    if (!isOpen || !isPlaidScriptLoaded || !linkToken || linkTokenLoading) {
       return;
     }
 
@@ -123,7 +119,7 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
         handler.destroy();
       }
     };
-  }, [isPlaidScriptLoaded, linkToken, isOpen, onSuccess]);
+  }, [isPlaidScriptLoaded, linkToken, isOpen, onSuccess, linkTokenLoading]);
   
   const isReady = step === 'ready' && !!plaidHandler;
   
@@ -138,7 +134,6 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
     // Reset state after a short delay to allow for closing animation
     setTimeout(() => {
         setStep('loading');
-        setLinkToken(null);
         setError(null);
         setPlaidHandler(null);
     }, 300);

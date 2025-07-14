@@ -6,6 +6,7 @@ import { Account } from "@/api/entities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Building, CreditCard, PiggyBank, TrendingUp, Eye, EyeOff, Trash2, AlertTriangle, RefreshCw, CheckCircle, Wallet } from "lucide-react";
+import { useBankData } from "@/hooks/useBankData";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,9 +41,22 @@ export default function Accounts() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
+  // Bank Data Hook
+  const { bankData, isLoading: bankDataLoading, error: bankDataError, refetch: refetchBankData } = useBankData();
+
   useEffect(() => {
     loadAccounts();
   }, []);
+
+  // Log bank data response when it changes
+  useEffect(() => {
+    if (bankData) {
+      console.log('Bank Data in Accounts component:', bankData);
+    }
+    if (bankDataError) {
+      console.error('Bank Data Error in Accounts component:', bankDataError);
+    }
+  }, [bankData, bankDataError]);
 
   const loadAccounts = async () => {
     setIsLoading(true);
@@ -154,6 +168,16 @@ export default function Accounts() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={refetchBankData}
+            disabled={bankDataLoading}
+            size="sm"
+            className="gap-2 text-xs"
+          >
+            <RefreshCw className={`w-4 h-4 ${bankDataLoading ? 'animate-spin' : ''}`} />
+            {bankDataLoading ? 'Loading...' : 'Bank Data'}
+          </Button>
           <Button
             variant="outline"
             onClick={handleVerifyIntegration}

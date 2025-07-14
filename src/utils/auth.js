@@ -63,7 +63,8 @@ export const handleAuthParams = (search) => {
   const searchParams = new URLSearchParams(search);
   const token = searchParams.get("token");
   const baseUrl = searchParams.get("baseUrl");
-
+  console.log("Token:", token);
+  console.log("Base URL:", baseUrl);
   if (token) {
     setAuthToken(token);
     if (baseUrl) {

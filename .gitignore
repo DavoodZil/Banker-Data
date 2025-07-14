@@ -25,3 +25,5 @@ virtual-card-maker-app-master
 *.sw?
 
 .env
+# Local Netlify folder
+.netlify
