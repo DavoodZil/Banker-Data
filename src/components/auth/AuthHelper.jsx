@@ -6,11 +6,7 @@ import { CheckCircle, AlertCircle, Key, Globe } from 'lucide-react';
 
 const AuthHelper = () => {
   const handleSetCredentials = () => {
-    // Set the provided token and base URL
-    setAuthToken('eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxMDE5IiwianRpIjoiOTM3YmEzMTZiZTQ3YWQ5NjhmMTFkMTkzMWEzNjc3Nzg0MDE4Yjg1ZDE1NTk0NjUxZWYzN2UxMTk4NmMyYmVmNzkxMzZiNDRkYWRhZDc4YWUiLCJpYXQiOjE3NTI0NzQ0MDcuNTQwOTkzLCJuYmYiOjE3NTI0NzQ0MDcuNTQwOTU1LCJleHAiOjE3NTI1MTA0MDcuNTM0MDY4LCJzdWIiOiIxMjAxMTEiLCJzY29wZXMiOltdfQ.ZpU8FW46KwKCuP8SfT39fGp7_qfd47w3UhT7Du5T1KjlvCtYFZBpQMhFq8M7mbJyBeY9DJw7mLU0FYm8HV-pJ6vitRmk8g47IsIEfcQVTm-TidyPx4PVy5nUDitosl1o3UpfbicmzaXPuUXOf24i0G8ZC_saUWCz1C_qUdXJ2gggWHPOsQsTRDIvqTouq9SuqlTHMSoGtLzHNL_B0c8LZrtzg2ZNXLxH-r97_rzixjJCJ2ecKTubH-kC3S_Qpbmj25ZRKVUF9RBh3B2evlmWHLZA2Il-mMhIltUsCgoqN8OuagXPphp8cKw_VB8GvdLHIxJJdV1dUorCbe103swHcJKDfesFIJDmyzXwHdou_WyODOQiFyTja2fyUbgRUHYdjx9USJhYwOtb5cj5V10x56M-z6uCVTr_TuT6cNu2NdX8pTGDZHZXLFMU85cq_6QyLPzxALnUUO7oJ6A_TpJ5Goa00pWzlhOSrfRdfKCRZmPFOpMAE4340uZE83lhFqmRzeE9_0ZgB0zqbV8c2tAeMmgXd9HBLHvXIg7VtJEczL3JDSgJ4UYioWWiAbp0dSMnAhzTA6dypWuZEnvIoKw66NLzZ7d797_zAbcOhe-dZxaN72BjkzRmAbpG513CAWiFF8BcRj3n4HbmrAx0Z3CqKpE-CdUVSy4BMbx08hnBJz8');
-    setBaseUrl('https://staging.api.ocw.sebipay.com/api/v4');
-    
-    // Reload the page to apply the authentication
+        // Reload the page to apply the authentication
     window.location.reload();
   };
 

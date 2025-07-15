@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Edit, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { getAuthToken } from "@/utils/auth";
+import api from "@/services/api";
 
 const categoryColors = {
   groceries: "bg-green-50 text-green-700 border-green-200",
@@ -27,9 +28,6 @@ export default function PaginatedTransactionTable({
   onEditTransaction
 }) {
   // Prepend the base URL if only endpoint number is provided
-  const baseUrl = "https://staging.api.ocw.sebipay.com/api/v4/ag-grid/";
-  const fullEndpoint = apiEndpoint.startsWith('http') ? apiEndpoint : `${baseUrl}${apiEndpoint}`;
-  
   const [transactions, setTransactions] = useState([]);
   const [rowCount, setRowCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,11 +64,7 @@ export default function PaginatedTransactionTable({
         headers.Authorization = `Bearer ${token}`;
       }
       
-      const response = await fetch(fullEndpoint, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(payload)
-      });
+      const response = await api.post('/ag-grid/42', payload, { headers });
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error("Authentication required. Please log in again.");
@@ -97,11 +91,11 @@ export default function PaginatedTransactionTable({
 
   return (
     <div>
-      {error && (
+      {/* {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
           <span className="text-red-600">Error: {error}</span>
         </div>
-      )}
+      )} */}
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
