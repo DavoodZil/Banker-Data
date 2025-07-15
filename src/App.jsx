@@ -18,6 +18,13 @@ import Import from '@/pages/Import'
 import API from '@/pages/API'
 import Unauthorized from '@/pages/Unauthorized'
 import AuthTest from '@/pages/AuthTest'
+import Reports from '@/pages/Reports';
+import Merchants from '@/pages/Merchants';
+import Goals from '@/pages/Goals';
+import CashFlow from '@/pages/CashFlow';
+import Budget from '@/pages/Budget';
+import Tag from '@/pages/Tag';
+import Group from '@/pages/Group';
 
 function App() {
   const location = useLocation();
@@ -110,11 +117,88 @@ function App() {
         />
         
         <Route
+          path="/merchants"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Merchants />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Reports />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/goals"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Goals />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/cashflow"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CashFlow />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/budget"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Budget />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/tag"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Tag />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
           path="/entity"
           element={
             <ProtectedRoute>
               <Layout>
                 <Entity />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/group"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Group />
               </Layout>
             </ProtectedRoute>
           }
@@ -137,6 +221,17 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <API />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Reports />
               </Layout>
             </ProtectedRoute>
           }
