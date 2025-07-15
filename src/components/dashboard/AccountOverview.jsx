@@ -71,10 +71,10 @@ export default function AccountOverview({ accounts, isLoading }) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="font-medium text-gray-900 truncate">
-                      {account.account_name}
+                      {account.account_name.split(' ')[1]}
                     </div>
                     <div className="text-sm text-gray-500 truncate">
-                      {account.institution_name} •••• {account.account_number_last_four}
+                      {account.institution_name} •••• {account.account_name.split(' ')[2].slice(-4)} 
                     </div>
                   </div>
                 </div>
