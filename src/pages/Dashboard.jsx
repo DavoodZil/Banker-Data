@@ -1,14 +1,10 @@
 
-import React, { useState, useEffect } from "react";
-import { Account } from "@/api/entities";
-import { Transaction } from "@/api/entities";
-import { Category } from "@/api/entities";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   CreditCard,
   PiggyBank,
@@ -19,71 +15,23 @@ import {
   Target,
   AlertTriangle
 } from "lucide-react";
-import { format, subDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { syncTransactions } from "@/api/functions";
-
+import { useBankData } from "@/hooks/useBankData";
 import AccountOverview from "../components/dashboard/AccountOverview";
-import RecentTransactions from "../components/dashboard/RecentTransactions";
-import SpendingChart from "../components/dashboard/SpendingChart";
-import CategoryBreakdown from "../components/dashboard/CategoryBreakdown";
-import BudgetTracking from "../components/dashboard/BudgetTracking";
-import NetWorthChart from "../components/dashboard/NetWorthChart";
 
 export default function Dashboard() {
-  const [accounts, setAccounts] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [lastSync, setLastSync] = useState(new Date());
+  const { bankData, isLoading, error, refetch } = useBankData();
+  const [isSyncing, setIsSyncing] = React.useState(false);
+  const [lastSync, setLastSync] = React.useState(new Date());
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  // Extract data safely
+  const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts) : [];
+  const transactions = bankData?.data?.transactions || [];
+  const categories = bankData?.data?.categories || [];
 
-  const loadData = async () => {
-    setIsLoading(true);
-    try {
-      // All data fetching is automatically filtered by user through the entity system
-      const [accountsData, transactionsData, categoriesData] = await Promise.all([
-        Account.list('-updated_date'),
-        Transaction.list('-date', 200),
-        Category.list('-updated_date')
-      ]);
-      setAccounts(accountsData);
-      setTransactions(transactionsData);
-      setCategories(categoriesData);
-      setLastSync(new Date());
-    } catch (error) {
-      console.error('Error loading data:', error);
-    }
-    setIsLoading(false);
-  };
-
-  const handleSyncTransactions = async () => {
-    setIsSyncing(true);
-    try {
-      const response = await syncTransactions();
-      if (response.data && response.data.success) {
-        await loadData(); // Refresh all data after sync
-        setLastSync(new Date());
-      } else {
-        const errorMessage = response.data?.message || response.data?.error || "Unknown error";
-        console.error("Sync failed:", errorMessage);
-        alert(`Sync Failed: ${errorMessage}`);
-      }
-    } catch (error) {
-      const errorData = error.response?.data;
-      const errorMessage = errorData?.message || errorData?.error || error.message || "Failed to sync transactions";
-      console.error('Failed to sync transactions:', error);
-      alert(`Sync Failed: ${errorMessage}`);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
+  // Metrics calculations (same as before)
   const calculateNetWorth = () => {
     return accounts.reduce((sum, account) => {
       if (account.account_type === 'credit' || account.account_type === 'loan') {
@@ -96,7 +44,6 @@ export default function Dashboard() {
   const calculateMonthlySpending = () => {
     const monthStart = startOfMonth(new Date());
     const monthEnd = endOfMonth(new Date());
-
     return transactions
       .filter(t => {
         const transactionDate = new Date(t.date);
@@ -110,7 +57,6 @@ export default function Dashboard() {
   const calculateMonthlyIncome = () => {
     const monthStart = startOfMonth(new Date());
     const monthEnd = endOfMonth(new Date());
-
     return transactions
       .filter(t => {
         const transactionDate = new Date(t.date);
@@ -144,7 +90,6 @@ export default function Dashboard() {
     const lastMonthNetWorth = currentNetWorth * 0.97; // Mock 3% growth
     const change = currentNetWorth - lastMonthNetWorth;
     const changePercent = lastMonthNetWorth > 0 ? (change / lastMonthNetWorth) * 100 : 0;
-    
     return {
       change,
       changePercent,
@@ -170,14 +115,14 @@ export default function Dashboard() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleSyncTransactions}
-            disabled={isSyncing}
+            onClick={refetch}
+            disabled={isSyncing || isLoading}
             className="gap-2"
           >
-            <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Syncing...' : 'Sync'}
+            <RefreshCw className={`w-4 h-4 ${isSyncing || isLoading ? 'animate-spin' : ''}`} />
+            {isSyncing || isLoading ? 'Syncing...' : 'Sync'}
           </Button>
-          <Link to={createPageUrl("Accounts")}>
+          <Link to={createPageUrl("Accounts")}> 
             <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2">
               <Plus className="w-4 h-4" />
               Add Account
@@ -316,16 +261,13 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Accounts Section */}
       <AccountOverview accounts={accounts} isLoading={isLoading} />
-      
-      <BudgetTracking categories={categories} transactions={transactions} isLoading={isLoading} />
 
-      <RecentTransactions transactions={transactions} isLoading={isLoading} />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <NetWorthChart accounts={accounts} transactions={transactions} isLoading={isLoading} />
-          <SpendingChart transactions={transactions} isLoading={isLoading} />
-          <CategoryBreakdown transactions={transactions} isLoading={isLoading} />
+      {/* Coming Soon Section */}
+      <div className="flex flex-col items-center justify-center py-24">
+        <div className="text-3xl font-bold text-gray-400 mb-2">Coming Soon</div>
+        <div className="text-lg text-gray-500">Detailed analytics and charts will be available here soon.</div>
       </div>
     </div>
   );
