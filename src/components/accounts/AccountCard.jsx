@@ -71,7 +71,7 @@ export default function AccountCard({ account, showBalance, onUpdate }) {
             <div>
               <p className="text-xs text-gray-500">Current Balance</p>
               <p className="text-2xl font-bold text-gray-900">
-                {showBalance ? `$${account.balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '•••••'}
+                {showBalance ? `$${account.available_balance_amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '•••••'}
               </p>
             </div>
             {account.available_balance !== null && account.available_balance !== account.balance && (
@@ -85,7 +85,7 @@ export default function AccountCard({ account, showBalance, onUpdate }) {
           </div>
           
           <div className="flex items-center justify-between text-xs text-gray-600 pt-3 border-t">
-            <span>{account.institution_name}</span>
+            <span>{account.name}</span>
             <span>•••• {account.account_number_last_four}</span>
           </div>
         </CardContent>

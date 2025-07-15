@@ -86,7 +86,7 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
     setIsPlaidOpen(false);
     setStep('loading');
     try {
-      await exchangePublicToken({ linkKey: public_token, institution: metadata.institution });
+      await exchangePublicToken({ public_token: public_token, institution: metadata.institution, key: linkKey, metadata: metadata });
       setStep('success');
       onAddSuccess();
     } catch(err) {

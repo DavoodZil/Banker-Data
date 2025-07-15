@@ -1,7 +1,9 @@
-// Mock entities for iframe integration
+// Entities for iframe integration
 // These will communicate with the parent Angular application via postMessage
+// and also make real API calls
 
 import { mockAccounts, mockTransactions, mockCategories, mockTags, mockRules, mockFinancialEntities } from './mockData.js';
+import { categoryAPI, transactionAPI } from './functions.js';
 
 // Helper function to communicate with parent Angular app
 const sendToParent = (action, data) => {
@@ -58,64 +60,139 @@ export const Account = {
   }
 };
 
-// Mock Transaction entity
+// Transaction entity with real API integration
 export const Transaction = {
-  async list(filters = {}) {
-    sendToParent('transactions:list', { filters });
-    return mockTransactions;
+  async list(sortBy = '-date', limit = 500, filters = {}) {
+    try {
+      // Make real API call
+      const transactions = await transactionAPI.list(sortBy, limit, filters);
+      sendToParent('transactions:list', { filters, transactions });
+      return transactions;
+    } catch (error) {
+      console.error('Failed to fetch transactions from API, falling back to mock data:', error);
+      sendToParent('transactions:list', { filters, transactions: mockTransactions });
+      return mockTransactions;
+    }
   },
   
   async get(id) {
-    const transaction = mockTransactions.find(t => t.id === id);
-    sendToParent('transactions:get', { id, transaction });
-    return transaction;
+    try {
+      // Make real API call
+      const transaction = await transactionAPI.get(id);
+      sendToParent('transactions:get', { id, transaction });
+      return transaction;
+    } catch (error) {
+      console.error('Failed to fetch transaction from API, falling back to mock data:', error);
+      const mockTransaction = mockTransactions.find(t => t.id === id);
+      sendToParent('transactions:get', { id, transaction: mockTransaction });
+      return mockTransaction;
+    }
   },
   
   async create(data) {
-    const newTransaction = {
-      id: Date.now().toString(),
-      ...data,
-      date: data.date || new Date().toISOString()
-    };
-    sendToParent('transactions:create', { transaction: newTransaction });
-    return newTransaction;
+    try {
+      // Make real API call
+      const newTransaction = await transactionAPI.create({
+        ...data,
+        date: data.date || new Date().toISOString()
+      });
+      sendToParent('transactions:create', { transaction: newTransaction });
+      return newTransaction;
+    } catch (error) {
+      console.error('Failed to create transaction via API, using mock response:', error);
+      const mockTransaction = {
+        id: Date.now().toString(),
+        ...data,
+        date: data.date || new Date().toISOString()
+      };
+      sendToParent('transactions:create', { transaction: mockTransaction });
+      return mockTransaction;
+    }
   },
   
   async update(id, data) {
-    sendToParent('transactions:update', { id, data });
-    return { id, ...data };
+    try {
+      // Make real API call
+      const updatedTransaction = await transactionAPI.update(id, data);
+      sendToParent('transactions:update', { id, data: updatedTransaction });
+      return updatedTransaction;
+    } catch (error) {
+      console.error('Failed to update transaction via API, using mock response:', error);
+      sendToParent('transactions:update', { id, data });
+      return { id, ...data };
+    }
   },
   
   async delete(id) {
-    sendToParent('transactions:delete', { id });
-    return { success: true };
+    try {
+      // Make real API call
+      const result = await transactionAPI.delete(id);
+      sendToParent('transactions:delete', { id, result });
+      return result;
+    } catch (error) {
+      console.error('Failed to delete transaction via API, using mock response:', error);
+      sendToParent('transactions:delete', { id });
+      return { success: true };
+    }
   }
 };
 
-// Mock Category entity
+// Category entity with real API integration
 export const Category = {
-  async list() {
-    sendToParent('categories:list', {});
-    return mockCategories;
+  async list(sortBy = '-updated_date') {
+    try {
+      // Make real API call
+      const categories = await categoryAPI.list(sortBy);
+      sendToParent('categories:list', { categories });
+      return categories;
+    } catch (error) {
+      console.error('Failed to fetch categories from API, falling back to mock data:', error);
+      sendToParent('categories:list', { categories: mockCategories });
+      return mockCategories;
+    }
   },
   
   async create(data) {
-    const newCategory = {
-      id: Date.now().toString(),
-      ...data
-    };
-    sendToParent('categories:create', { category: newCategory });
-    return newCategory;
+    try {
+      // Make real API call
+      const newCategory = await categoryAPI.create(data);
+      sendToParent('categories:create', { category: newCategory });
+      return newCategory;
+    } catch (error) {
+      console.error('Failed to create category via API, using mock response:', error);
+      const mockCategory = {
+        id: Date.now().toString(),
+        ...data
+      };
+      sendToParent('categories:create', { category: mockCategory });
+      return mockCategory;
+    }
   },
   
   async update(id, data) {
-    sendToParent('categories:update', { id, data });
-    return { id, ...data };
+    try {
+      // Make real API call
+      const updatedCategory = await categoryAPI.update(id, data);
+      sendToParent('categories:update', { id, data: updatedCategory });
+      return updatedCategory;
+    } catch (error) {
+      console.error('Failed to update category via API, using mock response:', error);
+      sendToParent('categories:update', { id, data });
+      return { id, ...data };
+    }
   },
   
   async delete(id) {
-    sendToParent('categories:delete', { id });
-    return { success: true };
+    try {
+      // Make real API call
+      const result = await categoryAPI.delete(id);
+      sendToParent('categories:delete', { id, result });
+      return result;
+    } catch (error) {
+      console.error('Failed to delete category via API, using mock response:', error);
+      sendToParent('categories:delete', { id });
+      return { success: true };
+    }
   }
 };
 

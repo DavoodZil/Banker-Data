@@ -3,6 +3,8 @@
 
 import { sendToParent } from './entities.js';
 import axios from 'axios';
+import api from '@/services/api';
+import { API_CONFIG, buildApiUrl, handleApiError } from './config.js';
 
 // Mock Plaid integration functions
 export const createLinkToken = async () => {
@@ -13,15 +15,16 @@ export const createLinkToken = async () => {
   };
 };
 
-export const exchangePublicToken = async ({ linkKey, institution }) => {
+export const exchangePublicToken = async ({ public_token, institution, key, metadata }) => {
 
   const payload = {
-    public_token: linkKey,
-    key: linkKey,
+    public_token: public_token,
+    key: key,
     institutionName: institution?.name || null,
     institutionId: institution?.institution_id || null,
+    metadata: metadata
   };
-  const response = await axios.post('https://master.api.ocw-api.sebipay.com/plaid/callback', payload);
+  const response = await axios.post('https://1614008f199c.ngrok-free.app/api/plaid/callback', payload);
   return response.data;
 };
 
@@ -123,4 +126,138 @@ export const api_v1_transactions = async () => {
     { id: '1', amount: -45.67, description: 'Grocery Store' },
     { id: '2', amount: -120.00, description: 'Gas Station' }
   ];
+}; 
+
+// Category API functions
+export const categoryAPI = {
+  // Get all categories
+  async list(sortBy = API_CONFIG.SORTING.CATEGORIES.DEFAULT) {
+    try {
+      const url = buildApiUrl(API_CONFIG.ENDPOINTS.CATEGORIES, { sort: sortBy });
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Get a single category by ID
+  async get(id) {
+    try {
+      const response = await api.get(`${API_CONFIG.ENDPOINTS.CATEGORIES}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching category:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Create a new category
+  async create(categoryData) {
+    try {
+      const response = await api.post(API_CONFIG.ENDPOINTS.CATEGORIES, categoryData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating category:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Update an existing category
+  async update(id, categoryData) {
+    try {
+      const response = await api.put(`${API_CONFIG.ENDPOINTS.CATEGORIES}/${id}`, categoryData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating category:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Delete a category
+  async delete(id) {
+    try {
+      const response = await api.delete(`${API_CONFIG.ENDPOINTS.CATEGORIES}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Get category statistics
+  async getStats(categoryId) {
+    try {
+      const response = await api.get(`${API_CONFIG.ENDPOINTS.CATEGORIES}/${categoryId}/stats`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching category stats:', error);
+      throw handleApiError(error);
+    }
+  }
+};
+
+// Transaction API functions
+export const transactionAPI = {
+  // Get all transactions with optional filters
+  async list(sortBy = API_CONFIG.SORTING.TRANSACTIONS.DEFAULT, limit = API_CONFIG.PAGINATION.DEFAULT_LIMIT, filters = {}) {
+    try {
+      const params = {
+        sort: sortBy,
+        limit: Math.min(limit, API_CONFIG.PAGINATION.MAX_LIMIT),
+        ...filters
+      };
+      const url = buildApiUrl(API_CONFIG.ENDPOINTS.TRANSACTIONS, params);
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Get a single transaction by ID
+  async get(id) {
+    try {
+      const response = await api.get(`${API_CONFIG.ENDPOINTS.TRANSACTIONS}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching transaction:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Create a new transaction
+  async create(transactionData) {
+    try {
+      const response = await api.post(API_CONFIG.ENDPOINTS.TRANSACTIONS, transactionData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Update an existing transaction
+  async update(id, transactionData) {
+    try {
+      const response = await api.put(`${API_CONFIG.ENDPOINTS.TRANSACTIONS}/${id}`, transactionData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating transaction:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Delete a transaction
+  async delete(id) {
+    try {
+      const response = await api.delete(`${API_CONFIG.ENDPOINTS.TRANSACTIONS}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      throw handleApiError(error);
+    }
+  }
 }; 
