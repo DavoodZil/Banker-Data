@@ -16,8 +16,16 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
 
   useEffect(() => {
     setLoadingCategories(true);
-    Category.list().then((cats) => {
-      setCategories(cats || []);
+    Category.list().then((response) => {
+      // Combine both categories and yd_categories arrays and clean names
+      const allCategories = [
+        ...(response.categories || []),
+        ...(response.yd_categories || [])
+      ].map(category => ({
+        ...category,
+        name: category.name ? category.name.replace(/&nbsp;/g, ' ').trim() : category.name
+      }));
+      setCategories(allCategories);
       setLoadingCategories(false);
     }).catch(() => setLoadingCategories(false));
   }, []);

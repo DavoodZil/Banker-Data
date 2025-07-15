@@ -258,7 +258,7 @@ export default function Transactions() {
             {isSyncing ? 'Syncing...' : (syncMethod === 'ngrok' ? 'Sync via Ngrok' : 'Sync')}
           </Button>
           
-          <Button
+          {/* <Button
             variant="outline"
             onClick={handleWebhookTrigger}
             disabled={isSyncing || isLoading}
@@ -266,7 +266,7 @@ export default function Transactions() {
           >
             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
             Trigger Webhook
-          </Button>
+          </Button> */}
           
           <Button
             variant="outline"

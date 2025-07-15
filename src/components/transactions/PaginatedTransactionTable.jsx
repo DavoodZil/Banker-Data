@@ -54,7 +54,8 @@ export default function PaginatedTransactionTable({
         pivotMode: false,
         groupKeys: [],
         filterModel: {},
-        sortModel: []
+        sortModel: [],
+        filteredBankAccounts: ""
       };
       const token = getAuthToken();
       const headers = {

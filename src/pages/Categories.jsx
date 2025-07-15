@@ -32,18 +32,31 @@ export default function Categories() {
   const loadData = async () => {
     setIsLoading(true);
     // Both categories and transactions are automatically filtered by user ownership
-    const [categoriesData, transactionsData] = await Promise.all([
+    const [categoriesResponse, transactionsData] = await Promise.all([
       Category.list('-updated_date'),
       Transaction.list('-date', 500)
     ]);
-    setCategories(categoriesData);
+    // Combine both categories and yd_categories arrays and clean names
+    const allCategories = [
+      ...(categoriesResponse.categories || []),
+      ...(categoriesResponse.yd_categories || [])
+    ].map(category => ({
+      ...category,
+      name: category.name ? category.name.replace(/&nbsp;/g, ' ').trim() : category.name
+    }));
+    setCategories(allCategories);
     setTransactions(transactionsData);
     setIsLoading(false);
   };
 
   const handleAddCategory = async (categoryData) => {
     try {
-      await Category.create(categoryData);
+      // Clean the name before sending to API
+      const cleanedData = {
+        ...categoryData,
+        name: categoryData.name ? categoryData.name.replace(/&nbsp;/g, ' ').trim() : categoryData.name
+      };
+      await Category.create(cleanedData);
       loadData();
       setShowAddModal(false);
     } catch (error) {
@@ -54,11 +67,13 @@ export default function Categories() {
 
   const handleUpdateCategory = async (categoryId, updates) => {
     try {
-      await Category.update({
+      // Clean the name before sending to API
+      const cleanedUpdates = {
         id: categoryId,
-        name: updates.name,
+        name: updates.name ? updates.name.replace(/&nbsp;/g, ' ').trim() : updates.name,
         yd_category_id: updates.budget_amount ? parseFloat(updates.budget_amount) : undefined
-      });
+      };
+      await Category.update(cleanedUpdates);
       loadData();
       setEditingCategory(null);
     } catch (error) {

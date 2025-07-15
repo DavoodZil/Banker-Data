@@ -98,14 +98,17 @@ export const Category = {
     // Use axios instance to call the real API endpoint
     try {
       const response = await (await import('@/services/api')).default.get('/bank-data/categories');
-      // The API returns { success: true, data: { categories: [...] } }
-      if (response.data && response.data.success && response.data.data && Array.isArray(response.data.data.categories)) {
-        return response.data.data.categories;
+      // The API returns { success: true, data: { categories: [...], yd_categories: [...] } }
+      if (response.data && response.data.success && response.data.data) {
+        return {
+          categories: Array.isArray(response.data.data.categories) ? response.data.data.categories : [],
+          yd_categories: Array.isArray(response.data.data.yd_categories) ? response.data.data.yd_categories : []
+        };
       }
-      return [];
+      return { categories: [], yd_categories: [] };
     } catch (error) {
       console.error('Failed to fetch categories:', error);
-      return [];
+      return { categories: [], yd_categories: [] };
     }
   },
   

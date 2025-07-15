@@ -47,14 +47,19 @@ export default function Dashboard() {
     setIsLoading(true);
     try {
       // All data fetching is automatically filtered by user through the entity system
-      const [accountsData, transactionsData, categoriesData] = await Promise.all([
+      const [accountsData, transactionsData, categoriesResponse] = await Promise.all([
         Account.list('-updated_date'),
         Transaction.list('-date', 200),
         Category.list('-updated_date')
       ]);
       setAccounts(accountsData);
       setTransactions(transactionsData);
-      setCategories(categoriesData);
+      // Combine both categories and yd_categories arrays
+      const allCategories = [
+        ...(categoriesResponse.categories || []),
+        ...(categoriesResponse.yd_categories || [])
+      ];
+      setCategories(allCategories);
       setLastSync(new Date());
     } catch (error) {
       console.error('Error loading data:', error);
