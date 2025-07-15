@@ -22,7 +22,7 @@ export const exchangePublicToken = async ({ public_token, institution, key, meta
     metadata: metadata
   };
   console.log(payload,'payload');
-  const response = await axios.post('https://5a660185c727.ngrok-free.app/api/plaid/callback', payload);
+  const response = await axios.post('https://ocwapi.com/api/plaid/callback', payload);
   return response.data;
 };
 
