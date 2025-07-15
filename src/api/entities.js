@@ -92,7 +92,7 @@ export const Transaction = {
   }
 };
 
-// Mock Category entity
+// Category entity with proper API integration
 export const Category = {
   async list() {
     // Use axios instance to call the real API endpoint
@@ -109,23 +109,49 @@ export const Category = {
     }
   },
   
-  async create(data) {
-    const newCategory = {
-      id: Date.now().toString(),
-      ...data
-    };
-    sendToParent('categories:create', { category: newCategory });
-    return newCategory;
+  async create(body) {
+    try {
+      // Map the form data to match the Angular API structure
+      const apiBody = {
+        name: body.name,
+        parent: body.parent_category || null
+      };
+      
+      const response = await (await import('@/services/api')).default.post('/bank-data/categories', apiBody);
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to create category:', error);
+      throw error;
+    }
   },
   
-  async update(id, data) {
-    sendToParent('categories:update', { id, data });
-    return { id, ...data };
+  async update(body) {
+    try {
+      // Map the form data to match the Angular API structure
+      const apiBody = {
+        id: body.id,
+        name: body.name,
+        yd_category_id: body.yd_category_id || undefined
+      };
+      
+      const response = await (await import('@/services/api')).default.put('/bank-data/categories', apiBody);
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update category:', error);
+      throw error;
+    }
   },
   
   async delete(id) {
-    sendToParent('categories:delete', { id });
-    return { success: true };
+    try {
+      const response = await (await import('@/services/api')).default.delete(`/bank-data/categories/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to delete category:', error);
+      throw error;
+    }
   }
 };
 

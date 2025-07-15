@@ -134,7 +134,7 @@ export default function Layout({ children, currentPageName }) {
                 ))}
               </nav>
 
-              <div className="flex items-center gap-3">
+              {/* <div className="flex items-center gap-3">
                  <DropdownMenu>
                    <DropdownMenuTrigger asChild>
                      <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-500 hover:text-gray-900">
@@ -169,7 +169,7 @@ export default function Layout({ children, currentPageName }) {
                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-semibold text-gray-600">
                    U
                  </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </header>

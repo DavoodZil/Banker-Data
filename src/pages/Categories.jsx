@@ -42,15 +42,29 @@ export default function Categories() {
   };
 
   const handleAddCategory = async (categoryData) => {
-    await Category.create(categoryData);
-    loadData();
-    setShowAddModal(false);
+    try {
+      await Category.create(categoryData);
+      loadData();
+      setShowAddModal(false);
+    } catch (error) {
+      console.error('Failed to add category:', error);
+      // You might want to show an error toast here
+    }
   };
 
   const handleUpdateCategory = async (categoryId, updates) => {
-    await Category.update(categoryId, updates);
-    loadData();
-    setEditingCategory(null);
+    try {
+      await Category.update({
+        id: categoryId,
+        name: updates.name,
+        yd_category_id: updates.budget_amount ? parseFloat(updates.budget_amount) : undefined
+      });
+      loadData();
+      setEditingCategory(null);
+    } catch (error) {
+      console.error('Failed to update category:', error);
+      // You might want to show an error toast here
+    }
   };
 
   const getCategoryStats = (categoryName) => {

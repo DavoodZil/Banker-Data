@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Edit, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { getAuthToken } from "@/utils/auth";
 
 const categoryColors = {
   groceries: "bg-green-50 text-green-700 border-green-200",
@@ -20,11 +21,15 @@ const categoryColors = {
 };
 
 export default function PaginatedTransactionTable({
-  apiEndpoint = "ag-grid/42",
+  apiEndpoint = "42",
   accounts = [],
   pageSize = 50,
   onEditTransaction
 }) {
+  // Prepend the base URL if only endpoint number is provided
+  const baseUrl = "https://staging.api.ocw.sebipay.com/api/v4/ag-grid/";
+  const fullEndpoint = apiEndpoint.startsWith('http') ? apiEndpoint : `${baseUrl}${apiEndpoint}`;
+  
   const [transactions, setTransactions] = useState([]);
   const [rowCount, setRowCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,12 +56,30 @@ export default function PaginatedTransactionTable({
         filterModel: {},
         sortModel: []
       };
-      const response = await fetch(apiEndpoint, {
+      const token = getAuthToken();
+      const headers = {
+        "Content-Type": "application/json"
+      };
+      
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      
+      const response = await fetch(fullEndpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(payload)
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Authentication required. Please log in again.");
+        } else if (response.status === 403) {
+          throw new Error("Access denied. You don't have permission to view this data.");
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
+      
       const data = await response.json();
       setTransactions(data.rowData || []);
       setRowCount(data.rowCount || 0);
