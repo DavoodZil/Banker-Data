@@ -44,14 +44,14 @@ export default function Accounts() {
   // Bank Data Hook
   const { bankData, isLoading: bankDataLoading, error: bankDataError, refetch: refetchBankData } = useBankData();
 
-  useEffect(() => {
-    loadAccounts();
-  }, []);
-
-  // Log bank data response when it changes
+  // Set accounts when bank data is available
   useEffect(() => {
     if (bankData) {
-      console.log('Bank Data in Accounts component:', bankData);
+      const accounts = Object.values(bankData.data.accounts) || [];
+      setAccounts(accounts.map(account => ({
+        ...account,
+        type: 'checking'
+      })));
     }
     if (bankDataError) {
       console.error('Bank Data Error in Accounts component:', bankDataError);
@@ -61,9 +61,8 @@ export default function Accounts() {
   const loadAccounts = async () => {
     setIsLoading(true);
     try {
-      // Accounts are automatically filtered by user ownership
-      const data = await Account.list('-updated_date');
-      setAccounts(data);
+      // Refetch bank data to get latest accounts
+      await refetchBankData();
     } catch (error) {
       console.error('Error loading accounts:', error);
     }
@@ -79,13 +78,11 @@ export default function Accounts() {
         loadAccounts();
       } else {
         const errorMessage = response.data?.message || response.data?.error || "Unknown error during sync";
-        console.error("Sync failed:", errorMessage);
         alert(`Sync Failed: ${errorMessage}`);
       }
     } catch (error) {
       const errorData = error.response?.data;
       const errorMessage = errorData?.message || errorData?.error || error.message || "An unexpected error occurred.";
-      console.error('Failed to sync transactions:', error);
       alert(`Sync Failed: ${errorMessage}`);
     } finally {
       setIsSyncing(false);
@@ -141,12 +138,12 @@ export default function Accounts() {
   };
 
   const accountsByType = {
-    checking: accounts.filter(a => a.account_type === 'checking'),
-    savings: accounts.filter(a => a.account_type === 'savings'),
-    credit: accounts.filter(a => a.account_type === 'credit'),
-    investment: accounts.filter(a => a.account_type === 'investment'),
-    loan: accounts.filter(a => a.account_type === 'loan'),
-    cash: accounts.filter(a => a.account_type === 'cash')
+    checking: accounts.filter(a => a.type === 'checking'),
+    savings: accounts.filter(a => a.type === 'savings'),
+    credit: accounts.filter(a => a.type === 'credit'),
+    investment: accounts.filter(a => a.type === 'investment'),
+    loan: accounts.filter(a => a.type === 'loan'),
+    cash: accounts.filter(a => a.type === 'cash')
   };
 
   const typeConfig = {

@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Plaid Modal Z-Index Fix */
+.plaid-link {
+  z-index: 9999 !important;
+}
+
+.plaid-link iframe {
+  z-index: 9999 !important;
+}
+
+/* Ensure Plaid modal appears above all other elements */
+[data-plaid-link] {
+  z-index: 9999 !important;
+}
+
+/* Fix for any potential overlay issues */
+.plaid-link-overlay {
+  z-index: 9998 !important;
+}
+
 
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

@@ -38,9 +38,10 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
   const [error, setError] = useState(null);
   const [plaidHandler, setPlaidHandler] = useState(null);
   const [isPlaidScriptLoaded, setIsPlaidScriptLoaded] = useState(!!window.Plaid);
+  const [isPlaidOpen, setIsPlaidOpen] = useState(false);
 
   // Use the Plaid Link Token hook
-  const { linkToken, isLoading: linkTokenLoading, error: linkTokenError, refetch: refetchLinkToken } = usePlaidLinkToken(isOpen);
+  const { linkToken, isLoading: linkTokenLoading, error: linkTokenError, refetch: refetchLinkToken, linkKey } = usePlaidLinkToken(isOpen);
 
   // Effect to load Plaid's script
   useEffect(() => {
@@ -68,6 +69,7 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
     if (isOpen) {
       setStep('loading');
       setError(null);
+      setIsPlaidOpen(false);
     }
   }, [isOpen]);
 
@@ -81,9 +83,10 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
   }, [linkTokenError]);
 
   const onSuccess = useCallback(async (public_token, metadata) => {
+    setIsPlaidOpen(false);
     setStep('loading');
     try {
-      await exchangePublicToken({ public_token, institution: metadata.institution });
+      await exchangePublicToken({ public_token: public_token, institution: metadata.institution, key: linkKey, metadata: metadata });
       setStep('success');
       onAddSuccess();
     } catch(err) {
@@ -99,33 +102,62 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
       return;
     }
 
-    const handler = window.Plaid.create({
-      token: linkToken,
-      onSuccess,
-      onExit: (err, metadata) => {
-        if (err) {
-          console.error("Plaid exit error:", err, metadata);
-          setError('The connection process was closed unexpectedly.');
-          setStep('error');
+    // Check if Plaid is available
+    if (!window.Plaid) {
+      console.error('Plaid is not available on window object');
+      setError('Plaid connection service is not available. Please refresh the page and try again.');
+      setStep('error');
+      return;
+    }
+
+    console.log('Creating Plaid handler with token:', linkToken);
+    
+    try {
+      const handler = window.Plaid.create({
+        token: linkToken,
+        onSuccess,
+        onExit: (err, metadata) => {
+          console.log('Plaid exit:', err, metadata);
+          setIsPlaidOpen(false);
+          if (err) {
+            console.error("Plaid exit error:", err, metadata);
+            setError('The connection process was closed unexpectedly.');
+            setStep('error');
+          }
+        },
+      });
+
+      setPlaidHandler(handler);
+      setStep('ready');
+      console.log('Plaid handler created successfully');
+
+      return () => {
+        if (handler) {
+          console.log('Destroying Plaid handler');
+          handler.destroy();
         }
-      },
-    });
-
-    setPlaidHandler(handler);
-    setStep('ready');
-
-    return () => {
-      if (handler) {
-        handler.destroy();
-      }
-    };
+      };
+    } catch (error) {
+      console.error('Error creating Plaid handler:', error);
+      setError('Failed to initialize Plaid connection. Please try again.');
+      setStep('error');
+    }
   }, [isPlaidScriptLoaded, linkToken, isOpen, onSuccess, linkTokenLoading]);
   
   const isReady = step === 'ready' && !!plaidHandler;
   
   const handleOpenPlaid = () => {
     if (isReady) {
-      plaidHandler.open();
+      console.log('Opening Plaid modal...');
+      setIsPlaidOpen(true);
+      try {
+        plaidHandler.open();
+      } catch (error) {
+        console.error('Error opening Plaid modal:', error);
+        setIsPlaidOpen(false);
+        setError('Failed to open Plaid connection. Please try again.');
+        setStep('error');
+      }
     }
   };
 
@@ -136,8 +168,14 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
         setStep('loading');
         setError(null);
         setPlaidHandler(null);
+        setIsPlaidOpen(false);
     }, 300);
   };
+  
+  // Don't render the dialog when Plaid is open to prevent z-index conflicts
+  if (isPlaidOpen) {
+    return null;
+  }
   
   return (
     <Dialog open={isOpen} onOpenChange={!['loading', 'success'].includes(step) ? handleClose : ()=>{}}>

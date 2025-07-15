@@ -3,6 +3,7 @@ import api from '@/services/api';
 
 export const usePlaidLinkToken = (isOpen) => {
   const [linkToken, setLinkToken] = useState(null);
+  const [linkKey ,setLinkKey] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -11,12 +12,12 @@ export const usePlaidLinkToken = (isOpen) => {
     setError(null);
     
     try {
-      const response = await api.post('/bank-account-verify/plaid/get-link-token',{});
-      console.log('Plaid Link Token API Response:', response.data);
+      const response = await api.post('/bank-account-verify/plaid/get-link-token',{sourceType:1});
       
-      if (response.data.link_token) {
-        setLinkToken(response.data.link_token);
-        return response.data.link_token;
+      if (response.data.data.token) {
+        setLinkToken(response.data.data.token);
+        setLinkKey(response.data.data.key);
+        return response.data.data.token;
       } else {
         throw new Error(response.data.error || "Failed to retrieve link token");
       }
@@ -39,6 +40,7 @@ export const usePlaidLinkToken = (isOpen) => {
   return {
     linkToken,
     isLoading,
+    linkKey,
     error,
     fetchLinkToken,
     refetch: fetchLinkToken
