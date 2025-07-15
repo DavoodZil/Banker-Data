@@ -55,7 +55,9 @@ export default function RulesPage() {
       merchants: { enabled: true, matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
       amount: { enabled: true, transaction_type: 'expense', operator: 'greater_than', value1: 123, value2: null },
       categories: { enabled: true, values: [] },
-      accounts: { enabled: false, values: [] }
+      accounts: { enabled: false, values: [] },
+      description: { enabled: false, match_type: 'contains', value: '' }, // <-- Add description condition
+      date: { enabled: false, match_type: 'after', value1: '', value2: '' }, // <-- Add date condition
     },
     actions: {
       rename_merchant: { enabled: false, new_name: '' },
@@ -253,6 +255,34 @@ export default function RulesPage() {
       }
     }));
     setShowSplitModal(false);
+  };
+
+  // Add handler for Description condition
+  const handleDescriptionChange = (field, value) => {
+    setRule(prev => ({
+      ...prev,
+      conditions: {
+        ...prev.conditions,
+        description: {
+          ...prev.conditions.description,
+          [field]: value
+        }
+      }
+    }));
+  };
+
+  // Add handler for Date condition
+  const handleDateChange = (field, value) => {
+    setRule(prev => ({
+      ...prev,
+      conditions: {
+        ...prev.conditions,
+        date: {
+          ...prev.conditions.date,
+          [field]: value
+        }
+      }
+    }));
   };
 
   const categoriesWithSubcategories = {
@@ -564,6 +594,67 @@ export default function RulesPage() {
                 </SelectContent>
               </Select>
             </CriteriaBlock>
+
+            <CriteriaBlock title="Description" isEnabled={rule.conditions.description.enabled} onToggle={() => handleToggle('conditions', 'description')}>
+              <div className="flex gap-3 items-center">
+                <Select
+                  value={rule.conditions.description.match_type}
+                  onValueChange={value => handleDescriptionChange('match_type', value)}
+                >
+                  <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="contains">Contains</SelectItem>
+                    <SelectItem value="exact">Exact</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="Description..."
+                  value={rule.conditions.description.value}
+                  onChange={e => handleDescriptionChange('value', e.target.value)}
+                />
+              </div>
+            </CriteriaBlock>
+
+            <CriteriaBlock title="Date" isEnabled={rule.conditions.date.enabled} onToggle={() => handleToggle('conditions', 'date')}>
+              <div className="flex gap-3 items-center">
+                <Select
+                  value={rule.conditions.date.match_type}
+                  onValueChange={value => handleDateChange('match_type', value)}
+                >
+                  <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="after">After</SelectItem>
+                    <SelectItem value="before">Before</SelectItem>
+                    <SelectItem value="on">On</SelectItem>
+                    <SelectItem value="between">Between</SelectItem>
+                  </SelectContent>
+                </Select>
+                {rule.conditions.date.match_type === 'between' ? (
+                  <>
+                    <Input
+                      type="date"
+                      value={rule.conditions.date.value1}
+                      onChange={e => handleDateChange('value1', e.target.value)}
+                      className="w-[140px]"
+                    />
+                    <span className="mx-1">to</span>
+                    <Input
+                      type="date"
+                      value={rule.conditions.date.value2}
+                      onChange={e => handleDateChange('value2', e.target.value)}
+                      className="w-[140px]"
+                    />
+                  </>
+                ) : (
+                  <Input
+                    type="date"
+                    value={rule.conditions.date.value1}
+                    onChange={e => handleDateChange('value1', e.target.value)}
+                    className="w-[140px]"
+                  />
+                )}
+              </div>
+            </CriteriaBlock>
           </div>
         </div>
         
@@ -721,7 +812,16 @@ export default function RulesPage() {
                 <Separator />
               </>
             )}
-            
+          </div>
+            <div className="flex items-center my-6">
+              <div className="flex-grow border-t border-gray-300" />
+              <span className="mx-4 text-gray-500 font-semibold">OR</span>
+              <div className="flex-grow border-t border-gray-300" />
+            </div>
+
+          {/* OR separator and Split transaction option in a separate card */}
+          <div className="mt-8" />
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
             <ActionRow label="Split transaction" icon={GitCommitHorizontal} isEnabled={rule.actions.split_transaction.enabled} onToggle={() => handleToggle('actions', 'split_transaction')}>
               <div className="space-y-3">
                 <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
