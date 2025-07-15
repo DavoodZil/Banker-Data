@@ -21,6 +21,7 @@ export const exchangePublicToken = async ({ public_token, institution, key, meta
     institutionId: institution?.institution_id || null,
     metadata: metadata
   };
+  console.log(payload,'payload');
   const response = await axios.post('https://5a660185c727.ngrok-free.app/api/plaid/callback', payload);
   return response.data;
 };
