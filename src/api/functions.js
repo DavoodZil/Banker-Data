@@ -2,7 +2,7 @@
 // These will communicate with the parent Angular application via postMessage
 
 import { sendToParent } from './entities.js';
-
+import axios from 'axios';
 // Mock Plaid integration functions
 export const createLinkToken = async () => {
   sendToParent('plaid:createLinkToken', {});
@@ -12,12 +12,17 @@ export const createLinkToken = async () => {
   };
 };
 
-export const exchangePublicToken = async (publicToken) => {
-  sendToParent('plaid:exchangePublicToken', { publicToken });
-  return {
-    accessToken: 'mock-access-token-' + Date.now(),
-    itemId: 'mock-item-id-' + Date.now()
+export const exchangePublicToken = async ({ public_token, institution, key, metadata }) => {
+
+  const payload = {
+    public_token: public_token,
+    key: key,
+    institutionName: institution?.name || null,
+    institutionId: institution?.institution_id || null,
+    metadata: metadata
   };
+  const response = await axios.post('https://5a660185c727.ngrok-free.app/api/plaid/callback', payload);
+  return response.data;
 };
 
 export const plaidWebhook = async (webhookData) => {
