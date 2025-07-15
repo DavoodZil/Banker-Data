@@ -79,12 +79,11 @@ export default function Categories() {
     { name: 'investments', color: '#6366f1', icon: '📊' }
   ];
 
-  const allCategories = [...categories, ...defaultCategories.filter(dc => 
-    !categories.some(c => c.name === dc.name)
-  )];
+  // Remove merging with defaultCategories and only use API categories
+  const allCategories = categories;
 
   const filteredCategories = allCategories.filter(category =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    category.name && category.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalSpent = transactions

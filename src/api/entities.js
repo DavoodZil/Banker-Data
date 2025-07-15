@@ -95,8 +95,18 @@ export const Transaction = {
 // Mock Category entity
 export const Category = {
   async list() {
-    sendToParent('categories:list', {});
-    return mockCategories;
+    // Use axios instance to call the real API endpoint
+    try {
+      const response = await (await import('@/services/api')).default.get('/bank-data/categories');
+      // The API returns { success: true, data: { categories: [...] } }
+      if (response.data && response.data.success && response.data.data && Array.isArray(response.data.data.categories)) {
+        return response.data.data.categories;
+      }
+      return [];
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      return [];
+    }
   },
   
   async create(data) {
