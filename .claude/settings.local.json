@@ -7,7 +7,16 @@
       "Bash(npm run type-check:*)",
       "Bash(npm run build:*)",
       "Bash(timeout 10 npm run dev)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npx husky:*)",
+      "Bash(npm run prepare:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npx lint-staged:*)",
+      "Bash(where npx)",
+      "Bash(rm:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": []
   }
