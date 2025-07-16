@@ -1,12 +1,21 @@
 import axios from 'axios';
 import { getAuthToken, getBaseUrl } from '@/utils/auth';
+import { config, debugLog } from '@/config/environment';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // Uses .env variable
+  baseURL: config.api.baseUrl,
+  timeout: config.api.timeout,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Log API configuration in development
+debugLog('API Service initialized:', {
+  baseURL: config.api.baseUrl,
+  useMockData: config.api.useMockData,
+  timeout: config.api.timeout,
 });
 
 // Request interceptor to add authentication token
@@ -24,6 +33,14 @@ api.interceptors.request.use(
     if (token) {
       request.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Log request details in debug mode
+    debugLog('API Request:', {
+      method: request.method,
+      url: request.url,
+      baseURL: request.baseURL,
+      hasAuth: !!token,
+    });
 
     return request;
   },

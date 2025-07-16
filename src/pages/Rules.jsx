@@ -11,7 +11,7 @@ import {
   Store, DollarSign, List, CreditCard, Pencil, Tag, EyeOff, ClipboardCheck, Target, GitCommitHorizontal, PlusCircle, MinusCircle, Plus, ArrowRight,
   TrendingUp, Heart, Car, Home, Zap, UtensilsCrossed, MapPin, User, ShoppingBag, Shield, FileText, Briefcase, ArrowLeftRight, Search
 } from 'lucide-react';
-import { Tag as TagEntity } from "@/api/entities";
+import { useTags } from "@/hooks/api";
 
 import CreateCategoryModal from "../components/rules/CreateCategoryModal";
 import SuccessModal from "../components/rules/SuccessModal";
@@ -77,17 +77,11 @@ export default function RulesPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedActionCategory, setSelectedActionCategory] = useState('');
   const [customCategories, setCustomCategories] = useState([]);
-  const [allTags, setAllTags] = useState([]);
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
 
-  useEffect(() => {
-    const loadTags = async () => {
-        const tagsData = await TagEntity.list();
-        setAllTags(tagsData);
-    };
-    loadTags();
-  }, []);
+  // Use the new hook
+  const { tags: allTags } = useTags();
 
   const handleToggle = (type, key) => {
     setRule(prev => ({

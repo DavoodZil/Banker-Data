@@ -3,56 +3,35 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Briefcase, Plus, GitMerge, Loader2 } from 'lucide-react';
-import { FinancialEntity } from "@/api/entities";
-import { EntityRule } from "@/api/entities";
-import { Account } from "@/api/entities";
-import { Transaction } from "@/api/entities";
+import { useEntities } from "@/hooks/api";
+import { useAccounts } from "@/hooks/api";
+import { useTransactions } from "@/hooks/api";
 import CreateEntityModal from "../components/entities/CreateEntityModal";
 import ManageEntityRulesModal from "../components/entities/ManageEntityRulesModal";
 import EntityCard from "../components/entities/EntityCard";
 
 export default function EntityPage() {
-  const [entities, setEntities] = useState([]);
   const [rules, setRules] = useState([]);
-  const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [editingEntity, setEditingEntity] = useState(null);
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
-      const [entitiesData, rulesData, accountsData] = await Promise.all([
-        FinancialEntity.list(),
-        EntityRule.list(),
-        Account.list()
-      ]);
-      setEntities(entitiesData);
-      setRules(rulesData);
-      setAccounts(accountsData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // Use the new hooks
+  const { entities, isLoading, createEntity, updateEntity } = useEntities();
+  const { accounts } = useAccounts();
+  const { transactions, updateTransaction } = useTransactions();
 
   const handleSaveEntity = async (formData) => {
     try {
       if (editingEntity) {
-        await FinancialEntity.update(editingEntity.id, formData);
+        await updateEntity(editingEntity.id, formData);
       } else {
-        await FinancialEntity.create(formData);
+        await createEntity(formData);
       }
       setEditingEntity(null);
       setShowCreateModal(false);
-      fetchData();
     } catch (error) {
       console.error('Error saving entity:', error);
     }
@@ -66,10 +45,9 @@ export default function EntityPage() {
   const applyRulesToTransactions = async () => {
     setIsProcessing(true);
     try {
-      const allTransactions = await Transaction.list();
       const transactionsToUpdate = [];
 
-      allTransactions.forEach(tx => {
+      transactions.forEach(tx => {
           for (const rule of rules) {
               if (rule.source_account_ids.includes(tx.account_id) && tx.financial_entity_id !== rule.target_entity_id) {
                   transactionsToUpdate.push({ id: tx.id, updates: { financial_entity_id: rule.target_entity_id } });
@@ -79,7 +57,7 @@ export default function EntityPage() {
       });
 
       if (transactionsToUpdate.length > 0) {
-          await Promise.all(transactionsToUpdate.map(t => Transaction.update(t.id, t.updates)));
+          await Promise.all(transactionsToUpdate.map(t => updateTransaction(t.id, t.updates)));
       }
     } catch (error) {
       console.error('Error applying rules:', error);

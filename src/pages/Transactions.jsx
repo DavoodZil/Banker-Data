@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Transaction } from "@/api/entities";
-import { Account } from "@/api/entities";
+import { useTransactions } from "@/hooks/api";
+import { useAccounts } from "@/hooks/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, Download, Calendar, ArrowUpDown, RefreshCw, Upload } from "lucide-react";
 import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
-import { syncTransactions } from "@/api/functions";
-import { fetchFromNgrok } from "@/api/functions";
-import { triggerWebhookSync } from "@/api/functions";
+// TODO: Implement these functions in the new API structure
+// import { syncTransactions } from "@/api/functions";
+// import { fetchFromNgrok } from "@/api/functions";
+// import { triggerWebhookSync } from "@/api/functions";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
@@ -20,9 +21,6 @@ import TransactionList from "../components/transactions/TransactionList";
 import TransactionEditModal from "../components/transactions/TransactionEditModal";
 
 export default function Transactions() {
-  const [transactions, setTransactions] = useState([]);
-  const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,20 +35,21 @@ export default function Transactions() {
   });
   const [syncMethod, setSyncMethod] = useState('direct'); // 'direct' or 'ngrok'
 
+  // Use the new hooks
+  const { transactions, isLoading, error, refetch: refetchTransactions, updateTransaction } = useTransactions();
+  const { accounts, refetch: refetchAccounts } = useAccounts();
+
   useEffect(() => {
-    loadData();
+    // Data is automatically loaded by the hooks
+    setLastSync(new Date());
   }, []);
 
   const loadData = async () => {
-    setIsLoading(true);
-    const [transactionsData, accountsData] = await Promise.all([
-      Transaction.list('-date', 200),
-      Account.list('-updated_date')
+    await Promise.all([
+      refetchTransactions(),
+      refetchAccounts()
     ]);
-    setTransactions(transactionsData);
-    setAccounts(accountsData);
     setLastSync(new Date());
-    setIsLoading(false);
   };
 
   const handleSyncTransactions = async () => {
@@ -120,7 +119,7 @@ export default function Transactions() {
   };
 
   const handleUpdateTransaction = async (transactionId, updates) => {
-    await Transaction.update(transactionId, updates);
+    await updateTransaction(transactionId, updates);
     loadData();
     setSelectedTransaction(null);
   };

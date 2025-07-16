@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Account } from "@/api/entities";
+import { useAccounts } from "@/hooks/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Building, CreditCard, PiggyBank, TrendingUp, Eye, EyeOff, Trash2, AlertTriangle, RefreshCw, CheckCircle, Wallet } from "lucide-react";
@@ -24,13 +24,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import ConnectAccountFlow from "../components/accounts/ConnectAccountFlow";
 import CreateManualAccountModal from "../components/accounts/CreateManualAccountModal";
 import AccountCard from "../components/accounts/AccountCard";
-import { removeAllAccounts } from "@/api/functions";
-import { syncTransactions } from "@/api/functions";
-import { verifyPlaidIntegration } from "@/api/functions";
+// TODO: Implement these functions in the new API structure
+// import { removeAllAccounts } from "@/api/functions";
+// import { syncTransactions } from "@/api/functions";
+// import { verifyPlaidIntegration } from "@/api/functions";
 
 export default function Accounts() {
-  const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showConnectFlow, setShowConnectFlow] = useState(false);
   const [showManualAccountModal, setShowManualAccountModal] = useState(false);
   const [showAddAccountModal, setShowAddAccountModal] = useState(false);
@@ -41,32 +40,24 @@ export default function Accounts() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Bank Data Hook
+  // Use the new hooks
+  const { accounts, isLoading, error, refetch } = useAccounts();
   const { bankData, isLoading: bankDataLoading, error: bankDataError, refetch: refetchBankData } = useBankData();
 
   // Set accounts when bank data is available
   useEffect(() => {
-    if (bankData) {
-      const accounts = Object.values(bankData.data.accounts) || [];
-      setAccounts(accounts.map(account => ({
-        ...account,
-        type: 'checking'
-      })));
-    }
     if (bankDataError) {
       console.error('Bank Data Error in Accounts component:', bankDataError);
     }
-  }, [bankData, bankDataError]);
+  }, [bankDataError]);
 
   const loadAccounts = async () => {
-    setIsLoading(true);
     try {
-      // Refetch bank data to get latest accounts
-      await refetchBankData();
+      // Refetch accounts using the hook
+      await refetch();
     } catch (error) {
       console.error('Error loading accounts:', error);
     }
-    setIsLoading(false);
   };
 
   const handleSyncTransactions = async () => {

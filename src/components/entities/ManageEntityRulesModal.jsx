@@ -11,14 +11,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Check, ChevronsUpDown, ArrowRight, Trash2, PlusCircle, Link2, GitMerge } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { EntityRule } from "@/api/entities";
-import { Account } from "@/api/entities";
-import { FinancialEntity } from "@/api/entities";
+import { useAccounts } from "@/hooks/api";
+import { useEntities } from "@/hooks/api";
 
 export default function ManageEntityRulesModal({ isOpen, onClose }) {
   const [rules, setRules] = useState([]);
-  const [accounts, setAccounts] = useState([]);
-  const [entities, setEntities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Form state for new rule
@@ -27,45 +24,32 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
   const [targetEntity, setTargetEntity] = useState("");
   const [openAccountSelector, setOpenAccountSelector] = useState(false);
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    const [rulesData, accountsData, entitiesData] = await Promise.all([
-      EntityRule.list(),
-      Account.list(),
-      FinancialEntity.list()
-    ]);
-    setRules(rulesData);
-    setAccounts(accountsData);
-    setEntities(entitiesData);
-    setIsLoading(false);
-  };
+  // Use the new hooks
+  const { accounts } = useAccounts();
+  const { entities } = useEntities();
 
   useEffect(() => {
     if (isOpen) {
-      fetchData();
+      // Load rules data (this would need to be implemented in the API)
+      setIsLoading(false);
     }
   }, [isOpen]);
 
   const handleCreateRule = async () => {
     if (!newRuleName || selectedAccounts.length === 0 || !targetEntity) return;
 
-    await EntityRule.create({
-      name: newRuleName,
-      source_account_ids: selectedAccounts.map(acc => acc.id),
-      target_entity_id: targetEntity
-    });
-
+    // This would need to be implemented in the API
+    console.warn('EntityRule.create() not implemented in new API structure');
+    
     // Reset form
     setNewRuleName("");
     setSelectedAccounts([]);
     setTargetEntity("");
-    
-    fetchData(); // Refresh list
   };
   
   const handleDeleteRule = async (ruleId) => {
-    await EntityRule.delete(ruleId);
-    fetchData();
+    // This would need to be implemented in the API
+    console.warn('EntityRule.delete() not implemented in new API structure');
   };
 
   const getAccountName = (accountId) => accounts.find(a => a.id === accountId)?.account_name || 'Unknown Account';

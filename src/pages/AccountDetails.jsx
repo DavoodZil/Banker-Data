@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Account } from '@/api/entities';
-import { Transaction } from '@/api/entities';
+import { useAccounts } from '@/hooks/api';
+import { useTransactions } from '@/hooks/api';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,9 +22,6 @@ const accountTypeIcons = {
 };
 
 export default function AccountDetailsPage() {
-  const [account, setAccount] = useState(null);
-  const [transactions, setTransactions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const location = useLocation();
 
@@ -33,38 +30,20 @@ export default function AccountDetailsPage() {
     return params.get('id');
   }, [location.search]);
 
-  const loadData = async () => {
-    if (!accountId) {
-      setIsLoading(false);
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const [accountData, transactionsData] = await Promise.all([
-        Account.filter({ id: accountId }),
-        Transaction.filter({ account_id: accountId }, '-date', 50)
-      ]);
-      if (accountData.length > 0) {
-        setAccount(accountData[0]);
-      }
-      setTransactions(transactionsData);
-    } catch (error) {
-      console.error('Failed to load account details:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Use the new hooks
+  const { accounts, updateAccount } = useAccounts();
+  const { transactions, refetch: refetchTransactions } = useTransactions();
 
-  useEffect(() => {
-    loadData();
-  }, [accountId]);
+  // Find the specific account and filter transactions
+  const account = accounts.find(acc => acc.id === accountId);
+  const accountTransactions = transactions.filter(tx => tx.account_id === accountId);
+  const isLoading = !account && accountId; // Show loading if we have an ID but no account found
 
   const handleUpdateAccount = async (updatedData) => {
     if (!account) return;
     try {
-      await Account.update(account.id, updatedData);
+      await updateAccount(account.id, updatedData);
       setShowEditModal(false);
-      loadData(); // Reload data to show updated name
     } catch (error) {
       console.error('Failed to update account:', error);
     }
@@ -156,9 +135,9 @@ export default function AccountDetailsPage() {
         </Card>
       </div>
 
-      <AccountDetailsChart currentBalance={account.balance} transactions={transactions} />
+      <AccountDetailsChart currentBalance={account.balance} transactions={accountTransactions} />
 
-      <RecentTransactionsList transactions={transactions} />
+      <RecentTransactionsList transactions={accountTransactions} />
 
       <EditAccountModal
         isOpen={showEditModal}
