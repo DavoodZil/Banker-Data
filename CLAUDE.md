@@ -6,10 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development
 ```bash
-npm run dev      # Start development server on port 5173
-npm run build    # Build for production
-npm run preview  # Preview production build
-npm run lint     # Run ESLint
+npm run dev        # Start development server on port 5173
+npm run build      # Build for production
+npm run preview    # Preview production build
+npm run lint       # Run ESLint
+npm run type-check # Run TypeScript type checking
 ```
 
 ### Testing
@@ -18,7 +19,7 @@ No test commands are currently configured. Consider implementing tests with a fr
 ## Architecture Overview
 
 ### Tech Stack
-- **React 18.2** with **Vite** build tool
+- **React 18.2** with **TypeScript** and **Vite** build tool
 - **Shadcn/ui** component library (built on Radix UI)
 - **Tailwind CSS** for styling
 - **React Router DOM v7** for routing
@@ -29,8 +30,8 @@ No test commands are currently configured. Consider implementing tests with a fr
 ### Project Structure
 ```
 /src
-├── api/          # API layer with client.js for API calls
-├── components/   # Feature-based component organization
+├── api/          # API layer with client.ts for API calls
+├── components/   # Feature-based component organization (.tsx files)
 │   ├── accounts/
 │   ├── auth/
 │   ├── categories/
@@ -39,10 +40,11 @@ No test commands are currently configured. Consider implementing tests with a fr
 │   ├── rules/
 │   ├── transactions/
 │   └── ui/       # Shadcn/ui components
-├── hooks/        # Custom hooks (useAuth, useBankData, usePlaidLinkToken)
-├── pages/        # Route components
-├── services/     # API configuration (axios instance)
-└── utils/        # Utilities (auth.js, iframeCommunication.js)
+├── hooks/        # Custom hooks (useAuth, useBankData, usePlaidLinkToken) (.ts files)
+├── pages/        # Route components (.tsx files)
+├── services/     # API configuration (axios instance) (.ts files)
+├── types/        # TypeScript type definitions
+└── utils/        # Utilities (auth.ts, iframeCommunication.ts)
 ```
 
 ### Key Architectural Patterns
