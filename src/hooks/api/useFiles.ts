@@ -5,7 +5,8 @@ import { useApiCall } from './useApiCall';
 export const useFileUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFile, setUploadedFile] = useState(null);
-  const { execute, isLoading, error } = useApiCall();
+  const { execute, loading, error } = useApiCall();
+  const isLoading = loading;
 
   const uploadFile = useCallback(async (file) => {
     setUploadProgress(0);
@@ -74,7 +75,8 @@ export const useFileUpload = () => {
 };
 
 export const useFileImport = () => {
-  const { execute, isLoading, error } = useApiCall();
+  const { execute, loading, error } = useApiCall();
+  const isLoading = loading;
 
   const extractData = useCallback(async (fileId) => {
     try {

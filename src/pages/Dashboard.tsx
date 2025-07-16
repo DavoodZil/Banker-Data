@@ -19,6 +19,7 @@ import { format, startOfMonth, endOfMonth } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useBankData } from "@/hooks/useBankData";
+import { AccountResponse } from "@/types/api.types";
 import AccountOverview from "../components/dashboard/AccountOverview";
 
 export default function Dashboard() {
@@ -27,14 +28,14 @@ export default function Dashboard() {
   const [lastSync, setLastSync] = React.useState(new Date());
 
   // Extract data safely with the correct structure
-  const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts) : [];
+  const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts as Record<string, AccountResponse>) : [];
   const categories = bankData?.data?.categories || {};
   const providerAccounts = bankData?.data?.providerAccounts || [];
 
   // Metrics calculations updated for new structure
   const calculateNetWorth = () => {
     return accounts.reduce((sum, account) => {
-      const balance = parseFloat(account.current_balance) || 0;
+      const balance = parseFloat((account as any).current_balance?.toString() || '0') || 0;
       // Assuming credit/loan accounts have negative balances
       return sum + balance;
     }, 0);
@@ -48,7 +49,7 @@ export default function Dashboard() {
     
     // Mock calculation based on account balances (this is just for demo)
     const totalBalance = accounts.reduce((sum, account) => {
-      return sum + (parseFloat(account.current_balance) || 0);
+      return sum + (parseFloat((account as any).current_balance?.toString() || '0') || 0);
     }, 0);
     
     // Mock monthly spending as 20% of total balance
@@ -58,7 +59,7 @@ export default function Dashboard() {
   const calculateMonthlyIncome = () => {
     // Mock calculation since transactions are not available
     const totalBalance = accounts.reduce((sum, account) => {
-      return sum + (parseFloat(account.current_balance) || 0);
+      return sum + (parseFloat((account as any).current_balance?.toString() || '0') || 0);
     }, 0);
     
     // Mock monthly income as 30% of total balance
@@ -69,7 +70,7 @@ export default function Dashboard() {
     // Since categories don't have budget amounts in this structure,
     // we'll use a mock calculation
     const totalBalance = accounts.reduce((sum, account) => {
-      return sum + (parseFloat(account.current_balance) || 0);
+      return sum + (parseFloat((account as any).current_balance?.toString() || '0') || 0);
     }, 0);
     
     // Mock budget as 50% of total balance
@@ -103,17 +104,17 @@ export default function Dashboard() {
   const netWorthTrend = getNetWorthTrend();
 
   // Transform accounts to match expected format for AccountOverview
-  const transformedAccounts = accounts.map(account => ({
+  const transformedAccounts = accounts.map((account: any) => ({
     id: account.id,
     account_name: account.nick_name || account.name,
     account_type: 'checking', 
-    balance: parseFloat(account.current_balance) || 0,
+    balance: parseFloat(account.current_balance?.toString() || '0') || 0,
     currency: 'USD', 
     institution_name: account.company_id, 
-    account_number_last_four: account.id.slice(-4),
-    available_balance: parseFloat(account.available_balance_amount) || 0,
+    account_number_last_four: account.id?.toString().slice(-4) || '0000',
+    available_balance: parseFloat(account.available_balance_amount?.toString() || '0') || 0,
     lastSync: account.last_updated,
-    is_active: account.status === 1 
+    is_active: account.status === '1' || account.status === 1 
   }));
 
   return (

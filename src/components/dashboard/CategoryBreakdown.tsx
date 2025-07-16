@@ -2,8 +2,14 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TransactionResponse } from "@/types/api.types";
 
-const categoryColors = {
+interface CategoryBreakdownProps {
+  transactions: TransactionResponse[];
+  isLoading: boolean;
+}
+
+const categoryColors: Record<string, string> = {
   groceries: "#10b981",
   dining: "#f59e0b",
   transportation: "#3b82f6",
@@ -15,7 +21,7 @@ const categoryColors = {
   uncategorized: "#6b7280"
 };
 
-export default function CategoryBreakdown({ transactions, isLoading }) {
+export default function CategoryBreakdown({ transactions, isLoading }: CategoryBreakdownProps) {
   if (isLoading) {
     return (
       <Card className="card-shadow border-0">
@@ -38,21 +44,21 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
   }
 
   const getCategoryBreakdown = () => {
-    const categories = {};
+    const categories: Record<string, number> = {};
     transactions.forEach(transaction => {
       if (transaction.amount < 0) {
-        const category = transaction.category || 'uncategorized';
+        const category = transaction.category?.name || 'uncategorized';
         categories[category] = (categories[category] || 0) + Math.abs(transaction.amount);
       }
     });
     
     return Object.entries(categories)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([,a], [,b]) => (b as number) - (a as number))
       .slice(0, 8);
   };
 
   const categoryData = getCategoryBreakdown();
-  const totalSpending = categoryData.reduce((sum, [, amount]) => sum + amount, 0);
+  const totalSpending = categoryData.reduce((sum, [, amount]) => sum + (amount as number), 0);
 
   return (
     <Card className="card-shadow border-0">
@@ -61,7 +67,8 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
       </CardHeader>
       <CardContent className="space-y-4">
         {categoryData.map(([category, amount]) => {
-          const percentage = totalSpending > 0 ? (amount / totalSpending) * 100 : 0;
+          const amountNum = amount as number;
+          const percentage = totalSpending > 0 ? (amountNum / totalSpending) * 100 : 0;
           
           return (
             <div key={category} className="space-y-2">
@@ -76,7 +83,7 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
                   </span>
                 </div>
                 <span className="text-sm font-semibold">
-                  ${amount.toLocaleString()}
+                  ${amountNum.toLocaleString()}
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">

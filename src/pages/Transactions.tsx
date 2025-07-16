@@ -36,8 +36,29 @@ export default function Transactions() {
   const [syncMethod, setSyncMethod] = useState('direct'); // 'direct' or 'ngrok'
 
   // Use the new hooks
-  const { transactions, isLoading, error, refetch: refetchTransactions, updateTransaction } = useTransactions();
-  const { accounts, refetch: refetchAccounts } = useAccounts();
+  const { transactions, loading, error, fetchTransactions, updateTransaction } = useTransactions();
+  const { accounts, fetchAccounts } = useAccounts();
+  
+  // Mock the missing properties for compatibility
+  const isLoading = loading;
+  const refetch = fetchTransactions;
+  const refetchAccounts = fetchAccounts;
+  
+  // Mock functions for missing API calls
+  const fetchFromNgrok = async () => {
+    console.log('Ngrok sync not implemented yet');
+    return { data: { success: false, message: 'Ngrok sync not implemented' } };
+  };
+  
+  const syncTransactions = async () => {
+    console.log('Direct sync not implemented yet');
+    return { data: { success: false, message: 'Direct sync not implemented' } };
+  };
+  
+  const triggerWebhookSync = async () => {
+    console.log('Webhook sync not implemented yet');
+    return { data: { success: false, message: 'Webhook sync not implemented' } };
+  };
 
   useEffect(() => {
     // Data is automatically loaded by the hooks
@@ -46,8 +67,8 @@ export default function Transactions() {
 
   const loadData = async () => {
     await Promise.all([
-      refetchTransactions(),
-      refetchAccounts()
+      fetchTransactions(),
+      fetchAccounts()
     ]);
     setLastSync(new Date());
   };
@@ -107,10 +128,10 @@ export default function Transactions() {
           await loadData();
         }, 2000);
       } else {
-        console.error("Webhook trigger failed:", response.data?.error || "Unknown error");
-        alert(`Webhook trigger failed: ${response.data?.message || "Unknown error"}`);
+        console.error("Webhook trigger failed:", (response.data as any)?.error || "Unknown error");
+        alert(`Webhook trigger failed: ${(response.data as any)?.message || "Unknown error"}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to trigger webhook sync:', error);
       alert(`Failed to trigger webhook sync: ${error.message}`);
     } finally {

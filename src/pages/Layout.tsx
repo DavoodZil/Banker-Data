@@ -1,6 +1,6 @@
 
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
@@ -78,7 +78,12 @@ const menuItems = [
   },
 ];
 
-export default function Layout({ children, currentPageName }) {
+interface LayoutProps {
+  children: ReactNode;
+  currentPageName?: string;
+}
+
+export default function Layout({ children, currentPageName }: LayoutProps) {
   const location = useLocation();
 
   return (

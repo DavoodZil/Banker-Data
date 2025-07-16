@@ -3,8 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
+import { TransactionResponse } from '@/types/api.types';
 
-const calculateBalanceHistory = (currentBalance, transactions, days) => {
+interface AccountDetailsChartProps {
+  currentBalance: number;
+  transactions: TransactionResponse[];
+}
+
+const calculateBalanceHistory = (currentBalance: number, transactions: TransactionResponse[], days: number) => {
   const endDate = startOfDay(new Date());
   const startDate = startOfDay(subDays(endDate, days));
   const dateInterval = eachDayOfInterval({ start: startDate, end: endDate });
@@ -16,7 +22,7 @@ const calculateBalanceHistory = (currentBalance, transactions, days) => {
   balanceData.set(format(endDate, 'yyyy-MM-dd'), { date: format(endDate, 'MMM dd'), balance: currentBalance });
 
   let runningBalance = currentBalance;
-  const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   for (const tx of sortedTransactions) {
     const txDate = startOfDay(new Date(tx.date));
@@ -32,7 +38,7 @@ const calculateBalanceHistory = (currentBalance, transactions, days) => {
   }
   
   let lastKnownBalance = runningBalance;
-  const finalChartData = Array.from(balanceData.values()).sort((a,b) => new Date(a.date) - new Date(b.date));
+  const finalChartData = Array.from(balanceData.values()).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   for(let i = finalChartData.length - 1; i >= 0; i--) {
       if(finalChartData[i].balance !== null) {
@@ -45,7 +51,7 @@ const calculateBalanceHistory = (currentBalance, transactions, days) => {
   return finalChartData;
 };
 
-export default function AccountDetailsChart({ currentBalance, transactions }) {
+export default function AccountDetailsChart({ currentBalance, transactions }: AccountDetailsChartProps) {
   const [timeRange, setTimeRange] = useState(30); // Default to 30 days
 
   const chartData = useMemo(() => {

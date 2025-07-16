@@ -79,15 +79,15 @@ export const useTags = () => {
 };
 
 export const useTagSuggestions = () => {
-  const { execute, isLoading, error } = useApiCall();
+  const { execute, loading, error } = useApiCall();
 
-  const getSuggestions = useCallback(async (transactionData) => {
+  const getSuggestions = useCallback(async (transactionData: any) => {
     return execute(() => tagApi.getSuggestions(transactionData));
   }, [execute]);
 
   return {
     getSuggestions,
-    isLoading,
+    isLoading: loading,
     error,
   };
 }; 

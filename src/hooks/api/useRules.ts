@@ -119,7 +119,8 @@ export const useRule = (id) => {
 };
 
 export const useRuleTest = () => {
-  const { execute, isLoading, error } = useApiCall();
+  const { execute, loading, error } = useApiCall();
+  const isLoading = loading;
 
   const testRule = useCallback(async (rule, transactions) => {
     return execute(() => ruleApi.test(rule, transactions));

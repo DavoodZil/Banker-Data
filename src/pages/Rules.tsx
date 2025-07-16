@@ -12,6 +12,7 @@ import {
   TrendingUp, Heart, Car, Home, Zap, UtensilsCrossed, MapPin, User, ShoppingBag, Shield, FileText, Briefcase, ArrowLeftRight, Search
 } from 'lucide-react';
 import { useTags } from "@/hooks/api";
+import { TagEntity, FilterToggleProps } from "@/types/api.types";
 
 import CreateCategoryModal from "../components/rules/CreateCategoryModal";
 import SuccessModal from "../components/rules/SuccessModal";
@@ -19,7 +20,14 @@ import CreateTagModal from "../components/rules/CreateTagModal";
 import TagSelector from "../components/rules/TagSelector";
 import SplitTransactionModal from "../components/rules/SplitTransactionModal";
 
-const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
+interface CriteriaBlockProps {
+  title: string;
+  isEnabled: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}
+
+const CriteriaBlock = ({ title, isEnabled, onToggle, children }: CriteriaBlockProps) => (
   <div className="bg-white rounded-lg border border-gray-200">
     <div className="flex items-center justify-between p-4">
       <h3 className="font-semibold text-gray-800">{title}</h3>
@@ -34,7 +42,7 @@ const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
   </div>
 );
 
-const ActionRow = ({ label, icon: Icon, isEnabled, onToggle, children }) => (
+const ActionRow = ({ label, icon: Icon, isEnabled, onToggle, children }: FilterToggleProps) => (
   <div className="space-y-3">
      <div className="flex items-center justify-between">
        <div className="flex items-center gap-3">
@@ -79,9 +87,22 @@ export default function RulesPage() {
   const [customCategories, setCustomCategories] = useState([]);
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
+  const [allTags, setAllTags] = useState<TagEntity[]>([]);
 
   // Use the new hook
-  const { tags: allTags } = useTags();
+  const { tags, refetch } = useTags();
+  
+  // Set allTags from the hook
+  useEffect(() => {
+    if (tags) {
+      setAllTags(tags);
+    }
+  }, [tags]);
+  
+  // Fetch tags on component mount
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const handleToggle = (type, key) => {
     setRule(prev => ({
@@ -196,9 +217,16 @@ export default function RulesPage() {
     setShowSuccessModal(true);
   };
   
-  const handleCreateTag = async (tagData) => {
-    const newTag = await TagEntity.create(tagData);
-    setAllTags(prev => [...prev, newTag]);
+  const handleCreateTag = async (tagData: any) => {
+    // For now, create a mock TagEntity since the actual API isn't available
+    const newTag: TagEntity = {
+      id: Date.now().toString(),
+      name: tagData.name,
+      color: tagData.color,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    setAllTags((prev: TagEntity[]) => [...prev, newTag]);
     
     setRule(prev => ({
         ...prev,

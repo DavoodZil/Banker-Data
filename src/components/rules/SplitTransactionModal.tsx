@@ -215,14 +215,15 @@ export default function SplitTransactionModal({
 
   const filteredCategories = useMemo(() => {
     if (!allCategories) return {};
-    return Object.entries(allCategories).reduce((acc, [category, { icon, emoji, subcategories }]) => {
+    return Object.entries(allCategories).reduce((acc, [category, categoryData]) => {
+      const { icon, emoji, subcategories } = categoryData as any;
       if (!categorySearch) {
         acc[category] = { icon, emoji, subcategories };
         return acc;
       }
       const lowerCaseSearch = categorySearch.toLowerCase();
       const categoryMatches = category.toLowerCase().includes(lowerCaseSearch);
-      const matchingSubcategories = subcategories.filter(sub => 
+      const matchingSubcategories = (subcategories || []).filter((sub: string) => 
         sub.toLowerCase().includes(lowerCaseSearch)
       );
       if (categoryMatches || matchingSubcategories.length > 0) {

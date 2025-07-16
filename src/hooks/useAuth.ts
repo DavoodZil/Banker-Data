@@ -38,7 +38,7 @@ export const useAuth = () => {
   }, []);
 
   const getBaseUrl = useCallback(() => {
-    return sessionStorage.getItem("base_url") || import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+    return sessionStorage.getItem("base_url") || (import.meta as any).env?.VITE_API_URL || "http://localhost:3000/api";
   }, []);
 
   useEffect(() => {

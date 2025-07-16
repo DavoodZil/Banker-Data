@@ -79,7 +79,8 @@ export const useMerchants = () => {
 };
 
 export const useMerchantSearch = () => {
-  const { execute, isLoading, error } = useApiCall();
+  const { execute, loading, error } = useApiCall();
+  const isLoading = loading;
 
   const searchMerchants = useCallback(async (query) => {
     return execute(() => merchantApi.search(query));

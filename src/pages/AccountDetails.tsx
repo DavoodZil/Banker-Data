@@ -32,7 +32,10 @@ export default function AccountDetailsPage() {
 
   // Use the new hooks
   const { accounts, updateAccount } = useAccounts();
-  const { transactions, refetch: refetchTransactions } = useTransactions();
+  const { transactions, fetchTransactions } = useTransactions();
+  
+  // Mock compatibility
+  const refetch = fetchTransactions;
 
   // Find the specific account and filter transactions
   const account = accounts.find(acc => acc.id === accountId);

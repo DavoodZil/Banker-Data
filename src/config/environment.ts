@@ -5,7 +5,7 @@
  * All environment variables must be prefixed with VITE_ to be accessible.
  */
 
-const env = import.meta.env;
+const env = (import.meta as any).env;
 
 export const config = {
   // API Configuration
@@ -43,7 +43,7 @@ export const isUsingMockData = () => config.api.useMockData;
 export const getApiBaseUrl = () => config.api.baseUrl;
 
 // Helper function for debug logging
-export const debugLog = (...args) => {
+export const debugLog = (...args: any[]) => {
   if (config.features.enableDebugMode) {
     console.log('[DEBUG]', ...args);
   }
@@ -59,7 +59,7 @@ export const EnvironmentType = {
 // Validate required environment variables
 const validateEnvironment = () => {
   const required = ['VITE_API_BASE_URL'];
-  const missing = required.filter(key => !env[key]);
+  const missing = required.filter((key: string) => !env[key]);
   
   if (missing.length > 0 && config.app.isProduction) {
     console.error(`Missing required environment variables: ${missing.join(', ')}`);

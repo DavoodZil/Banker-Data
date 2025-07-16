@@ -14,7 +14,7 @@ export function useApiCall() {
   const [error, setError] = useState(null);
   const { toast } = useToast();
 
-  const execute = useCallback(async (apiFunction, options = {}) => {
+  const execute = useCallback(async (apiFunction: any, options: any = {}) => {
     setLoading(true);
     setError(null);
     
@@ -94,7 +94,7 @@ export function useMutation() {
       }
       
       // Call onSuccess callback if provided
-      if (options.onSuccess) {
+      if (options && options.onSuccess) {
         options.onSuccess(responseData);
       }
       
@@ -111,7 +111,7 @@ export function useMutation() {
       });
       
       // Call onError callback if provided
-      if (options.onError) {
+      if (options && options.onError) {
         options.onError(err);
       }
       

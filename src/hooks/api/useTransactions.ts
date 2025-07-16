@@ -23,15 +23,15 @@ export function useTransactions(initialFilters = {}) {
   const { toast } = useToast();
 
   // Fetch transactions with filters and pagination
-  const fetchTransactions = useCallback(async (options = {}) => {
+  const fetchTransactions = useCallback(async (options: any = {}) => {
     setLoading(true);
     setError(null);
     
     const params = {
-      page: options.page || pagination.page,
-      limit: options.limit || pagination.limit,
-      ...filters,
-      ...options.filters,
+      page: options.page || (pagination as any).page || 1,
+      limit: options.limit || (pagination as any).limit || 10,
+      ...(filters as any),
+      ...(options.filters || {}),
     };
 
     try {

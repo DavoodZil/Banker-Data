@@ -23,8 +23,14 @@ export default function Categories() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Use the new hooks
-  const { categories, isLoading, error, refetch: refetchCategories, createCategory, updateCategory } = useCategories();
-  const { transactions, refetch: refetchTransactions } = useTransactions();
+  const { categories, loading, error, fetchCategories, createCategory, updateCategory } = useCategories();
+  const { transactions, fetchTransactions } = useTransactions();
+  
+  // Mock compatibility
+  const isLoading = loading;
+  const refetch = fetchCategories;
+  const refetchCategories = fetchCategories;
+  const refetchTransactions = fetchTransactions;
 
   useEffect(() => {
     // Data is automatically loaded by the hooks
@@ -32,8 +38,8 @@ export default function Categories() {
 
   const loadData = async () => {
     await Promise.all([
-      refetchCategories(),
-      refetchTransactions()
+      fetchCategories(),
+      fetchTransactions()
     ]);
   };
 

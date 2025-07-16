@@ -13,7 +13,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
   });
 
   // Use the new hook
-  const { categories, isLoading: loadingCategories } = useCategories();
+  const { categories, loading: loadingCategories } = useCategories();
 
   useEffect(() => {
     if (category) {
