@@ -12,7 +12,7 @@ export const getAuthToken = () => {
  * Set the authentication token
  * @param {string} token - The token to store
  */
-export const setAuthToken = (token) => {
+export const setAuthToken = (token: string) => {
   sessionStorage.setItem("app_token", token);
 };
 
@@ -35,7 +35,7 @@ export const getBaseUrl = () => {
  * Set the base URL
  * @param {string} baseUrl - The base URL to store
  */
-export const setBaseUrl = (baseUrl) => {
+export const setBaseUrl = (baseUrl: string) => {
   sessionStorage.setItem("base_url", baseUrl);
 };
 
@@ -59,7 +59,7 @@ export const clearAuth = () => {
  * Handle URL parameters for authentication
  * @param {string} search - URL search string
  */
-export const handleAuthParams = (search) => {
+export const handleAuthParams = (search: string) => {
   const searchParams = new URLSearchParams(search);
   // const token = searchParams.get("token");
   // const baseUrl = searchParams.get("baseUrl");

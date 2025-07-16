@@ -5,7 +5,7 @@
  * @param {string} action - The action type
  * @param {object} data - The data to send
  */
-export const sendIframeMessage = (action, data = {}) => {
+export const sendIframeMessage = (action: string, data: any = {}) => {
   if (window.parent && window.parent !== window) {
     const message = {
       source: 'banker-data-iframe',
@@ -24,7 +24,7 @@ export const sendIframeMessage = (action, data = {}) => {
  * @param {string} action - The action type
  * @param {object} data - The data to send
  */
-export const sendToParent = (action, data = {}) => {
+export const sendToParent = (action: string, data: any = {}) => {
   if (window.parent && window.parent !== window) {
     const message = {
       source: 'banker-data-iframe',
@@ -43,8 +43,8 @@ export const sendToParent = (action, data = {}) => {
  * @param {function} callback - Callback function to handle messages
  * @returns {function} - Cleanup function to remove the listener
  */
-export const listenToParent = (callback) => {
-  const messageHandler = (event) => {
+export const listenToParent = (callback: (data: any) => void) => {
+  const messageHandler = (event: MessageEvent) => {
     if (event.data.source === 'angular-parent') {
       console.log('Received from parent:', event.data);
       callback(event.data);
@@ -65,11 +65,11 @@ export const listenToParent = (callback) => {
  * @param {object} data - The data to send
  * @returns {Promise} - Promise that resolves with the response
  */
-export const requestFromParent = (action, data = {}) => {
+export const requestFromParent = (action: string, data: any = {}) => {
   return new Promise((resolve, reject) => {
     const requestId = Date.now().toString();
     
-    const messageHandler = (event) => {
+    const messageHandler = (event: MessageEvent) => {
       if (event.data.source === 'angular-parent' && 
           event.data.requestId === requestId) {
         window.removeEventListener('message', messageHandler);
@@ -118,7 +118,7 @@ export const notifyReady = () => {
  * Notify the parent about route changes
  * @param {string} route - The current route
  */
-export const notifyRouteChange = (route) => {
+export const notifyRouteChange = (route: string) => {
   sendToParent('route:change', { route });
 };
 
@@ -127,7 +127,7 @@ export const notifyRouteChange = (route) => {
  * @param {string} action - The user action
  * @param {object} data - Action data
  */
-export const notifyUserAction = (action, data = {}) => {
+export const notifyUserAction = (action: string, data: any = {}) => {
   sendToParent('user:action', { action, data });
 };
 

@@ -6,44 +6,45 @@
  */
 
 import api from '@/services/api';
+import type { Account, Transaction, Category, Rule, Tag, Entity, Merchant, PlaidLinkToken } from '@/types/api.types';
 
 // Account API functions
 export const accountApi = {
-  list: (params = {}) => api.get('/bank-data/accounts', { params }),
-  get: (id) => api.get(`/bank-data/accounts/${id}`),
-  create: (data) => api.post('/bank-data/accounts', data),
-  update: (id, data) => api.put(`/bank-data/accounts/${id}`, data),
-  patch: (id, data) => api.patch(`/bank-data/accounts/${id}`, data),
-  delete: (id) => api.delete(`/bank-data/accounts/${id}`),
+  list: (params: any = {}) => api.get('/bank-data/accounts', { params }),
+  get: (id: string) => api.get(`/bank-data/accounts/${id}`),
+  create: (data: any) => api.post('/bank-data/accounts', data),
+  update: (id: string, data: any) => api.put(`/bank-data/accounts/${id}`, data),
+  patch: (id: string, data: any) => api.patch(`/bank-data/accounts/${id}`, data),
+  delete: (id: string) => api.delete(`/bank-data/accounts/${id}`),
   
   // Account-specific endpoints
-  getBalanceHistory: (id, params) => api.get(`/bank-data/accounts/${id}/balance-history`, { params }),
-  sync: (id) => api.post(`/bank-data/accounts/${id}/sync`),
-  getTransactions: (id, params) => api.get(`/bank-data/accounts/${id}/transactions`, { params }),
-  connectPlaid: (data) => api.post('/bank-data/accounts/connect-plaid', data),
-  disconnect: (id) => api.post(`/bank-data/accounts/${id}/disconnect`),
+  getBalanceHistory: (id: string, params: any) => api.get(`/bank-data/accounts/${id}/balance-history`, { params }),
+  sync: (id: string) => api.post(`/bank-data/accounts/${id}/sync`),
+  getTransactions: (id: string, params: any) => api.get(`/bank-data/accounts/${id}/transactions`, { params }),
+  connectPlaid: (data: any) => api.post('/bank-data/accounts/connect-plaid', data),
+  disconnect: (id: string) => api.post(`/bank-data/accounts/${id}/disconnect`),
 };
 
 // Transaction API functions
 export const transactionApi = {
-  list: (params = {}) => api.get('/bank-data/transactions', { params }),
-  get: (id) => api.get(`/bank-data/transactions/${id}`),
-  create: (data) => api.post('/bank-data/transactions', data),
-  update: (id, data) => api.put(`/bank-data/transactions/${id}`, data),
-  patch: (id, data) => api.patch(`/bank-data/transactions/${id}`, data),
-  delete: (id) => api.delete(`/bank-data/transactions/${id}`),
+  list: (params: any = {}) => api.get('/bank-data/transactions', { params }),
+  get: (id: string) => api.get(`/bank-data/transactions/${id}`),
+  create: (data: any) => api.post('/bank-data/transactions', data),
+  update: (id: string, data: any) => api.put(`/bank-data/transactions/${id}`, data),
+  patch: (id: string, data: any) => api.patch(`/bank-data/transactions/${id}`, data),
+  delete: (id: string) => api.delete(`/bank-data/transactions/${id}`),
   
   // Transaction-specific endpoints
-  categorize: (id, categoryId) => api.patch(`/bank-data/transactions/${id}`, { category_id: categoryId }),
-  bulkCategorize: (data) => api.post('/bank-data/transactions/bulk-categorize', data),
-  split: (id, splits) => api.post(`/bank-data/transactions/${id}/split`, { splits }),
-  addTags: (id, tagIds) => api.post(`/bank-data/transactions/${id}/tags`, { tag_ids: tagIds }),
-  removeTags: (id, tagIds) => api.delete(`/bank-data/transactions/${id}/tags`, { data: { tag_ids: tagIds } }),
+  categorize: (id: string, categoryId: string) => api.patch(`/bank-data/transactions/${id}`, { category_id: categoryId }),
+  bulkCategorize: (data: any) => api.post('/bank-data/transactions/bulk-categorize', data),
+  split: (id: string, splits: any) => api.post(`/bank-data/transactions/${id}/split`, { splits }),
+  addTags: (id: string, tagIds: string[]) => api.post(`/bank-data/transactions/${id}/tags`, { tag_ids: tagIds }),
+  removeTags: (id: string, tagIds: string[]) => api.delete(`/bank-data/transactions/${id}/tags`, { data: { tag_ids: tagIds } }),
   
   // Analytics
-  getStatistics: (params) => api.get('/bank-data/transactions/statistics', { params }),
-  getSpendingByCategory: (params) => api.get('/bank-data/transactions/spending-by-category', { params }),
-  getSpendingByMerchant: (params) => api.get('/bank-data/transactions/spending-by-merchant', { params }),
+  getStatistics: (params: any) => api.get('/bank-data/transactions/statistics', { params }),
+  getSpendingByCategory: (params: any) => api.get('/bank-data/transactions/spending-by-category', { params }),
+  getSpendingByMerchant: (params: any) => api.get('/bank-data/transactions/spending-by-merchant', { params }),
 };
 
 // Category API functions
