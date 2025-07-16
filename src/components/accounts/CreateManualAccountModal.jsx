@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Account } from '@/api/entities';
+import { useAccounts } from '@/hooks/api';
 
 export default function CreateManualAccountModal({ isOpen, onClose, onSuccess }) {
   const [accountName, setAccountName] = useState('');
@@ -13,11 +13,14 @@ export default function CreateManualAccountModal({ isOpen, onClose, onSuccess })
   const [institutionName, setInstitutionName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  // Use the new hook
+  const { createAccount } = useAccounts();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await Account.create({
+      await createAccount({
         account_name: accountName,
         account_type: accountType,
         balance: parseFloat(balance) || 0,

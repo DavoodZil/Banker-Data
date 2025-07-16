@@ -2,21 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Plus, KeyRound, Loader2, Copy } from "lucide-react";
-import { AccessToken } from "@/api/entities";
-import { generateAccessToken } from "@/api/functions";
-import { revokeAccessToken } from "@/api/functions";
+import { useAccessTokens } from "@/hooks/api";
+import { useToast } from "@/components/ui/use-toast";
 
 const GenerateTokenModal = ({ isOpen, onClose, onTokenGenerated }) => {
     const [name, setName] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
+    const { generateToken } = useAccessTokens();
+
     const handleGenerate = async () => {
         if (!name) return;
         setIsGenerating(true);
         try {
-            const response = await generateAccessToken({ name });
-            if (response.data.token) {
-                onTokenGenerated(response.data.token);
+            const response = await generateToken(name);
+            if (response.token) {
+                onTokenGenerated(response.token);
             }
         } catch (error) {
             console.error("Failed to generate token:", error);
@@ -116,32 +117,20 @@ const TokenList = ({ tokens, onRevoke }) => {
 
 
 export default function APIPage() {
-    const [tokens, setTokens] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [showGenerateModal, setShowGenerateModal] = useState(false);
     const [generatedToken, setGeneratedToken] = useState(null);
 
-    const loadTokens = async () => {
-        setIsLoading(true);
-        const userTokens = await AccessToken.list();
-        setTokens(userTokens);
-        setIsLoading(false);
-    };
-
-    useEffect(() => {
-        loadTokens();
-    }, []);
+    const { tokens, isLoading, revokeToken, refetch } = useAccessTokens();
 
     const handleRevoke = async (tokenId) => {
         if (window.confirm("Are you sure you want to revoke this token? This cannot be undone.")) {
-            await revokeAccessToken({ tokenId });
-            loadTokens();
+            await revokeToken(tokenId);
         }
     };
 
     const handleTokenGenerated = (token) => {
         setGeneratedToken(token);
-        loadTokens();
+        refetch();
     };
 
     const exampleCurl = "curl -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\\n  https://preview--zil-money-958c34cc.base44.app/functions/api/v1/accounts";

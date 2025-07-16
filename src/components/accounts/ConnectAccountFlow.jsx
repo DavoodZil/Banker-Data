@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Landmark, Loader2, ShieldCheck, CheckCircle, AlertTriangle } from "lucide-react";
-import { exchangePublicToken } from '@/api/functions';
+import { usePlaidLink } from '@/hooks/api';
 import { usePlaidLinkToken } from '@/hooks/usePlaidLinkToken';
 
 const StatusDisplay = ({ step, error, isReady }) => (
@@ -82,11 +82,13 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
     }
   }, [linkTokenError]);
 
+  const { exchangePublicToken } = usePlaidLink();
+
   const onSuccess = useCallback(async (public_token, metadata) => {
     setIsPlaidOpen(false);
     setStep('loading');
     try {
-      await exchangePublicToken({ public_token: public_token, institution: metadata.institution, key: linkKey, metadata: metadata });
+      await exchangePublicToken(public_token);
       setStep('success');
       onAddSuccess();
     } catch(err) {
@@ -94,7 +96,7 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
       setError("Failed to add your account after connection. Please try again.");
       setStep('error');
     }
-  }, [onAddSuccess]);
+  }, [onAddSuccess, exchangePublicToken]);
 
   // Effect to create the Plaid handler once we have the token and script
   useEffect(() => {

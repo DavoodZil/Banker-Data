@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Category } from "@/api/entities";
+import { useCategories } from "@/hooks/api";
 
 export default function AddCategoryModal({ isOpen, onClose, onSave, category }) {
   const [formData, setFormData] = useState({
@@ -11,24 +11,9 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
     parent_category: '',
     budget_amount: ''
   });
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
 
-  useEffect(() => {
-    setLoadingCategories(true);
-    Category.list().then((response) => {
-      // Combine both categories and yd_categories arrays and clean names
-      const allCategories = [
-        ...(response.categories || []),
-        ...(response.yd_categories || [])
-      ].map(category => ({
-        ...category,
-        name: category.name ? category.name.replace(/&nbsp;/g, ' ').trim() : category.name
-      }));
-      setCategories(allCategories);
-      setLoadingCategories(false);
-    }).catch(() => setLoadingCategories(false));
-  }, []);
+  // Use the new hook
+  const { categories, isLoading: loadingCategories } = useCategories();
 
   useEffect(() => {
     if (category) {
@@ -54,10 +39,13 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
     });
   };
 
-  // Exclude current category from parent options (for edit)
-  const parentOptions = categories.filter(
-    (cat) => !category || cat.id !== category.id
-  );
+  // Clean category names and exclude current category from parent options (for edit)
+  const parentOptions = categories
+    .map(cat => ({
+      ...cat,
+      name: cat.name ? cat.name.replace(/&nbsp;/g, ' ').trim() : cat.name
+    }))
+    .filter((cat) => !category || cat.id !== category.id);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

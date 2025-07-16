@@ -14,18 +14,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { removeAccount } from "@/api/functions";
+import { useAccounts } from "@/hooks/api";
 
 export default function AccountCard({ account, showBalance, onUpdate }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const { deleteAccount } = useAccounts();
 
   const handleDelete = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDeleting(true);
     try {
-      await removeAccount({ item_id: account.plaid_item_id });
+      await deleteAccount(account.id);
       setShowDeleteDialog(false);
       onUpdate();
     } catch (error) {
