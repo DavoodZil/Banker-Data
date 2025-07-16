@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Account } from '@/api/entities';
-import { Transaction } from '@/api/entities';
+import { useAccounts } from '@/hooks/api';
+import { useTransactions } from '@/hooks/api';
+import { useFileUpload, useFileImport } from '@/hooks/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { UploadFile, ExtractDataFromUploadedFile } from '@/api/integrations';
 import { Loader2, FileUp, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const STEPS = {
@@ -19,21 +19,20 @@ const STEPS = {
 
 export default function UploadFlow() {
   const [step, setStep] = useState(STEPS.SELECT_ACCOUNT);
-  const [manualAccounts, setManualAccounts] = useState([]);
   const [selectedAccountId, setSelectedAccountId] = useState(null);
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [parsedTransactions, setParsedTransactions] = useState([]);
 
-  useEffect(() => {
-    const fetchManualAccounts = async () => {
-      // Accounts are automatically filtered to show only user's accounts
-      const accounts = await Account.filter({ source: 'manual' });
-      setManualAccounts(accounts);
-    };
-    fetchManualAccounts();
-  }, []);
+  // Use the new hooks
+  const { accounts: allAccounts, updateAccount } = useAccounts();
+  const { createTransaction } = useTransactions();
+  const { uploadFile } = useFileUpload();
+  const { extractData } = useFileImport();
+
+  // Filter manual accounts
+  const manualAccounts = allAccounts.filter(account => account.source === 'manual');
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -47,36 +46,22 @@ export default function UploadFlow() {
     setIsLoading(true);
     setError(null);
     try {
-      const { file_url } = await UploadFile({ file });
-      const transactionSchema = {
-        type: "object",
-        properties: {
-          transactions: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                Date: { type: "string" },
-                Description: { type: "string" },
-                Amount: { type: "number" },
-                Category: { type: "string" },
-              },
-              required: ["Date", "Description", "Amount"],
-            },
-          },
-        },
-      };
-
-      const result = await ExtractDataFromUploadedFile({ file_url, json_schema: transactionSchema });
+      // Upload the file
+      const uploadResponse = await uploadFile(file);
       
-      if (result.status === 'success' && result.output.transactions) {
-        setParsedTransactions(result.output.transactions);
+      const fileId = uploadResponse.id;
+      
+      // Extract data from the uploaded file
+      const extractResponse = await extractData(fileId);
+      
+      if (extractResponse.transactions) {
+        setParsedTransactions(extractResponse.transactions);
         setStep(STEPS.REVIEW);
       } else {
-        throw new Error(result.details || "Could not extract transactions from the file. Please ensure it has 'Date', 'Description', and 'Amount' columns.");
+        throw new Error("Could not extract transactions from the file. Please ensure it has 'Date', 'Description', and 'Amount' columns.");
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setIsLoading(false);
     }
@@ -94,13 +79,16 @@ export default function UploadFlow() {
         category: tx.Category ? tx.Category.toLowerCase().replace(/ /g, '_') : 'uncategorized',
       }));
 
-      await Transaction.bulkCreate(transactionsToCreate);
+      // Create transactions one by one using the hook
+      for (const tx of transactionsToCreate) {
+        await createTransaction(tx);
+      }
       
       // Update account balance
       const totalImportedAmount = transactionsToCreate.reduce((sum, tx) => sum + tx.amount, 0);
       const account = manualAccounts.find(a => a.id === selectedAccountId);
       if (account) {
-          await Account.update(account.id, { balance: account.balance + totalImportedAmount });
+          await updateAccount(account.id, { balance: account.balance + totalImportedAmount });
       }
 
       setStep(STEPS.COMPLETE);

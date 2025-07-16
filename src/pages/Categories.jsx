@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Category } from "@/api/entities";
-import { Transaction } from "@/api/entities";
+import { useCategories } from "@/hooks/api";
+import { useTransactions } from "@/hooks/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,35 +18,23 @@ import CategoryCard from "../components/categories/CategoryCard";
 import AddCategoryModal from "../components/categories/AddCategoryModal";
 
 export default function Categories() {
-  const [categories, setCategories] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Use the new hooks
+  const { categories, isLoading, error, refetch: refetchCategories, createCategory, updateCategory } = useCategories();
+  const { transactions, refetch: refetchTransactions } = useTransactions();
+
   useEffect(() => {
-    loadData();
+    // Data is automatically loaded by the hooks
   }, []);
 
   const loadData = async () => {
-    setIsLoading(true);
-    // Both categories and transactions are automatically filtered by user ownership
-    const [categoriesResponse, transactionsData] = await Promise.all([
-      Category.list('-updated_date'),
-      Transaction.list('-date', 500)
+    await Promise.all([
+      refetchCategories(),
+      refetchTransactions()
     ]);
-    // Combine both categories and yd_categories arrays and clean names
-    const allCategories = [
-      ...(categoriesResponse.categories || []),
-      ...(categoriesResponse.yd_categories || [])
-    ].map(category => ({
-      ...category,
-      name: category.name ? category.name.replace(/&nbsp;/g, ' ').trim() : category.name
-    }));
-    setCategories(allCategories);
-    setTransactions(transactionsData);
-    setIsLoading(false);
   };
 
   const handleAddCategory = async (categoryData) => {
@@ -56,7 +44,7 @@ export default function Categories() {
         ...categoryData,
         name: categoryData.name ? categoryData.name.replace(/&nbsp;/g, ' ').trim() : categoryData.name
       };
-      await Category.create(cleanedData);
+      await createCategory(cleanedData);
       loadData();
       setShowAddModal(false);
     } catch (error) {
@@ -73,7 +61,7 @@ export default function Categories() {
         name: updates.name ? updates.name.replace(/&nbsp;/g, ' ').trim() : updates.name,
         yd_category_id: updates.budget_amount ? parseFloat(updates.budget_amount) : undefined
       };
-      await Category.update(cleanedUpdates);
+      await updateCategory(categoryId, cleanedUpdates);
       loadData();
       setEditingCategory(null);
     } catch (error) {
@@ -108,8 +96,11 @@ export default function Categories() {
     { name: 'investments', color: '#6366f1', icon: '📊' }
   ];
 
-  // Remove merging with defaultCategories and only use API categories
-  const allCategories = categories;
+  // Clean category names
+  const allCategories = categories.map(category => ({
+    ...category,
+    name: category.name ? category.name.replace(/&nbsp;/g, ' ').trim() : category.name
+  }));
 
   const filteredCategories = allCategories.filter(category =>
     category.name && category.name.toLowerCase().includes(searchQuery.toLowerCase())

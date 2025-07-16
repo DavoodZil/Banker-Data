@@ -5,6 +5,25 @@
  * @param {string} action - The action type
  * @param {object} data - The data to send
  */
+export const sendIframeMessage = (action, data = {}) => {
+  if (window.parent && window.parent !== window) {
+    const message = {
+      source: 'banker-data-iframe',
+      action,
+      data,
+      timestamp: new Date().toISOString()
+    };
+    
+    window.parent.postMessage(message, '*');
+    console.log('Sent to parent:', message);
+  }
+};
+
+/**
+ * Send a message to the parent Angular application (alias for backward compatibility)
+ * @param {string} action - The action type
+ * @param {object} data - The data to send
+ */
 export const sendToParent = (action, data = {}) => {
   if (window.parent && window.parent !== window) {
     const message = {
