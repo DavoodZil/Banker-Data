@@ -45,7 +45,7 @@ api.interceptors.request.use(
     return request;
   },
   (error) => {
-    console.error('Request Error:', error);
+
     return Promise.reject(error);
   }
 );
@@ -54,13 +54,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error);
+
     
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
       // Clear authentication data and redirect to unauthorized page
-      localStorage.removeItem('app_token');
-      localStorage.removeItem('base_url');
+      sessionStorage.removeItem('app_token');
+      sessionStorage.removeItem('base_url');
       window.location.href = '/unauthorized';
     }
     

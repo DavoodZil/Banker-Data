@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Toaster } from "@/components/ui/toaster"
 import { useEffect } from 'react'
 import { notifyReady, listenToParent } from '@/utils/iframeCommunication'
-import { handleAuthParams } from '@/utils/auth'
+import { handleAuthParams, clearAuth } from '@/utils/auth'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import Layout from '@/pages/Layout'
 
@@ -38,8 +38,14 @@ function App() {
     
     // Listen for messages from parent
     const cleanup = listenToParent((message) => {
-      console.log('Received message from parent:', message);
-      // Handle parent messages here if needed
+      
+      // Handle logout message from parent Angular app
+      if (message.action === 'logout' || message.action === 'auth:logout') {
+        clearAuth();
+        window.location.href = '/unauthorized';
+      }
+      
+      // Handle other parent messages here if needed
     });
     
     return cleanup;
