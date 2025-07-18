@@ -15,7 +15,6 @@ export const sendIframeMessage = (action, data = {}) => {
     };
     
     window.parent.postMessage(message, '*');
-    console.log('Sent to parent:', message);
   }
 };
 
@@ -34,7 +33,6 @@ export const sendToParent = (action, data = {}) => {
     };
     
     window.parent.postMessage(message, '*');
-    console.log('Sent to parent:', message);
   }
 };
 
@@ -46,7 +44,6 @@ export const sendToParent = (action, data = {}) => {
 export const listenToParent = (callback) => {
   const messageHandler = (event) => {
     if (event.data.source === 'angular-parent') {
-      console.log('Received from parent:', event.data);
       callback(event.data);
     }
   };

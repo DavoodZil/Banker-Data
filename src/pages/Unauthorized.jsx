@@ -8,7 +8,6 @@ export default function Unauthorized() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If user is already authenticated, redirect to dashboard
     if (isAuthenticated()) {
       navigate('/dashboard');
     }
