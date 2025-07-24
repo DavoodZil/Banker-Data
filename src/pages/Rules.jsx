@@ -164,7 +164,7 @@ export default function RulesPage() {
         setShowSuccessModal(true);
         // Navigate back to rules list after saving
         setTimeout(() => {
-          navigate('/rules/list');
+          navigate('/rules');
         }, 1500);
       } else {
         console.error(response);
@@ -953,7 +953,7 @@ export default function RulesPage() {
       </div>
       
       <div className="flex justify-end gap-3 pt-4">
-        <Button variant="outline" onClick={() => navigate('/rules/list')}>Cancel</Button>
+        <Button variant="outline" onClick={() => navigate('/rules')}>Cancel</Button>
         <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleSaveRule}>
           {isEditing ? 'Update Rule' : 'Save Rule'}
         </Button>

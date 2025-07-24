@@ -217,7 +217,7 @@ export default function RulesListPage() {
             Apply All Rules
           </Button>
           <Button
-            onClick={() => navigate('/rules')}
+            onClick={() => navigate('/rules/create')}
             className="bg-emerald-600 hover:bg-emerald-700 gap-2"
           >
             <Plus className="w-4 h-4" />
@@ -276,7 +276,7 @@ export default function RulesListPage() {
             </p>
             {!searchQuery && (
               <Button
-                onClick={() => navigate('/rules')}
+                onClick={() => navigate('/rules/create')}
                 className="bg-emerald-600 hover:bg-emerald-700 gap-2"
               >
                 <Plus className="w-4 h-4" />

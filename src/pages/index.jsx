@@ -93,13 +93,13 @@ function _getCurrentPage(url) {
     }
     
     // Handle specific nested routes
-    if (url === '/rules/list') {
+    if (url === '/rules') {
         return 'RulesList';
     }
-    if (url.startsWith('/rules/edit/')) {
+    if (url === '/rules/create') {
         return 'Rules';
     }
-    if (url === '/rules') {
+    if (url.startsWith('/rules/edit/')) {
         return 'Rules';
     }
     
