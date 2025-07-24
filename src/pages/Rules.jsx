@@ -20,7 +20,7 @@ import SuccessModal from "../components/rules/SuccessModal";
 import CreateTagModal from "../components/rules/CreateTagModal";
 import TagSelector from "../components/rules/TagSelector";
 import SplitTransactionModal from "../components/rules/SplitTransactionModal";
-import { payloadMapper, payloadActionMapper } from '@/utils/rulePayload';
+import { payloadMapper, payloadActionMapper, decodeRuleData } from '@/utils/rulePayload';
 
 
 const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
@@ -101,28 +101,12 @@ export default function RulesPage() {
     if (isEditing && existingRule && !ruleLoading) {
       try {
         const ruleData = JSON.parse(existingRule.rule_data || '{}');
-        
-        // Transform the rule data back to the form state
+        // Use the new decodeRuleData function to populate the form state
+        const decoded = decodeRuleData(ruleData);
         setRule({
           name: existingRule.name || "Rule",
           description: existingRule.description || "",
-          conditions: {
-            merchants: { enabled: true, matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
-            amount: { enabled: true, transaction_type: 'expense', operator: 'greater_than', value1: 123, value2: null },
-            categories: { enabled: true, values: [] },
-            accounts: { enabled: false, values: [] },
-            description: { enabled: false, match_type: 'contains', value: '' },
-            date: { enabled: false, match_type: 'after', value1: '', value2: '' },
-          },
-          actions: {
-            rename_merchant: { enabled: false, new_name: '' },
-            update_category: { enabled: false, new_category: '' },
-            add_tags: { enabled: false, tags: [] },
-            hide_transaction: { enabled: false },
-            mark_for_review: { enabled: false, review_status: 'needs_review', reviewer: '' },
-            link_to_goal: { enabled: false, goal_id: '' },
-            split_transaction: { enabled: false, splitType: 'amount', splits: [], hideOriginal: false }
-          }
+          ...decoded
         });
       } catch (error) {
         console.error('Error parsing existing rule data:', error);
