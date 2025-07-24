@@ -20,6 +20,39 @@ import CreateTagModal from "../components/rules/CreateTagModal";
 import TagSelector from "../components/rules/TagSelector";
 import SplitTransactionModal from "../components/rules/SplitTransactionModal";
 
+// --- CONSTANTS ---
+const IF_DESCRIPTION = 1;  
+const IF_AMOUNT = 2;
+const IF_DATE = 3;
+const IF_ACCOUNT = 4;
+const IF_MERCHANT = 5;
+const IF_CATEGORY = 6;
+
+const DESCRIPTION_MATCH_TYPE_CONTAINS = 1;
+const DESCRIPTION_MATCH_TYPE_EXACT = 2;
+const AMOUNT_MATCH_TYPE_GREATER_THAN = 1;
+const AMOUNT_MATCH_TYPE_LESS_THAN = 2;
+const AMOUNT_MATCH_TYPE_EQUALS = 3;
+const AMOUNT_MATCH_TYPE_BETWEEN = 4;
+const AMOUNT_MATCH_TYPE_EXPENSE = 5;
+const AMOUNT_MATCH_TYPE_INCOME = 6;
+
+const DATE_MATCH_TYPE_AFTER = 1;
+const DATE_MATCH_TYPE_BEFORE = 2;
+const DATE_MATCH_TYPE_ON = 3;
+const DATE_MATCH_TYPE_BETWEEN = 4;
+
+const MERCHANT_MATCH_TYPE_CONTAINS = 1;
+const MERCHANT_MATCH_TYPE_EXACT = 2;
+const MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT = 3;
+const MERCHANT_MATCH_TYPE_MERCHANT_NAME = 4;
+
+const THEN_ACTION_RENAME_MERCHANT = 1;
+const THEN_ACTION_UPDATE_CATEGORY = 2;
+const THEN_ACTION_ADD_TAG = 3;
+const THEN_ACTION_HIDE_TRANSACTION = 4;
+const THEN_ACTION_LINK_TO_GOAL = 5;
+
 const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
   <div className="bg-white rounded-lg border border-gray-200">
     <div className="flex items-center justify-between p-4">
@@ -82,141 +115,127 @@ export default function RulesPage() {
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
 
-  const payloadMapper = (condition) => {
-    const enabledFields = Object.entries(condition)
-      .filter(([key, value]) => value.enabled)
-      .map(([key, value]) => {
-        // Handle conditions with matchers (like merchants)
-        if (value.matchers) {
-          return [
-            key === 'merchants' ? 5 :
-            key === 'amount' ? 2 :
-            key === 'date' ? 3 :
-            key === 'accounts' ? 4 :
-            key === 'description' ? 1 :
-            key === 'categories' ? 6 : null,
-            ...value.matchers.map(matcher => matcherMapper(matcher, key))
-          ];
-        } else {
-          // Handle conditions without matchers
-          if (key === 'amount') {
-            console.log(value);
-            // Build the payload for amount
-            if(value.operator === 'between') {
-              return [2, 4, value.value1, value.value2];
-            }else if(value.operator === 'expense'){
-              return [2, 5, value.value1];
-            }else if(value.operator === 'income'){
-              return [2, 6, value.value1];
-            }else if(value.operator === 'equals'){
-              return [2, 3, value.value1];
-            }else if(value.operator === 'greater_than'){
-              return [2, 1, value.value1];
-            }else if(value.operator === 'less_than'){
-              return [2, 2, value.value1];
-            }
-          }
-          if (key === 'categories') {
-            return [6, ...(value.values || [])];
-          }
-          if (key === 'accounts') {
-            return [4, ...(value.values || [])];
-          }
-          if (key === 'description') {
-            return [1, value.match_type, value.value];
-          }
-          if (key === 'date') {
-            return [3, value.match_type, value.value1, value.value2];
-          }
-          // Add more as needed
-        }
-        return null;
-      });
-    return enabledFields;
-  }
-
-
-  const payloadActionMapper = (action) => {
-    const enabledFields = Object.entries(action).filter(([key, value]) => value.enabled).map(([key, value]) =>{
-      if(key === 'rename_merchant') {
-        return [1, value.new_name]
-      }else if(key === 'update_category') {
-        return [2, value.new_category]
-      }else if(key === 'add_tags') {
-        return [3, value.tags]
-      }else if(key === 'hide_transaction') {
-        return [4]
-      }else if(key==='link_to_goal') {
-        return [5, value.goal_id]
+  const matcherMapper = (matcher, type) => {
+    if (type === 'merchants') {
+      switch (matcher.match_type) {
+        case 'contains':
+          return [MERCHANT_MATCH_TYPE_CONTAINS, matcher.value];
+        case 'exactly_matches':
+          return [MERCHANT_MATCH_TYPE_EXACT, matcher.value];
+        case 'original_statement':
+          return [MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT, matcher.value];
+        case 'merchant_name':
+          return [MERCHANT_MATCH_TYPE_MERCHANT_NAME, matcher.value];
+        default:
+          return null;
       }
-      return null;
-    });
-  
-    return enabledFields;
-  }
-
-
-  const matcherMapper = (matcher,type) => {
-    if(type === 'merchants') {  
-    if(matcher.match_type === 'contains') {
-      return [1, matcher.value]
-    }else if(matcher.match_type === 'exactly_matches') {
-      return [2, matcher.value]
-    }else if(matcher.match_type === 'original_statement') {
-      return [3, matcher.value]
-    }else if(matcher.match_type === 'merchant_name') {
-      return [4, matcher.value]
+    } else if (type === 'amount') {
+      switch (matcher.match_type) {
+        case 'greater_than':
+          return [AMOUNT_MATCH_TYPE_GREATER_THAN, matcher.value1];
+        case 'less_than':
+          return [AMOUNT_MATCH_TYPE_LESS_THAN, matcher.value1];
+        case 'equals':
+          return [AMOUNT_MATCH_TYPE_EQUALS, matcher.value1];
+        case 'between':
+          return [AMOUNT_MATCH_TYPE_BETWEEN, matcher.value1, matcher.value2];
+        case 'expense':
+          return [AMOUNT_MATCH_TYPE_EXPENSE, matcher.value1];
+        case 'income':
+          return [AMOUNT_MATCH_TYPE_INCOME, matcher.value1];
+        default:
+          return null;
       }
-      return null;
-    }else if(type === 'amount') {
-      if(matcher.match_type === 'greater_than') {
-        return [1, matcher.value1]
-      }else if(matcher.match_type === 'less_than') {
-        return [2, matcher.value1]
-      }else if(matcher.match_type === 'equals') {
-        return [3, matcher.value1]
-      }else if(matcher.match_type === 'between') {
-        return [4, matcher.value1, matcher.value2]
-      }else if(matcher.match_type === 'expense') {
-        return [5, matcher.value1]
-      }else if(matcher.match_type === 'income') {
-        return [6, matcher.value1]
+    } else if (type === 'date') {
+      switch (matcher.match_type) {
+        case 'after':
+          return [DATE_MATCH_TYPE_AFTER, matcher.value1];
+        case 'before':
+          return [DATE_MATCH_TYPE_BEFORE, matcher.value1];
+        case 'on':
+          return [DATE_MATCH_TYPE_ON, matcher.value1];
+        case 'between':
+          return [DATE_MATCH_TYPE_BETWEEN, matcher.value1, matcher.value2];
+        default:
+          return null;
       }
-      return null;
-    }else if(type === 'date') {
-      if(matcher.match_type === 'after') {
-        return [1, matcher.value1]
-      }else if(matcher.match_type === 'before') {
-        return [2, matcher.value1]
-      }else if(matcher.match_type === 'on') {
-        return [3, matcher.value1]
-      }else if(matcher.match_type === 'between') {
-        return [4, matcher.value1, matcher.value2]
-      }
-      return null;
-    }else if(type === 'categories') {
-      if(matcher.match_type === 'contains') {
-        return [1, matcher.value]
-      }else if(matcher.match_type === 'exactly_matches') {
-        return [2, matcher.value]
-      }
-    }else if(type === 'description') {
-      if(matcher.match_type === 'contains') {
-        return [1, matcher.value]
-      }else if(matcher.match_type === 'exactly_matches') {
-        return [2, matcher.value]
-      }
-    }else if(type === 'accounts') {
-      if(matcher.match_type === 'contains') {
-        return [1, matcher.value]
-      }else if(matcher.match_type === 'exactly_matches') {
-        return [2, matcher.value]
+    } else if (type === 'description') {
+      switch (matcher.match_type) {
+        case 'contains':
+          return [DESCRIPTION_MATCH_TYPE_CONTAINS, matcher.value];
+        case 'exact':
+          return [DESCRIPTION_MATCH_TYPE_EXACT, matcher.value];
+        default:
+          return null;
       }
     }
+    // Add similar logic for categories, accounts if needed
     return null;
-  }
+  };
 
+  const payloadMapper = (condition) => {
+    let result = [];
+    Object.entries(condition)
+      .filter(([key, value]) => value.enabled)
+      .forEach(([key, value]) => {
+        if (key === 'merchants') {
+          value.matchers.forEach(group => {
+            group.forEach(matcher => {
+              const mapped = matcherMapper(matcher, 'merchants');
+              if (mapped) result.push([IF_MERCHANT, ...mapped]);
+            });
+          });
+        } else if (key === 'amount') {
+          const mapped = matcherMapper({
+            match_type: value.operator,
+            value1: value.value1,
+            value2: value.value2
+          }, 'amount');
+          if (mapped) result.push([IF_AMOUNT, ...mapped]);
+        } else if (key === 'categories') {
+          (value.values || []).forEach(val => result.push([IF_CATEGORY, val]));
+        } else if (key === 'accounts') {
+          (value.values || []).forEach(val => result.push([IF_ACCOUNT, val]));
+        } else if (key === 'description') {
+          const mapped = matcherMapper({
+            match_type: value.match_type,
+            value: value.value
+          }, 'description');
+          if (mapped) result.push([IF_DESCRIPTION, ...mapped]);
+        } else if (key === 'date') {
+          const mapped = matcherMapper({
+            match_type: value.match_type,
+            value1: value.value1,
+            value2: value.value2
+          }, 'date');
+          if (mapped) result.push([IF_DATE, ...mapped]);
+        }
+      });
+    return result;
+  };
 
+  const payloadActionMapper = (action) => {
+    const enabledFields = Object.entries(action)
+      .filter(([key, value]) => value.enabled)
+      .map(([key, value]) => {
+        switch (key) {
+          case 'rename_merchant':
+            return [THEN_ACTION_RENAME_MERCHANT, value.new_name];
+          case 'update_category':
+            return [THEN_ACTION_UPDATE_CATEGORY, value.new_category];
+          case 'add_tags':
+            return [THEN_ACTION_ADD_TAG, value.tags];
+          case 'hide_transaction':
+            return [THEN_ACTION_HIDE_TRANSACTION];
+          case 'link_to_goal':
+            return [THEN_ACTION_LINK_TO_GOAL, value.goal_id];
+          // Add more as needed
+          default:
+            return null;
+        }
+      });
+    return enabledFields.filter(Boolean);
+  };
 
   // Use the new hook
   const { tags: allTags } = useTags();
