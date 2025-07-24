@@ -117,18 +117,18 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Rules />
+                <RulesList />
               </Layout>
             </ProtectedRoute>
           }
         />
         
         <Route
-          path="/rules/list"
+          path="/rules/create"
           element={
             <ProtectedRoute>
               <Layout>
-                <RulesList />
+                <Rules />
               </Layout>
             </ProtectedRoute>
           }
