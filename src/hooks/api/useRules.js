@@ -12,9 +12,13 @@ export const useRules = () => {
     setError(null);
     try {
       const response = await ruleApi.list();
-      setRules(response.data);
+      // The API returns { success: true, data: [...] }
+      // But axios wraps it in response.data, so we need response.data.data
+      const rulesData = response.data?.data || [];
+      setRules(rulesData);
     } catch (err) {
       setError(err.message);
+      setRules([]);
     } finally {
       setIsLoading(false);
     }

@@ -30,6 +30,8 @@ import Categories from "./Categories";
 
 import Rules from "./Rules";
 
+import RulesList from "./RulesList";
+
 import AccountDetails from "./AccountDetails";
 
 import API from "./API";
@@ -70,6 +72,8 @@ const PAGES = {
     
     Rules: Rules,
     
+    RulesList: RulesList,
+    
     AccountDetails: AccountDetails,
     
     API: API,
@@ -82,11 +86,25 @@ function _getCurrentPage(url) {
     if (url.endsWith('/')) {
         url = url.slice(0, -1);
     }
-    let urlLastPart = url.split('/').pop();
-    if (urlLastPart.includes('?')) {
-        urlLastPart = urlLastPart.split('?')[0];
+    
+    // Remove query parameters
+    if (url.includes('?')) {
+        url = url.split('?')[0];
     }
-
+    
+    // Handle specific nested routes
+    if (url === '/rules/list') {
+        return 'RulesList';
+    }
+    if (url.startsWith('/rules/edit/')) {
+        return 'Rules';
+    }
+    if (url === '/rules') {
+        return 'Rules';
+    }
+    
+    // Default behavior for other routes
+    let urlLastPart = url.split('/').pop();
     const pageName = Object.keys(PAGES).find(page => page.toLowerCase() === urlLastPart.toLowerCase());
     return pageName || Object.keys(PAGES)[0];
 }
@@ -131,7 +149,11 @@ function PagesContent() {
                 
                 <Route path="/Categories" element={<Categories />} />
                 
-                <Route path="/Rules" element={<Rules />} />
+                <Route path="/rules" element={<Rules />} />
+                
+                <Route path="/rules/list" element={<RulesList />} />
+                
+                <Route path="/rules/edit/:id" element={<Rules />} />
                 
                 <Route path="/AccountDetails" element={<AccountDetails />} />
                 
