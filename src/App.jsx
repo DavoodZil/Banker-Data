@@ -13,6 +13,7 @@ import Accounts from '@/pages/Accounts'
 import Transactions from '@/pages/Transactions'
 import Categories from '@/pages/Categories'
 import Rules from '@/pages/Rules'
+import RulesList from '@/pages/RulesList'
 import Entity from '@/pages/Entity'
 import Import from '@/pages/Import'
 import API from '@/pages/API'
@@ -113,6 +114,28 @@ function App() {
         
         <Route
           path="/rules"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Rules />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/rules/list"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <RulesList />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/rules/edit/:id"
           element={
             <ProtectedRoute>
               <Layout>

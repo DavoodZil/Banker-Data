@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,7 @@ import {
   Store, DollarSign, List, CreditCard, Pencil, Tag, EyeOff, ClipboardCheck, Target, GitCommitHorizontal, PlusCircle, MinusCircle, Plus, ArrowRight,
   TrendingUp, Heart, Car, Home, Zap, UtensilsCrossed, MapPin, User, ShoppingBag, Shield, FileText, Briefcase, ArrowLeftRight, Search
 } from 'lucide-react';
-import { useTags } from "@/hooks/api";
+import { useTags, useRule } from "@/hooks/api";
 import { ruleApi } from "@/api/client";
 
 import CreateCategoryModal from "../components/rules/CreateCategoryModal";
@@ -52,6 +53,14 @@ const ActionRow = ({ label, icon: Icon, isEnabled, onToggle, children }) => (
 
 
 export default function RulesPage() {
+  const { id: ruleId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isEditing = Boolean(ruleId);
+  
+  // If editing, fetch the rule data
+  const { rule: existingRule, isLoading: ruleLoading } = useRule(isEditing ? ruleId : null);
+  
   const [rule, setRule] = useState({
     name: "New Rule",
     description: "",
@@ -87,6 +96,40 @@ export default function RulesPage() {
   // Use the new hook
   const { tags: allTags } = useTags();
 
+  // Load existing rule data when editing
+  useEffect(() => {
+    if (isEditing && existingRule && !ruleLoading) {
+      try {
+        const ruleData = JSON.parse(existingRule.rule_data || '{}');
+        
+        // Transform the rule data back to the form state
+        setRule({
+          name: existingRule.name || "Rule",
+          description: existingRule.description || "",
+          conditions: {
+            merchants: { enabled: true, matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
+            amount: { enabled: true, transaction_type: 'expense', operator: 'greater_than', value1: 123, value2: null },
+            categories: { enabled: true, values: [] },
+            accounts: { enabled: false, values: [] },
+            description: { enabled: false, match_type: 'contains', value: '' },
+            date: { enabled: false, match_type: 'after', value1: '', value2: '' },
+          },
+          actions: {
+            rename_merchant: { enabled: false, new_name: '' },
+            update_category: { enabled: false, new_category: '' },
+            add_tags: { enabled: false, tags: [] },
+            hide_transaction: { enabled: false },
+            mark_for_review: { enabled: false, review_status: 'needs_review', reviewer: '' },
+            link_to_goal: { enabled: false, goal_id: '' },
+            split_transaction: { enabled: false, splitType: 'amount', splits: [], hideOriginal: false }
+          }
+        });
+      } catch (error) {
+        console.error('Error parsing existing rule data:', error);
+      }
+    }
+  }, [isEditing, existingRule, ruleLoading]);
+
   const handleToggle = (type, key) => {
     setRule(prev => ({
       ...prev,
@@ -98,27 +141,36 @@ export default function RulesPage() {
   };
 
   const handleSaveRule = async () => {
-
     console.log(rule);
 
-   const payload = {
-    name: rule.name,
-    description: rule.description,
-    rule_type: 1,
-    rule_data: JSON.stringify({
-      ifs: payloadMapper(rule.conditions),
-      thens: payloadActionMapper(rule.actions)
-    })
-   }
+    const payload = {
+      name: rule.name,
+      description: rule.description,
+      rule_type: 1,
+      rule_data: JSON.stringify({
+        ifs: payloadMapper(rule.conditions),
+        thens: payloadActionMapper(rule.actions)
+      })
+    }
 
-   console.log(payload);
+    console.log(payload);
 
-
-    const response = await ruleApi.create(payload);
-    if (response.status === 201) {
-      setShowSuccessModal(true);
-    } else {
-      console.error(response);
+    try {
+      const response = isEditing 
+        ? await ruleApi.update(ruleId, payload)
+        : await ruleApi.create(payload);
+        
+      if (response.status === 200 || response.status === 201) {
+        setShowSuccessModal(true);
+        // Navigate back to rules list after saving
+        setTimeout(() => {
+          navigate('/rules/list');
+        }, 1500);
+      } else {
+        console.error(response);
+      }
+    } catch (error) {
+      console.error('Error saving rule:', error);
     }
   }
 
@@ -348,6 +400,20 @@ export default function RulesPage() {
   const goals = ["Vacation Fund", "New Car"];
   const reviewers = ["John Smith", "Sarah Johnson", "Mike Wilson", "Emma Davis"];
 
+  // Show loading state when editing and rule is loading
+  if (isEditing && ruleLoading) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading rule...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const filteredCategories = Object.entries(allCategories).reduce((acc, [category, { icon, emoji, subcategories }]) => {
     if (!categorySearch) {
       acc[category] = { icon, emoji, subcategories };
@@ -384,7 +450,9 @@ export default function RulesPage() {
           .data-[state=checked] { background-color: var(--color-primary) !important; border-color: var(--color-primary) !important; color: white; }
         `}</style>
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Create Rule</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {isEditing ? 'Edit Rule' : 'Create Rule'}
+        </h1>
       </div>
       
       <div className="bg-white p-6 rounded-lg border border-gray-200 space-y-4">
@@ -885,8 +953,10 @@ export default function RulesPage() {
       </div>
       
       <div className="flex justify-end gap-3 pt-4">
-        <Button variant="outline">Cancel</Button>
-        <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleSaveRule}>Save Rule</Button>
+        <Button variant="outline" onClick={() => navigate('/rules/list')}>Cancel</Button>
+        <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleSaveRule}>
+          {isEditing ? 'Update Rule' : 'Save Rule'}
+        </Button>
       </div>
 
       <CreateCategoryModal
@@ -898,7 +968,7 @@ export default function RulesPage() {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        message="Your new category has been created and selected!"
+        message={isEditing ? "Rule updated successfully!" : "Rule created successfully!"}
       />
 
       <CreateTagModal
