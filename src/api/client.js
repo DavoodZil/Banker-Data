@@ -87,6 +87,14 @@ export const tagApi = {
   getSuggestions: (transactionData) => api.post('/bank-data/tags/suggestions', transactionData),
 };
 
+// Goal API functions
+export const goalApi = {
+  list: () => api.get('/bank-data/goals'),
+  create: (data) => api.post('/bank-data/goal', data),
+  update: (data) => api.put('/bank-data/goal', data), // data includes id
+  delete: (data) => api.delete('/bank-data/goal', { data }), // data includes id
+};
+
 // Entity API functions
 export const entityApi = {
   list: (params = {}) => api.get('/bank-data/entities', { params }),

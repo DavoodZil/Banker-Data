@@ -22,6 +22,7 @@ import AuthTest from '@/pages/AuthTest'
 import Reports from '@/pages/Reports';
 import Merchants from '@/pages/Merchants';
 import Goals from '@/pages/Goals';
+import GoalsList from '@/pages/GoalsList';
 import CashFlow from '@/pages/CashFlow';
 import Budget from '@/pages/Budget';
 import Tag from '@/pages/Tag';
@@ -173,7 +174,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Goals />
+                <GoalsList />
               </Layout>
             </ProtectedRoute>
           }
