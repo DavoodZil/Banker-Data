@@ -12,6 +12,7 @@ import {
   TrendingUp, Heart, Car, Home, Zap, UtensilsCrossed, MapPin, User, ShoppingBag, Shield, FileText, Briefcase, ArrowLeftRight, Search
 } from 'lucide-react';
 import { useTags } from "@/hooks/api";
+import { ruleApi } from "@/api/client";
 
 import CreateCategoryModal from "../components/rules/CreateCategoryModal";
 import SuccessModal from "../components/rules/SuccessModal";
@@ -47,6 +48,7 @@ const ActionRow = ({ label, icon: Icon, isEnabled, onToggle, children }) => (
   </div>
 );
 
+
 export default function RulesPage() {
   const [rule, setRule] = useState({
     name: "New Rule",
@@ -80,6 +82,142 @@ export default function RulesPage() {
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
 
+  const payloadMapper = (condition) => {
+    const enabledFields = Object.entries(condition)
+      .filter(([key, value]) => value.enabled)
+      .map(([key, value]) => {
+        // Handle conditions with matchers (like merchants)
+        if (value.matchers) {
+          return [
+            key === 'merchants' ? 5 :
+            key === 'amount' ? 2 :
+            key === 'date' ? 3 :
+            key === 'accounts' ? 4 :
+            key === 'description' ? 1 :
+            key === 'categories' ? 6 : null,
+            ...value.matchers.map(matcher => matcherMapper(matcher, key))
+          ];
+        } else {
+          // Handle conditions without matchers
+          if (key === 'amount') {
+            console.log(value);
+            // Build the payload for amount
+            if(value.operator === 'between') {
+              return [2, 4, value.value1, value.value2];
+            }else if(value.operator === 'expense'){
+              return [2, 5, value.value1];
+            }else if(value.operator === 'income'){
+              return [2, 6, value.value1];
+            }else if(value.operator === 'equals'){
+              return [2, 3, value.value1];
+            }else if(value.operator === 'greater_than'){
+              return [2, 1, value.value1];
+            }else if(value.operator === 'less_than'){
+              return [2, 2, value.value1];
+            }
+          }
+          if (key === 'categories') {
+            return [6, ...(value.values || [])];
+          }
+          if (key === 'accounts') {
+            return [4, ...(value.values || [])];
+          }
+          if (key === 'description') {
+            return [1, value.match_type, value.value];
+          }
+          if (key === 'date') {
+            return [3, value.match_type, value.value1, value.value2];
+          }
+          // Add more as needed
+        }
+        return null;
+      });
+    return enabledFields;
+  }
+
+
+  const payloadActionMapper = (action) => {
+    const enabledFields = Object.entries(action).filter(([key, value]) => value.enabled).map(([key, value]) =>{
+      if(key === 'rename_merchant') {
+        return [1, value.new_name]
+      }else if(key === 'update_category') {
+        return [2, value.new_category]
+      }else if(key === 'add_tags') {
+        return [3, value.tags]
+      }else if(key === 'hide_transaction') {
+        return [4]
+      }else if(key==='link_to_goal') {
+        return [5, value.goal_id]
+      }
+      return null;
+    });
+  
+    return enabledFields;
+  }
+
+
+  const matcherMapper = (matcher,type) => {
+    if(type === 'merchants') {  
+    if(matcher.match_type === 'contains') {
+      return [1, matcher.value]
+    }else if(matcher.match_type === 'exactly_matches') {
+      return [2, matcher.value]
+    }else if(matcher.match_type === 'original_statement') {
+      return [3, matcher.value]
+    }else if(matcher.match_type === 'merchant_name') {
+      return [4, matcher.value]
+      }
+      return null;
+    }else if(type === 'amount') {
+      if(matcher.match_type === 'greater_than') {
+        return [1, matcher.value1]
+      }else if(matcher.match_type === 'less_than') {
+        return [2, matcher.value1]
+      }else if(matcher.match_type === 'equals') {
+        return [3, matcher.value1]
+      }else if(matcher.match_type === 'between') {
+        return [4, matcher.value1, matcher.value2]
+      }else if(matcher.match_type === 'expense') {
+        return [5, matcher.value1]
+      }else if(matcher.match_type === 'income') {
+        return [6, matcher.value1]
+      }
+      return null;
+    }else if(type === 'date') {
+      if(matcher.match_type === 'after') {
+        return [1, matcher.value1]
+      }else if(matcher.match_type === 'before') {
+        return [2, matcher.value1]
+      }else if(matcher.match_type === 'on') {
+        return [3, matcher.value1]
+      }else if(matcher.match_type === 'between') {
+        return [4, matcher.value1, matcher.value2]
+      }
+      return null;
+    }else if(type === 'categories') {
+      if(matcher.match_type === 'contains') {
+        return [1, matcher.value]
+      }else if(matcher.match_type === 'exactly_matches') {
+        return [2, matcher.value]
+      }
+    }else if(type === 'description') {
+      if(matcher.match_type === 'contains') {
+        return [1, matcher.value]
+      }else if(matcher.match_type === 'exactly_matches') {
+        return [2, matcher.value]
+      }
+    }else if(type === 'accounts') {
+      if(matcher.match_type === 'contains') {
+        return [1, matcher.value]
+      }else if(matcher.match_type === 'exactly_matches') {
+        return [2, matcher.value]
+      }
+    }
+    return null;
+  }
+
+
+
   // Use the new hook
   const { tags: allTags } = useTags();
 
@@ -92,6 +230,31 @@ export default function RulesPage() {
       }
     }));
   };
+
+  const handleSaveRule = async () => {
+
+    console.log(rule);
+
+   const payload = {
+    name: rule.name,
+    description: rule.description,
+    rule_type: 1,
+    rule_data: JSON.stringify({
+      ifs: payloadMapper(rule.conditions),
+      thens: payloadActionMapper(rule.actions)
+    })
+   }
+
+   console.log(payload);
+
+
+    const response = await ruleApi.create(payload);
+    if (response.status === 201) {
+      setShowSuccessModal(true);
+    } else {
+      console.error(response);
+    }
+  }
 
   const handleMatcherChange = (groupIndex, matcherIndex, field, value) => {
     setRule(prev => {
@@ -857,7 +1020,7 @@ export default function RulesPage() {
       
       <div className="flex justify-end gap-3 pt-4">
         <Button variant="outline">Cancel</Button>
-        <Button className="bg-emerald-600 hover:bg-emerald-700">Save Rule</Button>
+        <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleSaveRule}>Save Rule</Button>
       </div>
 
       <CreateCategoryModal
