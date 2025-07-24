@@ -12,9 +12,12 @@ export const useTags = () => {
     setError(null);
     try {
       const response = await tagApi.list();
-      setTags(response.data);
+      // Handle the response structure - could be response.data.data or response.data
+      const tagsData = response.data?.data || response.data || [];
+      setTags(Array.isArray(tagsData) ? tagsData : []);
     } catch (err) {
       setError(err.message);
+      setTags([]);
     } finally {
       setIsLoading(false);
     }
@@ -33,7 +36,8 @@ export const useTags = () => {
 
   const updateTag = useCallback(async (id, tagData) => {
     try {
-      const response = await tagApi.update(id, tagData);
+      // API expects data with id included
+      const response = await tagApi.update({ ...tagData, id });
       setTags(prev => prev.map(tag => tag.id === id ? response.data : tag));
       return response.data;
     } catch (err) {
@@ -44,7 +48,8 @@ export const useTags = () => {
 
   const deleteTag = useCallback(async (id) => {
     try {
-      await tagApi.delete(id);
+      // API expects data with id included
+      await tagApi.delete({ id });
       setTags(prev => prev.filter(tag => tag.id !== id));
     } catch (err) {
       setError(err.message);

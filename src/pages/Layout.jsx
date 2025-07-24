@@ -42,7 +42,7 @@ const menuItems = [
   },
   {
     title: "Tag",
-    url: createPageUrl("Tag"),
+    url: createPageUrl("Tags"),
   },
   {
     title: "Entity",
