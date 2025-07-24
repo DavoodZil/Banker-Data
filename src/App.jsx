@@ -25,6 +25,7 @@ import Goals from '@/pages/Goals';
 import CashFlow from '@/pages/CashFlow';
 import Budget from '@/pages/Budget';
 import Tag from '@/pages/Tag';
+import TagsList from '@/pages/TagsList';
 import Group from '@/pages/Group';
 
 function App() {
@@ -206,6 +207,17 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Tag />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/tags"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TagsList />
               </Layout>
             </ProtectedRoute>
           }

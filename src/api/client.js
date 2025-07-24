@@ -76,13 +76,13 @@ export const ruleApi = {
 
 // Tag API functions
 export const tagApi = {
-  list: (params = {}) => api.get('/bank-data/tags', { params }),
-  get: (id) => api.get(`/bank-data/tags/${id}`),
-  create: (data) => api.post('/bank-data/tags', data),
-  update: (id, data) => api.put(`/bank-data/tags/${id}`, data),
-  delete: (id) => api.delete(`/bank-data/tags/${id}`),
+  list: () => api.get('/bank-data/tags'),
+  create: (data) => api.post('/bank-data/tag', data),
+  update: (data) => api.put('/bank-data/tag', data), // data includes id
+  delete: (data) => api.delete('/bank-data/tag', { data }), // data includes id
   
-  // Tag-specific endpoints
+  // Keep these for backwards compatibility if needed
+  get: (id) => api.get(`/bank-data/tags/${id}`),
   getPopular: (limit = 20) => api.get('/bank-data/tags/popular', { params: { limit } }),
   getSuggestions: (transactionData) => api.post('/bank-data/tags/suggestions', transactionData),
 };
