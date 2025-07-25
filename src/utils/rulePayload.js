@@ -38,9 +38,9 @@ export const matcherMapper = (matcher, type) => {
         return [MERCHANT_MATCH_TYPE_CONTAINS, matcher.value];
       case 'exactly_matches':
         return [MERCHANT_MATCH_TYPE_EXACT, matcher.value];
-      case 'original_statement':
+      case 'starts_with':
         return [MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT, matcher.value];
-      case 'merchant_name':
+      case 'ends_with':
         return [MERCHANT_MATCH_TYPE_MERCHANT_NAME, matcher.value];
       default:
         return null;
@@ -231,8 +231,8 @@ export function decodeRuleData(ruleData, allTags = []) {
           let match_type = 'contains';
           if (matchType === MERCHANT_MATCH_TYPE_CONTAINS) match_type = 'contains';
           else if (matchType === MERCHANT_MATCH_TYPE_EXACT) match_type = 'exactly_matches';
-          else if (matchType === MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT) match_type = 'original_statement';
-          else if (matchType === MERCHANT_MATCH_TYPE_MERCHANT_NAME) match_type = 'merchant_name';
+          else if (matchType === MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT) match_type = 'starts_with';
+          else if (matchType === MERCHANT_MATCH_TYPE_MERCHANT_NAME) match_type = 'ends_with';
           merchantMatchers.push({ match_type, value });
           break;
         }
