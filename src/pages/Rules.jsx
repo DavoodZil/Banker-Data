@@ -20,7 +20,7 @@ import SuccessModal from "../components/rules/SuccessModal";
 import CreateTagModal from "../components/rules/CreateTagModal";
 import TagSelector from "../components/rules/TagSelector";
 import SplitTransactionModal from "../components/rules/SplitTransactionModal";
-import { payloadMapper, payloadActionMapper, decodeRuleData } from '@/utils/rulePayload';
+import { payloadMapper, payloadActionMapper, payloadSplitMapper, decodeRuleData } from '@/utils/rulePayload';
 
 
 const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
@@ -101,12 +101,9 @@ export default function RulesPage() {
   useEffect(() => {
     if (isEditing && existingRule && !ruleLoading) {
       try {
-        console.log('Existing rule:', existingRule);
         const ruleData = JSON.parse(existingRule.rule_data || '{}');
-        console.log('Parsed rule data:', ruleData);
         // Use the new decodeRuleData function to populate the form state
         const decoded = decodeRuleData(ruleData);
-        console.log('Decoded rule data:', decoded);
         setRule({
           name: existingRule.name || "Rule",
           description: existingRule.description || "",
@@ -119,26 +116,72 @@ export default function RulesPage() {
   }, [isEditing, existingRule, ruleLoading]);
 
   const handleToggle = (type, key) => {
-    setRule(prev => ({
-      ...prev,
-      [type]: {
-        ...prev[type],
-        [key]: { ...prev[type][key], enabled: !prev[type][key].enabled }
+    setRule(prev => {
+      // If toggling split_transaction on, disable all other actions
+      if (type === 'actions' && key === 'split_transaction' && !prev.actions.split_transaction.enabled) {
+        return {
+          ...prev,
+          actions: {
+            ...prev.actions,
+            rename_merchant: { ...prev.actions.rename_merchant, enabled: false },
+            update_category: { ...prev.actions.update_category, enabled: false },
+            add_tags: { ...prev.actions.add_tags, enabled: false },
+            hide_transaction: { ...prev.actions.hide_transaction, enabled: false },
+            mark_for_review: { ...prev.actions.mark_for_review, enabled: false },
+            link_to_goal: { ...prev.actions.link_to_goal, enabled: false },
+            split_transaction: { ...prev.actions.split_transaction, enabled: true }
+          }
+        };
       }
-    }));
+      
+      // If toggling any other action on while split_transaction is enabled, disable split_transaction
+      if (type === 'actions' && key !== 'split_transaction' && prev.actions.split_transaction.enabled && !prev.actions[key].enabled) {
+        return {
+          ...prev,
+          actions: {
+            ...prev.actions,
+            split_transaction: { ...prev.actions.split_transaction, enabled: false },
+            [key]: { ...prev.actions[key], enabled: true }
+          }
+        };
+      }
+      
+      // Normal toggle
+      return {
+        ...prev,
+        [type]: {
+          ...prev[type],
+          [key]: { ...prev[type][key], enabled: !prev[type][key].enabled }
+        }
+      };
+    });
   };
 
   const handleSaveRule = async () => {
-    console.log(rule);
+    // Determine if this is a split rule or a regular rule
+    const isSplitRule = rule.actions.split_transaction.enabled;
+    
+    let rule_data;
+    if (isSplitRule) {
+      // For split rules (rule_type 2)
+      const splits = payloadSplitMapper(rule.actions.split_transaction);
+      rule_data = {
+        ifs: payloadMapper(rule.conditions),
+        splits: splits || []
+      };
+    } else {
+      // For regular rules (rule_type 1)
+      rule_data = {
+        ifs: payloadMapper(rule.conditions),
+        thens: payloadActionMapper(rule.actions)
+      };
+    }
 
     const payload = {
       name: rule.name,
       description: rule.description,
-      rule_type: 1,
-      rule_data: JSON.stringify({
-        ifs: payloadMapper(rule.conditions),
-        thens: payloadActionMapper(rule.actions)
-      })
+      rule_type: isSplitRule ? 2 : 1,
+      rule_data: JSON.stringify(rule_data)
     }
 
     try {
