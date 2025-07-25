@@ -49,10 +49,10 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="flex items-center gap-2 text-xs text-gray-500">
+        {/* <div className="flex items-center gap-2 text-xs text-gray-500">
           <Hash className="w-3 h-3" />
           <span>ID: {goal.id}</span>
-        </div>
+        </div> */}
       </CardContent>
       
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
