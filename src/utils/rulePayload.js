@@ -151,6 +151,24 @@ export const payloadActionMapper = (action) => {
   return enabledFields.filter(Boolean);
 };
 
+export const payloadSplitMapper = (splitData) => {
+  if (!splitData.enabled || !splitData.splits || splitData.splits.length === 0) {
+    return null;
+  }
+  
+  return splitData.splits.map(split => ({
+    merchant: split.merchant || '',
+    category: split.category || null, // Keep as category name, backend will handle the conversion
+    amount: splitData.splitType === 'amount' ? parseFloat(split.amount) || 0 : parseFloat(split.percentage) || 0,
+    percentage: splitData.splitType === 'percentage' ? parseFloat(split.percentage) || 0 : null,
+    split_type: splitData.splitType,
+    tags: split.tags && split.tags.length > 0 ? split.tags : [],
+    review_status: split.review_status === 'needs_review' ? 1 : (split.review_status === 'reviewed' ? 2 : 0),
+    reviewer: split.reviewer || null,
+    hide_original: splitData.hideOriginal || false
+  }));
+};
+
 /**
  * Reverse-maps rule_data (with ifs/thens) to the form state for editing.
  * @param {object} ruleData - The parsed rule_data object from the API
@@ -300,6 +318,31 @@ export function decodeRuleData(ruleData) {
           break;
       }
     });
+  }
+
+  // --- Decode SPLITS (for rule_type 2) ---
+  if (Array.isArray(ruleData.splits) && ruleData.splits.length > 0) {
+    formState.actions.split_transaction.enabled = true;
+    
+    // Determine split type from the data
+    const splitType = ruleData.splits[0]?.split_type || 
+                     (ruleData.splits[0]?.percentage !== undefined && ruleData.splits[0]?.percentage !== null ? 'percentage' : 'amount');
+    
+    formState.actions.split_transaction.splitType = splitType;
+    formState.actions.split_transaction.splits = ruleData.splits.map((split, index) => ({
+      id: index + 1,
+      merchant: split.merchant || '',
+      category: split.category || split.category_id || '', // Support both category name and ID
+      amount: splitType === 'amount' ? (split.amount || '') : '',
+      percentage: splitType === 'percentage' ? (split.percentage || split.amount || '') : '',
+      tags: Array.isArray(split.tags) ? split.tags : (split.tags ? [split.tags] : []),
+      review_status: split.review_status === 1 ? 'needs_review' : (split.review_status === 2 ? 'reviewed' : 'none'),
+      reviewer: split.reviewer || ''
+    }));
+    
+    // Check for hide_original - could be in the first split or as a separate field
+    const hideOriginal = ruleData.splits[0]?.hide_original || ruleData.hide_original || false;
+    formState.actions.split_transaction.hideOriginal = hideOriginal;
   }
 
   return formState;
