@@ -506,10 +506,9 @@ export default function RulesPage() {
           <h2 className="font-semibold text-lg text-gray-800">If a transaction matches...</h2>
           <div className="space-y-4">
             <CriteriaBlock title="Merchants" isEnabled={rule.conditions.merchants.enabled} onToggle={() => handleToggle('conditions', 'merchants')}>
-              <Select defaultValue="original_statement">
+              <Select defaultValue="merchant_name">
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="original_statement">Original statement</SelectItem>
                   <SelectItem value="merchant_name">Merchant Name</SelectItem>
                 </SelectContent>
               </Select>
