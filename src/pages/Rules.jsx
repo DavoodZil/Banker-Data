@@ -12,7 +12,7 @@ import {
   Store, DollarSign, List, CreditCard, Pencil, Tag, EyeOff, ClipboardCheck, Target, GitCommitHorizontal, PlusCircle, MinusCircle, Plus, ArrowRight,
   TrendingUp, Heart, Car, Home, Zap, UtensilsCrossed, MapPin, User, ShoppingBag, Shield, FileText, Briefcase, ArrowLeftRight, Search
 } from 'lucide-react';
-import { useTags, useRule } from "@/hooks/api";
+import { useTags, useRule, useGoals } from "@/hooks/api";
 import { ruleApi } from "@/api/client";
 
 import CreateCategoryModal from "../components/rules/CreateCategoryModal";
@@ -93,8 +93,9 @@ export default function RulesPage() {
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
 
-  // Use the new hook
-  const { tags: allTags } = useTags();
+  // Use the hooks for tags and goals
+  const { tags: allTags, createTag } = useTags();
+  const { goals: allGoals } = useGoals();
 
   // Load existing rule data when editing
   useEffect(() => {
@@ -262,21 +263,24 @@ export default function RulesPage() {
   };
   
   const handleCreateTag = async (tagData) => {
-    const newTag = await TagEntity.create(tagData);
-    setAllTags(prev => [...prev, newTag]);
-    
-    setRule(prev => ({
+    try {
+      const newTag = await createTag(tagData);
+      
+      setRule(prev => ({
         ...prev,
         actions: {
-            ...prev.actions,
-            add_tags: {
-                ...prev.actions.add_tags,
-                enabled: true,
-                tags: [...prev.actions.add_tags.tags, newTag.name]
-            }
+          ...prev.actions,
+          add_tags: {
+            ...prev.actions.add_tags,
+            enabled: true,
+            tags: [...prev.actions.add_tags.tags, newTag.name]
+          }
         }
-    }));
-    setShowCreateTagModal(false);
+      }));
+      setShowCreateTagModal(false);
+    } catch (error) {
+      console.error('Error creating tag:', error);
+    }
   };
 
   const handleReviewStatusChange = (field, value) => {
@@ -381,7 +385,6 @@ export default function RulesPage() {
   });
 
   const accounts = ["Checking", "Savings", "Credit Card"];
-  const goals = ["Vacation Fund", "New Car"];
   const reviewers = ["John Smith", "Sarah Johnson", "Mike Wilson", "Emma Davis"];
 
   // Show loading state when editing and rule is loading
@@ -881,7 +884,19 @@ export default function RulesPage() {
                      }))}
                    >
                      <SelectTrigger><SelectValue placeholder="Select a goal" /></SelectTrigger>
-                     <SelectContent>{goals.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
+                     <SelectContent>
+                       {allGoals && allGoals.length > 0 ? (
+                         allGoals.map(goal => (
+                           <SelectItem key={goal.id} value={goal.id}>
+                             {goal.name}
+                           </SelectItem>
+                         ))
+                       ) : (
+                         <div className="p-2 text-sm text-gray-500 text-center">
+                           No goals available
+                         </div>
+                       )}
+                     </SelectContent>
                    </Select>
                 </ActionRow>
                 <Separator />
