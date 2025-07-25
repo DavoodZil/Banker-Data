@@ -103,7 +103,7 @@ export default function RulesPage() {
       try {
         const ruleData = JSON.parse(existingRule.rule_data || '{}');
         // Use the new decodeRuleData function to populate the form state
-        const decoded = decodeRuleData(ruleData);
+        const decoded = decodeRuleData(ruleData, allTags);
         setRule({
           name: existingRule.name || "Rule",
           description: existingRule.description || "",
@@ -113,7 +113,7 @@ export default function RulesPage() {
         console.error('Error parsing existing rule data:', error);
       }
     }
-  }, [isEditing, existingRule, ruleLoading]);
+  }, [isEditing, existingRule, ruleLoading, allTags]);
 
   const handleToggle = (type, key) => {
     setRule(prev => {
@@ -164,7 +164,7 @@ export default function RulesPage() {
     let rule_data;
     if (isSplitRule) {
       // For split rules (rule_type 2)
-      const splits = payloadSplitMapper(rule.actions.split_transaction);
+      const splits = payloadSplitMapper(rule.actions.split_transaction, allTags);
       rule_data = {
         ifs: payloadMapper(rule.conditions),
         splits: splits || []
@@ -173,7 +173,7 @@ export default function RulesPage() {
       // For regular rules (rule_type 1)
       rule_data = {
         ifs: payloadMapper(rule.conditions),
-        thens: payloadActionMapper(rule.actions)
+        thens: payloadActionMapper(rule.actions, allTags)
       };
     }
 
@@ -317,7 +317,7 @@ export default function RulesPage() {
           add_tags: {
             ...prev.actions.add_tags,
             enabled: true,
-            tags: [...prev.actions.add_tags.tags, newTag.name]
+            tags: [...prev.actions.add_tags.tags, newTag.name] // Store tag names for UI
           }
         }
       }));

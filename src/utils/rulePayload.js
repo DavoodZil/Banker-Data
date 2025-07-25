@@ -129,7 +129,27 @@ export const payloadMapper = (condition) => {
   return result;
 };
 
-export const payloadActionMapper = (action) => {
+// Helper function to convert tag names to IDs
+const convertTagNamesToIds = (tagNames, allTags) => {
+  if (!Array.isArray(tagNames) || !Array.isArray(allTags)) return [];
+  return tagNames.map(tagName => {
+    const tag = allTags.find(t => t.name === tagName);
+    return tag ? tag.id : null;
+  }).filter(Boolean);
+};
+
+// Helper function to convert tag IDs to names
+const convertTagIdsToNames = (tagIds, allTags) => {
+  if (!Array.isArray(tagIds) && typeof tagIds !== 'number') return [];
+  const ids = Array.isArray(tagIds) ? tagIds : [tagIds];
+  if (!Array.isArray(allTags)) return [];
+  return ids.map(tagId => {
+    const tag = allTags.find(t => t.id === tagId);
+    return tag ? tag.name : null;
+  }).filter(Boolean);
+};
+
+export const payloadActionMapper = (action, allTags = []) => {
   const enabledFields = Object.entries(action)
     .filter(([key, value]) => value.enabled)
     .map(([key, value]) => {
@@ -139,7 +159,9 @@ export const payloadActionMapper = (action) => {
         case 'update_category':
           return [THEN_ACTION_UPDATE_CATEGORY, value.new_category];
         case 'add_tags':
-          return [THEN_ACTION_ADD_TAG, value.tags];
+          // Convert tag names to IDs
+          const tagIds = convertTagNamesToIds(value.tags, allTags);
+          return [THEN_ACTION_ADD_TAG, tagIds];
         case 'hide_transaction':
           return [THEN_ACTION_HIDE_TRANSACTION];
         case 'link_to_goal':
@@ -151,7 +173,7 @@ export const payloadActionMapper = (action) => {
   return enabledFields.filter(Boolean);
 };
 
-export const payloadSplitMapper = (splitData) => {
+export const payloadSplitMapper = (splitData, allTags = []) => {
   if (!splitData.enabled || !splitData.splits || splitData.splits.length === 0) {
     return null;
   }
@@ -162,7 +184,7 @@ export const payloadSplitMapper = (splitData) => {
     amount: splitData.splitType === 'amount' ? parseFloat(split.amount) || 0 : parseFloat(split.percentage) || 0,
     percentage: splitData.splitType === 'percentage' ? parseFloat(split.percentage) || 0 : null,
     split_type: splitData.splitType,
-    tags: split.tags && split.tags.length > 0 ? split.tags : [],
+    tags: convertTagNamesToIds(split.tags || [], allTags),
     review_status: split.review_status === 'needs_review' ? 1 : (split.review_status === 'reviewed' ? 2 : 0),
     reviewer: split.reviewer || null,
     hide_original: splitData.hideOriginal || false
@@ -174,7 +196,7 @@ export const payloadSplitMapper = (splitData) => {
  * @param {object} ruleData - The parsed rule_data object from the API
  * @returns {object} - The form state for the rule
  */
-export function decodeRuleData(ruleData) {
+export function decodeRuleData(ruleData, allTags = []) {
   // Default form state structure
   const formState = {
     conditions: {
@@ -305,7 +327,8 @@ export function decodeRuleData(ruleData) {
           break;
         case THEN_ACTION_ADD_TAG:
           formState.actions.add_tags.enabled = true;
-          formState.actions.add_tags.tags = value;
+          // Convert tag IDs back to names for display
+          formState.actions.add_tags.tags = convertTagIdsToNames(value, allTags);
           break;
         case THEN_ACTION_HIDE_TRANSACTION:
           formState.actions.hide_transaction.enabled = true;
@@ -335,7 +358,7 @@ export function decodeRuleData(ruleData) {
       category: split.category || split.category_id || '', // Support both category name and ID
       amount: splitType === 'amount' ? (split.amount || '') : '',
       percentage: splitType === 'percentage' ? (split.percentage || split.amount || '') : '',
-      tags: Array.isArray(split.tags) ? split.tags : (split.tags ? [split.tags] : []),
+      tags: convertTagIdsToNames(Array.isArray(split.tags) ? split.tags : (split.tags ? [split.tags] : []), allTags),
       review_status: split.review_status === 1 ? 'needs_review' : (split.review_status === 2 ? 'reviewed' : 'none'),
       reviewer: split.reviewer || ''
     }));
