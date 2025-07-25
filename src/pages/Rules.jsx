@@ -141,11 +141,9 @@ export default function RulesPage() {
       })
     }
 
-    console.log(payload);
-
     try {
       const response = isEditing 
-        ? await ruleApi.update(ruleId, payload)
+        ? await ruleApi.update(ruleId, {...payload,reapply_rule:1,id:ruleId})
         : await ruleApi.create(payload);
         
       if (response.status === 200 || response.status === 201) {
