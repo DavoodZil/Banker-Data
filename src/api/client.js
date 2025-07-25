@@ -66,7 +66,7 @@ export const ruleApi = {
   get: (id) => api.get(`/bank-data/rule/${id}`),
   create: (data) => api.post('/bank-data/rules', data),
   update: (id, data) => api.put(`/bank-data/rules/${id}`, data),
-  delete: (id) => api.delete(`/bank-data/rules/${id}`),
+  delete: (id) => api.delete(`/bank-data/rule/${id}`),
   
   // Rule-specific endpoints
   test: (rule, transactions) => api.post('/bank-data/rules/test', { rule, transactions }),

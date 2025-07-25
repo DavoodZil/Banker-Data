@@ -102,7 +102,9 @@ export const useRule = (id) => {
     setError(null);
     try {
       const response = await ruleApi.get(id);
-      setRule(response.data);
+      // The API returns { success: true, data: {...} }
+      // But axios wraps it in response.data, so we need response.data.data
+      setRule(response.data?.data || response.data);
     } catch (err) {
       setError(err.message);
     } finally {

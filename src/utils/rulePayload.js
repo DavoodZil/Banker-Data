@@ -193,7 +193,7 @@ export function decodeRuleData(ruleData) {
           else if (matchType === MERCHANT_MATCH_TYPE_EXACT) match_type = 'exactly_matches';
           else if (matchType === MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT) match_type = 'original_statement';
           else if (matchType === MERCHANT_MATCH_TYPE_MERCHANT_NAME) match_type = 'merchant_name';
-          merchantMatchers.push([{ match_type, value }]);
+          merchantMatchers.push({ match_type, value });
           break;
         }
         case IF_AMOUNT: {
@@ -212,6 +212,12 @@ export function decodeRuleData(ruleData) {
             formState.conditions.amount.operator = 'between';
             formState.conditions.amount.value1 = v1;
             formState.conditions.amount.value2 = v2;
+          } else if (op === AMOUNT_MATCH_TYPE_EXPENSE) {
+            formState.conditions.amount.transaction_type = 'expense';
+            formState.conditions.amount.value1 = v1;
+          } else if (op === AMOUNT_MATCH_TYPE_INCOME) {
+            formState.conditions.amount.transaction_type = 'income';
+            formState.conditions.amount.value1 = v1;
           }
           break;
         }
@@ -261,7 +267,8 @@ export function decodeRuleData(ruleData) {
       }
     });
     if (merchantMatchers.length > 0) {
-      formState.conditions.merchants.matchers = merchantMatchers;
+      // Group all merchant matchers into a single OR group for simplicity
+      formState.conditions.merchants.matchers = [merchantMatchers];
     }
   }
 
