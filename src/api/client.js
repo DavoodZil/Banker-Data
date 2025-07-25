@@ -63,7 +63,7 @@ export const categoryApi = {
 // Rule API functions
 export const ruleApi = {
   list: (params = {}) => api.get('/bank-data/rules', { params }),
-  get: (id) => api.get(`/bank-data/rules/${id}`),
+  get: (id) => api.get(`/bank-data/rule/${id}`),
   create: (data) => api.post('/bank-data/rules', data),
   update: (id, data) => api.put(`/bank-data/rules/${id}`, data),
   delete: (id) => api.delete(`/bank-data/rules/${id}`),
