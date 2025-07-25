@@ -101,9 +101,12 @@ export default function RulesPage() {
   useEffect(() => {
     if (isEditing && existingRule && !ruleLoading) {
       try {
+        console.log('Existing rule:', existingRule);
         const ruleData = JSON.parse(existingRule.rule_data || '{}');
+        console.log('Parsed rule data:', ruleData);
         // Use the new decodeRuleData function to populate the form state
         const decoded = decodeRuleData(ruleData);
+        console.log('Decoded rule data:', decoded);
         setRule({
           name: existingRule.name || "Rule",
           description: existingRule.description || "",
