@@ -13,6 +13,7 @@ import Accounts from '@/pages/Accounts'
 import Transactions from '@/pages/Transactions'
 import Categories from '@/pages/Categories'
 import Rules from '@/pages/Rules'
+import RulesList from '@/pages/RulesList'
 import Entity from '@/pages/Entity'
 import Import from '@/pages/Import'
 import API from '@/pages/API'
@@ -21,9 +22,11 @@ import AuthTest from '@/pages/AuthTest'
 import Reports from '@/pages/Reports';
 import Merchants from '@/pages/Merchants';
 import Goals from '@/pages/Goals';
+import GoalsList from '@/pages/GoalsList';
 import CashFlow from '@/pages/CashFlow';
 import Budget from '@/pages/Budget';
 import Tag from '@/pages/Tag';
+import TagsList from '@/pages/TagsList';
 import Group from '@/pages/Group';
 
 function App() {
@@ -116,6 +119,28 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
+                <RulesList />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/rules/create"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Rules />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/rules/edit/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
                 <Rules />
               </Layout>
             </ProtectedRoute>
@@ -149,7 +174,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Goals />
+                <GoalsList />
               </Layout>
             </ProtectedRoute>
           }
@@ -183,6 +208,17 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Tag />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/tags"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TagsList />
               </Layout>
             </ProtectedRoute>
           }
