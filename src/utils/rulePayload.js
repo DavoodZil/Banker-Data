@@ -88,7 +88,7 @@ export const matcherMapper = (matcher, type) => {
   return null;
 };
 
-export const payloadMapper = (condition) => {
+export const payloadMapper = (condition, allCategories = []) => {
   let result = [];
   Object.entries(condition)
     .filter(([key, value]) => value.enabled)
@@ -108,7 +108,12 @@ export const payloadMapper = (condition) => {
         }, 'amount');
         if (mapped) result.push([IF_AMOUNT, ...mapped]);
       } else if (key === 'categories') {
-        (value.values || []).forEach(val => result.push([IF_CATEGORY, val]));
+        // Convert category names to IDs
+        (value.values || []).forEach(categoryName => {
+          const category = allCategories.find(c => c.name === categoryName);
+          const categoryId = category ? category.id : categoryName;
+          result.push([IF_CATEGORY, categoryId]);
+        });
       } else if (key === 'accounts') {
         (value.values || []).forEach(val => result.push([IF_ACCOUNT, val]));
       } else if (key === 'description') {
@@ -149,7 +154,28 @@ const convertTagIdsToNames = (tagIds, allTags) => {
   }).filter(Boolean);
 };
 
-export const payloadActionMapper = (action, allTags = []) => {
+// Helper function to convert category names to IDs
+const convertCategoryNamesToIds = (categoryNames, allCategories) => {
+  if (!Array.isArray(categoryNames)) return [];
+  if (!Array.isArray(allCategories)) return [];
+  return categoryNames.map(categoryName => {
+    const category = allCategories.find(c => c.name === categoryName);
+    return category ? category.id : null;
+  }).filter(Boolean);
+};
+
+// Helper function to convert category IDs to names
+const convertCategoryIdsToNames = (categoryIds, allCategories) => {
+  if (!Array.isArray(categoryIds) && typeof categoryIds !== 'number') return [];
+  const ids = Array.isArray(categoryIds) ? categoryIds : [categoryIds];
+  if (!Array.isArray(allCategories)) return [];
+  return ids.map(categoryId => {
+    const category = allCategories.find(c => c.id === categoryId);
+    return category ? category.name : null;
+  }).filter(Boolean);
+};
+
+export const payloadActionMapper = (action, allTags = [], allCategories = []) => {
   const enabledFields = Object.entries(action)
     .filter(([key, value]) => value.enabled)
     .map(([key, value]) => {
@@ -157,7 +183,10 @@ export const payloadActionMapper = (action, allTags = []) => {
         case 'rename_merchant':
           return [THEN_ACTION_RENAME_MERCHANT, value.new_name];
         case 'update_category':
-          return [THEN_ACTION_UPDATE_CATEGORY, value.new_category];
+          // Convert category name to ID
+          const category = allCategories.find(c => c.name === value.new_category);
+          const categoryId = category ? category.id : value.new_category;
+          return [THEN_ACTION_UPDATE_CATEGORY, categoryId];
         case 'add_tags':
           // Convert tag names to IDs
           const tagIds = convertTagNamesToIds(value.tags, allTags);
@@ -173,22 +202,28 @@ export const payloadActionMapper = (action, allTags = []) => {
   return enabledFields.filter(Boolean);
 };
 
-export const payloadSplitMapper = (splitData, allTags = []) => {
+export const payloadSplitMapper = (splitData, allTags = [], allCategories = []) => {
   if (!splitData.enabled || !splitData.splits || splitData.splits.length === 0) {
     return null;
   }
   
-  return splitData.splits.map(split => ({
-    merchant: split.merchant || '',
-    category: split.category || null, // Keep as category name, backend will handle the conversion
-    amount: splitData.splitType === 'amount' ? parseFloat(split.amount) || 0 : parseFloat(split.percentage) || 0,
-    percentage: splitData.splitType === 'percentage' ? parseFloat(split.percentage) || 0 : null,
-    split_type: splitData.splitType,
-    tags: convertTagNamesToIds(split.tags || [], allTags),
-    review_status: split.review_status === 'needs_review' ? 1 : (split.review_status === 'reviewed' ? 2 : 0),
-    reviewer: split.reviewer || null,
-    hide_original: splitData.hideOriginal || false
-  }));
+  return splitData.splits.map(split => {
+    // Convert category name to ID
+    const category = allCategories.find(c => c.name === split.category);
+    const categoryId = category ? category.id : split.category;
+    
+    return {
+      merchant: split.merchant || '',
+      category_id: categoryId,
+      amount: splitData.splitType === 'amount' ? parseFloat(split.amount) || 0 : parseFloat(split.percentage) || 0,
+      percentage: splitData.splitType === 'percentage' ? parseFloat(split.percentage) || 0 : null,
+      split_type: splitData.splitType,
+      tags: convertTagNamesToIds(split.tags || [], allTags),
+      review_status: split.review_status === 'needs_review' ? 1 : (split.review_status === 'reviewed' ? 2 : 0),
+      reviewer: split.reviewer || null,
+      hide_original: splitData.hideOriginal || false
+    };
+  });
 };
 
 /**
@@ -196,7 +231,7 @@ export const payloadSplitMapper = (splitData, allTags = []) => {
  * @param {object} ruleData - The parsed rule_data object from the API
  * @returns {object} - The form state for the rule
  */
-export function decodeRuleData(ruleData, allTags = []) {
+export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
   // Default form state structure
   const formState = {
     conditions: {
@@ -263,8 +298,11 @@ export function decodeRuleData(ruleData, allTags = []) {
         }
         case IF_CATEGORY: {
           formState.conditions.categories.enabled = true;
-          const [category] = rest;
-          formState.conditions.categories.values.push(category);
+          const [categoryId] = rest;
+          // Convert category ID back to name
+          const category = allCategories.find(c => c.id === categoryId);
+          const categoryName = category ? category.name : categoryId;
+          formState.conditions.categories.values.push(categoryName);
           break;
         }
         case IF_ACCOUNT: {
@@ -323,7 +361,10 @@ export function decodeRuleData(ruleData, allTags = []) {
           break;
         case THEN_ACTION_UPDATE_CATEGORY:
           formState.actions.update_category.enabled = true;
-          formState.actions.update_category.new_category = value;
+          // Convert category ID back to name
+          const actionCategory = allCategories.find(c => c.id === value);
+          const actionCategoryName = actionCategory ? actionCategory.name : value;
+          formState.actions.update_category.new_category = actionCategoryName;
           break;
         case THEN_ACTION_ADD_TAG:
           formState.actions.add_tags.enabled = true;
@@ -355,7 +396,15 @@ export function decodeRuleData(ruleData, allTags = []) {
     formState.actions.split_transaction.splits = ruleData.splits.map((split, index) => ({
       id: index + 1,
       merchant: split.merchant || '',
-      category: split.category || split.category_id || '', // Support both category name and ID
+      category: (() => {
+        // Convert category ID back to name
+        const categoryId = split.category_id || split.category;
+        if (typeof categoryId === 'number' || (typeof categoryId === 'string' && !isNaN(categoryId))) {
+          const category = allCategories.find(c => c.id == categoryId);
+          return category ? category.name : '';
+        }
+        return categoryId || '';
+      })(),
       amount: splitType === 'amount' ? (split.amount || '') : '',
       percentage: splitType === 'percentage' ? (split.percentage || split.amount || '') : '',
       tags: convertTagIdsToNames(Array.isArray(split.tags) ? split.tags : (split.tags ? [split.tags] : []), allTags),

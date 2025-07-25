@@ -12,10 +12,10 @@ import {
   Store, DollarSign, List, CreditCard, Pencil, Tag, EyeOff, ClipboardCheck, Target, GitCommitHorizontal, PlusCircle, MinusCircle, Plus, ArrowRight,
   TrendingUp, Heart, Car, Home, Zap, UtensilsCrossed, MapPin, User, ShoppingBag, Shield, FileText, Briefcase, ArrowLeftRight, Search
 } from 'lucide-react';
-import { useTags, useRule, useGoals } from "@/hooks/api";
+import { useTags, useRule, useGoals, useCategories } from "@/hooks/api";
 import { ruleApi } from "@/api/client";
 
-import CreateCategoryModal from "../components/rules/CreateCategoryModal";
+import AddCategoryModal from "../components/categories/AddCategoryModal";
 import SuccessModal from "../components/rules/SuccessModal";
 import CreateTagModal from "../components/rules/CreateTagModal";
 import TagSelector from "../components/rules/TagSelector";
@@ -93,9 +93,10 @@ export default function RulesPage() {
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
 
-  // Use the hooks for tags and goals
+  // Use the hooks for tags, goals, and categories
   const { tags: allTags, createTag } = useTags();
   const { goals: allGoals } = useGoals();
+  const { categories: allCategories, createCategory } = useCategories();
 
   // Load existing rule data when editing
   useEffect(() => {
@@ -103,7 +104,7 @@ export default function RulesPage() {
       try {
         const ruleData = JSON.parse(existingRule.rule_data || '{}');
         // Use the new decodeRuleData function to populate the form state
-        const decoded = decodeRuleData(ruleData, allTags);
+        const decoded = decodeRuleData(ruleData, allTags, allCategories);
         setRule({
           name: existingRule.name || "Rule",
           description: existingRule.description || "",
@@ -113,7 +114,7 @@ export default function RulesPage() {
         console.error('Error parsing existing rule data:', error);
       }
     }
-  }, [isEditing, existingRule, ruleLoading, allTags]);
+  }, [isEditing, existingRule, ruleLoading, allTags, allCategories]);
 
   const handleToggle = (type, key) => {
     setRule(prev => {
@@ -164,16 +165,16 @@ export default function RulesPage() {
     let rule_data;
     if (isSplitRule) {
       // For split rules (rule_type 2)
-      const splits = payloadSplitMapper(rule.actions.split_transaction, allTags);
+      const splits = payloadSplitMapper(rule.actions.split_transaction, allTags, allCategories);
       rule_data = {
-        ifs: payloadMapper(rule.conditions),
+        ifs: payloadMapper(rule.conditions, allCategories),
         splits: splits || []
       };
     } else {
       // For regular rules (rule_type 1)
       rule_data = {
-        ifs: payloadMapper(rule.conditions),
-        thens: payloadActionMapper(rule.actions, allTags)
+        ifs: payloadMapper(rule.conditions, allCategories),
+        thens: payloadActionMapper(rule.actions, allTags, allCategories)
       };
     }
 
@@ -271,39 +272,34 @@ export default function RulesPage() {
     });
   };
 
-  const handleCreateCategory = (categoryData) => {
-    const newCategoryName = categoryData.name;
-    const newCategoryGroup = categoryData.group;
+  const handleCreateCategory = async (categoryData) => {
+    try {
+      const newCategory = await createCategory({
+        name: categoryData.name,
+        parent_category: categoryData.parent_category || null
+      });
+      
+      const newCategoryName = newCategory.name;
+      
+      setSelectedCategory(newCategoryName);
+      setSelectedActionCategory(newCategoryName);
 
-    setCustomCategories(prev => {
-      const exists = prev.some(cat => cat.name === newCategoryName && cat.group === newCategoryGroup);
-      if (!exists) {
-        return [...prev, { 
-          name: newCategoryName, 
-          emoji: categoryData.emoji, 
-          group: newCategoryGroup, 
-          excludeFromBudget: categoryData.excludeFromBudget 
-        }];
-      }
-      return prev;
-    });
+      setRule(prevRule => {
+        const newRule = { ...prevRule };
+        if (newRule.conditions.categories.enabled) {
+          newRule.conditions.categories = { ...newRule.conditions.categories, values: [newCategoryName] };
+        }
+        if (newRule.actions.update_category.enabled) {
+          newRule.actions.update_category = { ...newRule.actions.update_category, new_category: newCategoryName };
+        }
+        return newRule;
+      });
 
-    setSelectedCategory(newCategoryName);
-    setSelectedActionCategory(newCategoryName);
-
-    setRule(prevRule => {
-      const newRule = { ...prevRule };
-      if (newRule.conditions.categories.enabled) {
-        newRule.conditions.categories = { ...newRule.conditions.categories, values: [newCategoryName] };
-      }
-      if (newRule.actions.update_category.enabled) {
-        newRule.actions.update_category = { ...newRule.actions.update_category, new_category: newCategoryName };
-      }
-      return newRule;
-    });
-
-    setShowCreateCategoryModal(false);
-    setShowSuccessModal(true);
+      setShowCreateCategoryModal(false);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error('Error creating category:', error);
+    }
   };
   
   const handleCreateTag = async (tagData) => {
@@ -392,41 +388,21 @@ export default function RulesPage() {
     }));
   };
 
-  const categoriesWithSubcategories = {
-    "Income": { icon: TrendingUp, subcategories: ["Paychecks", "Interest", "Business Income", "Other Income"] },
-    "Gifts & Donations": { icon: Heart, subcategories: ["Charity", "Gifts"] },
-    "Auto & Transport": { icon: Car, subcategories: ["Auto Payment", "Public Transit", "Gas", "Auto Maintenance", "Parking & Tolls", "Taxi & Ride Shares"] },
-    "Housing": { icon: Home, subcategories: ["Mortgage", "Rent", "Home Improvement"] },
-    "Bills & Utilities": { icon: Zap, subcategories: ["Garbage", "Water", "Gas & Electric", "Internet & Cable", "Phone"] },
-    "Food & Dining": { icon: UtensilsCrossed, subcategories: ["Groceries", "Restaurants & Bars", "Coffee Shops"] },
-    "Travel & Lifestyle": { icon: MapPin, subcategories: ["Travel & Vacation", "Entertainment & Recreation"] },
-    "Personal": { icon: User, subcategories: ["Pets", "Fun Money"] },
-    "Shopping": { icon: ShoppingBag, subcategories: ["Clothing", "Furniture & Housewares", "Electronics"] },
-    "Financial": { icon: Shield, subcategories: ["Insurance", "Taxes"] },
-    "Other": { icon: FileText, subcategories: ["Uncategorized", "Check", "Miscellaneous"] },
-    "Business": { icon: Briefcase, subcategories: ["Business Travel & Meals", "Business Auto Expenses", "Office Supplies & Expenses", "Postage & Shipping", "Domain", "Digital Marketing", "AI Tools", "UI/UX", "Customer SMS", "Backend Software & Tools", "Project Management Tool & Platform", "Analytics", "Website Publishing Platform", "Writing & Publishing", "Review Websites", "Social Media", "Email Marketing", "SEO"] },
-    "Transfers": { icon: ArrowLeftRight, subcategories: ["Transfer", "Credit Card Payment", "Balance Adjustments"] }
-  };
-
-  // Correctly clone the base categories object while preserving components
-  const allCategories = Object.entries(categoriesWithSubcategories).reduce((acc, [key, value]) => {
-    acc[key] = { ...value, subcategories: [...value.subcategories] };
-    return acc;
-  }, {});
-
-  customCategories.forEach(customCat => {
-    if (allCategories[customCat.group]) {
-      if (!allCategories[customCat.group].subcategories.includes(customCat.name)) {
-        allCategories[customCat.group].subcategories.push(customCat.name);
-      }
-    } else {
-      // New group from custom category, assign emoji
-      allCategories[customCat.group] = {
-        emoji: customCat.emoji, // Store emoji for new custom groups
-        subcategories: [customCat.name]
+  // Transform API categories for the category selector
+  const categoriesForSelector = allCategories.reduce((acc, category) => {
+    // Group by parent category or use "Other" as default
+    const groupName = category.parent_category || "Other";
+    
+    if (!acc[groupName]) {
+      acc[groupName] = {
+        icon: FileText, // Default icon
+        subcategories: []
       };
     }
-  });
+    
+    acc[groupName].subcategories.push(category.name);
+    return acc;
+  }, {});
 
   const accounts = ["Checking", "Savings", "Credit Card"];
   const reviewers = ["John Smith", "Sarah Johnson", "Mike Wilson", "Emma Davis"];
@@ -445,7 +421,7 @@ export default function RulesPage() {
     );
   }
 
-  const filteredCategories = Object.entries(allCategories).reduce((acc, [category, { icon, emoji, subcategories }]) => {
+  const filteredCategories = Object.entries(categoriesForSelector).reduce((acc, [category, { icon, emoji, subcategories }]) => {
     if (!categorySearch) {
       acc[category] = { icon, emoji, subcategories };
       return acc;
@@ -1001,7 +977,7 @@ export default function RulesPage() {
         </Button>
       </div>
 
-      <CreateCategoryModal
+      <AddCategoryModal
         isOpen={showCreateCategoryModal}
         onClose={() => setShowCreateCategoryModal(false)}
         onSave={handleCreateCategory}
@@ -1027,7 +1003,7 @@ export default function RulesPage() {
         splits={rule.actions.split_transaction.splits}
         splitType={rule.actions.split_transaction.splitType}
         hideOriginal={rule.actions.split_transaction.hideOriginal}
-        allCategories={allCategories}
+        allCategories={categoriesForSelector}
         onCreateCategory={() => setShowCreateCategoryModal(true)}
       />
     </div>
