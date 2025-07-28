@@ -28,6 +28,9 @@ export { useRules, useRule, useRuleTest } from './useRules';
 // Tag hooks
 export { useTags, useTagSuggestions } from './useTags';
 
+// Goal hooks
+export { useGoals } from './useGoals';
+
 // Entity hooks
 export { useEntities, useEntity } from './useEntities';
 

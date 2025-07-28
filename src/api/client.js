@@ -63,10 +63,10 @@ export const categoryApi = {
 // Rule API functions
 export const ruleApi = {
   list: (params = {}) => api.get('/bank-data/rules', { params }),
-  get: (id) => api.get(`/bank-data/rules/${id}`),
+  get: (id) => api.get(`/bank-data/rule/${id}`),
   create: (data) => api.post('/bank-data/rules', data),
-  update: (id, data) => api.put(`/bank-data/rules/${id}`, data),
-  delete: (id) => api.delete(`/bank-data/rules/${id}`),
+  update: (id, data) => api.put(`/bank-data/update-rule`, data),
+  delete: (id) => api.delete(`/bank-data/rule/${id}`),
   
   // Rule-specific endpoints
   test: (rule, transactions) => api.post('/bank-data/rules/test', { rule, transactions }),
@@ -76,15 +76,23 @@ export const ruleApi = {
 
 // Tag API functions
 export const tagApi = {
-  list: (params = {}) => api.get('/bank-data/tags', { params }),
-  get: (id) => api.get(`/bank-data/tags/${id}`),
-  create: (data) => api.post('/bank-data/tags', data),
-  update: (id, data) => api.put(`/bank-data/tags/${id}`, data),
-  delete: (id) => api.delete(`/bank-data/tags/${id}`),
+  list: () => api.get('/bank-data/tags'),
+  create: (data) => api.post('/bank-data/tag', data),
+  update: (data) => api.put('/bank-data/tag', data), // data includes id
+  delete: (data) => api.delete('/bank-data/tag', { data }), // data includes id
   
-  // Tag-specific endpoints
+  // Keep these for backwards compatibility if needed
+  get: (id) => api.get(`/bank-data/tags/${id}`),
   getPopular: (limit = 20) => api.get('/bank-data/tags/popular', { params: { limit } }),
   getSuggestions: (transactionData) => api.post('/bank-data/tags/suggestions', transactionData),
+};
+
+// Goal API functions
+export const goalApi = {
+  list: () => api.get('/bank-data/goals'),
+  create: (data) => api.post('/bank-data/goal', data),
+  update: (data) => api.put('/bank-data/goal', data), // data includes id
+  delete: (data) => api.delete('/bank-data/goal', { data }), // data includes id
 };
 
 // Entity API functions

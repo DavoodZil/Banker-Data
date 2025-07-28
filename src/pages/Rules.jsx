@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,13 +12,16 @@ import {
   Store, DollarSign, List, CreditCard, Pencil, Tag, EyeOff, ClipboardCheck, Target, GitCommitHorizontal, PlusCircle, MinusCircle, Plus, ArrowRight,
   TrendingUp, Heart, Car, Home, Zap, UtensilsCrossed, MapPin, User, ShoppingBag, Shield, FileText, Briefcase, ArrowLeftRight, Search
 } from 'lucide-react';
-import { useTags } from "@/hooks/api";
+import { useTags, useRule, useGoals, useCategories } from "@/hooks/api";
+import { ruleApi } from "@/api/client";
 
-import CreateCategoryModal from "../components/rules/CreateCategoryModal";
+import AddCategoryModal from "../components/categories/AddCategoryModal";
 import SuccessModal from "../components/rules/SuccessModal";
 import CreateTagModal from "../components/rules/CreateTagModal";
 import TagSelector from "../components/rules/TagSelector";
 import SplitTransactionModal from "../components/rules/SplitTransactionModal";
+import { payloadMapper, payloadActionMapper, payloadSplitMapper, decodeRuleData } from '@/utils/rulePayload';
+
 
 const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
   <div className="bg-white rounded-lg border border-gray-200">
@@ -47,12 +51,21 @@ const ActionRow = ({ label, icon: Icon, isEnabled, onToggle, children }) => (
   </div>
 );
 
+
 export default function RulesPage() {
+  const { id: ruleId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isEditing = Boolean(ruleId);
+  
+  // If editing, fetch the rule data
+  const { rule: existingRule, isLoading: ruleLoading } = useRule(isEditing ? ruleId : null);
+  
   const [rule, setRule] = useState({
     name: "New Rule",
     description: "",
     conditions: {
-      merchants: { enabled: true, matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
+      merchants: { enabled: true, type: 'merchant_name', matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
       amount: { enabled: true, transaction_type: 'expense', operator: 'greater_than', value1: 123, value2: null },
       categories: { enabled: true, values: [] },
       accounts: { enabled: false, values: [] },
@@ -80,18 +93,116 @@ export default function RulesPage() {
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
 
-  // Use the new hook
-  const { tags: allTags } = useTags();
+  // Use the hooks for tags, goals, and categories
+  const { tags: allTags, createTag } = useTags();
+  const { goals: allGoals } = useGoals();
+  const { categories: allCategories, createCategory } = useCategories();
+
+  // Load existing rule data when editing
+  useEffect(() => {
+    if (isEditing && existingRule && !ruleLoading) {
+      try {
+        const ruleData = JSON.parse(existingRule.rule_data || '{}');
+        // Use the new decodeRuleData function to populate the form state
+        const decoded = decodeRuleData(ruleData, allTags, allCategories);
+        setRule({
+          name: existingRule.name || "Rule",
+          description: existingRule.description || "",
+          ...decoded
+        });
+      } catch (error) {
+        console.error('Error parsing existing rule data:', error);
+      }
+    }
+  }, [isEditing, existingRule, ruleLoading, allTags, allCategories]);
 
   const handleToggle = (type, key) => {
-    setRule(prev => ({
-      ...prev,
-      [type]: {
-        ...prev[type],
-        [key]: { ...prev[type][key], enabled: !prev[type][key].enabled }
+    setRule(prev => {
+      // If toggling split_transaction on, disable all other actions
+      if (type === 'actions' && key === 'split_transaction' && !prev.actions.split_transaction.enabled) {
+        return {
+          ...prev,
+          actions: {
+            ...prev.actions,
+            rename_merchant: { ...prev.actions.rename_merchant, enabled: false },
+            update_category: { ...prev.actions.update_category, enabled: false },
+            add_tags: { ...prev.actions.add_tags, enabled: false },
+            hide_transaction: { ...prev.actions.hide_transaction, enabled: false },
+            mark_for_review: { ...prev.actions.mark_for_review, enabled: false },
+            link_to_goal: { ...prev.actions.link_to_goal, enabled: false },
+            split_transaction: { ...prev.actions.split_transaction, enabled: true }
+          }
+        };
       }
-    }));
+      
+      // If toggling any other action on while split_transaction is enabled, disable split_transaction
+      if (type === 'actions' && key !== 'split_transaction' && prev.actions.split_transaction.enabled && !prev.actions[key].enabled) {
+        return {
+          ...prev,
+          actions: {
+            ...prev.actions,
+            split_transaction: { ...prev.actions.split_transaction, enabled: false },
+            [key]: { ...prev.actions[key], enabled: true }
+          }
+        };
+      }
+      
+      // Normal toggle
+      return {
+        ...prev,
+        [type]: {
+          ...prev[type],
+          [key]: { ...prev[type][key], enabled: !prev[type][key].enabled }
+        }
+      };
+    });
   };
+
+  const handleSaveRule = async () => {
+    // Determine if this is a split rule or a regular rule
+    const isSplitRule = rule.actions.split_transaction.enabled;
+    
+    let rule_data;
+    if (isSplitRule) {
+      // For split rules (rule_type 2)
+      const splits = payloadSplitMapper(rule.actions.split_transaction, allTags, allCategories);
+      rule_data = {
+        ifs: payloadMapper(rule.conditions, allCategories),
+        splits: splits || []
+      };
+    } else {
+      // For regular rules (rule_type 1)
+      rule_data = {
+        ifs: payloadMapper(rule.conditions, allCategories),
+        thens: payloadActionMapper(rule.actions, allTags, allCategories)
+      };
+    }
+
+    const payload = {
+      name: rule.name,
+      description: rule.description,
+      rule_type: isSplitRule ? 2 : 1,
+      rule_data: JSON.stringify(rule_data)
+    }
+
+    try {
+      const response = isEditing 
+        ? await ruleApi.update(ruleId, {...payload,reapply_rule:1,id:ruleId})
+        : await ruleApi.create(payload);
+        
+      if (response.status === 200 || response.status === 201) {
+        setShowSuccessModal(true);
+        // Navigate back to rules list after saving
+        setTimeout(() => {
+          navigate('/rules');
+        }, 1500);
+      } else {
+        console.error(response);
+      }
+    } catch (error) {
+      console.error('Error saving rule:', error);
+    }
+  }
 
   const handleMatcherChange = (groupIndex, matcherIndex, field, value) => {
     setRule(prev => {
@@ -103,6 +214,18 @@ export default function RulesPage() {
       };
     });
   };
+
+
+  const handleMerchantChange = (field, value) => {
+    setRule(prev => {
+      const newMerchantState = { ...prev.conditions.merchants, [field]: value };
+      return {
+        ...prev,
+        conditions: { ...prev.conditions, merchants: newMerchantState }
+      };
+    });
+  };
+
 
   const handleAmountChange = (field, value) => {
     setRule(prev => {
@@ -161,57 +284,55 @@ export default function RulesPage() {
     });
   };
 
-  const handleCreateCategory = (categoryData) => {
-    const newCategoryName = categoryData.name;
-    const newCategoryGroup = categoryData.group;
+  const handleCreateCategory = async (categoryData) => {
+    try {
+      const newCategory = await createCategory({
+        name: categoryData.name,
+        parent_category: categoryData.parent_category || null
+      });
+      
+      const newCategoryName = newCategory.name;
+      
+      setSelectedCategory(newCategoryName);
+      setSelectedActionCategory(newCategoryName);
 
-    setCustomCategories(prev => {
-      const exists = prev.some(cat => cat.name === newCategoryName && cat.group === newCategoryGroup);
-      if (!exists) {
-        return [...prev, { 
-          name: newCategoryName, 
-          emoji: categoryData.emoji, 
-          group: newCategoryGroup, 
-          excludeFromBudget: categoryData.excludeFromBudget 
-        }];
-      }
-      return prev;
-    });
+      setRule(prevRule => {
+        const newRule = { ...prevRule };
+        if (newRule.conditions.categories.enabled) {
+          newRule.conditions.categories = { ...newRule.conditions.categories, values: [newCategoryName] };
+        }
+        if (newRule.actions.update_category.enabled) {
+          newRule.actions.update_category = { ...newRule.actions.update_category, new_category: newCategoryName };
+        }
+        return newRule;
+      });
 
-    setSelectedCategory(newCategoryName);
-    setSelectedActionCategory(newCategoryName);
-
-    setRule(prevRule => {
-      const newRule = { ...prevRule };
-      if (newRule.conditions.categories.enabled) {
-        newRule.conditions.categories = { ...newRule.conditions.categories, values: [newCategoryName] };
-      }
-      if (newRule.actions.update_category.enabled) {
-        newRule.actions.update_category = { ...newRule.actions.update_category, new_category: newCategoryName };
-      }
-      return newRule;
-    });
-
-    setShowCreateCategoryModal(false);
-    setShowSuccessModal(true);
+      setShowCreateCategoryModal(false);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error('Error creating category:', error);
+    }
   };
   
   const handleCreateTag = async (tagData) => {
-    const newTag = await TagEntity.create(tagData);
-    setAllTags(prev => [...prev, newTag]);
-    
-    setRule(prev => ({
+    try {
+      const newTag = await createTag(tagData);
+      
+      setRule(prev => ({
         ...prev,
         actions: {
-            ...prev.actions,
-            add_tags: {
-                ...prev.actions.add_tags,
-                enabled: true,
-                tags: [...prev.actions.add_tags.tags, newTag.name]
-            }
+          ...prev.actions,
+          add_tags: {
+            ...prev.actions.add_tags,
+            enabled: true,
+            tags: [...prev.actions.add_tags.tags, newTag.name] // Store tag names for UI
+          }
         }
-    }));
-    setShowCreateTagModal(false);
+      }));
+      setShowCreateTagModal(false);
+    } catch (error) {
+      console.error('Error creating tag:', error);
+    }
   };
 
   const handleReviewStatusChange = (field, value) => {
@@ -279,47 +400,40 @@ export default function RulesPage() {
     }));
   };
 
-  const categoriesWithSubcategories = {
-    "Income": { icon: TrendingUp, subcategories: ["Paychecks", "Interest", "Business Income", "Other Income"] },
-    "Gifts & Donations": { icon: Heart, subcategories: ["Charity", "Gifts"] },
-    "Auto & Transport": { icon: Car, subcategories: ["Auto Payment", "Public Transit", "Gas", "Auto Maintenance", "Parking & Tolls", "Taxi & Ride Shares"] },
-    "Housing": { icon: Home, subcategories: ["Mortgage", "Rent", "Home Improvement"] },
-    "Bills & Utilities": { icon: Zap, subcategories: ["Garbage", "Water", "Gas & Electric", "Internet & Cable", "Phone"] },
-    "Food & Dining": { icon: UtensilsCrossed, subcategories: ["Groceries", "Restaurants & Bars", "Coffee Shops"] },
-    "Travel & Lifestyle": { icon: MapPin, subcategories: ["Travel & Vacation", "Entertainment & Recreation"] },
-    "Personal": { icon: User, subcategories: ["Pets", "Fun Money"] },
-    "Shopping": { icon: ShoppingBag, subcategories: ["Clothing", "Furniture & Housewares", "Electronics"] },
-    "Financial": { icon: Shield, subcategories: ["Insurance", "Taxes"] },
-    "Other": { icon: FileText, subcategories: ["Uncategorized", "Check", "Miscellaneous"] },
-    "Business": { icon: Briefcase, subcategories: ["Business Travel & Meals", "Business Auto Expenses", "Office Supplies & Expenses", "Postage & Shipping", "Domain", "Digital Marketing", "AI Tools", "UI/UX", "Customer SMS", "Backend Software & Tools", "Project Management Tool & Platform", "Analytics", "Website Publishing Platform", "Writing & Publishing", "Review Websites", "Social Media", "Email Marketing", "SEO"] },
-    "Transfers": { icon: ArrowLeftRight, subcategories: ["Transfer", "Credit Card Payment", "Balance Adjustments"] }
-  };
-
-  // Correctly clone the base categories object while preserving components
-  const allCategories = Object.entries(categoriesWithSubcategories).reduce((acc, [key, value]) => {
-    acc[key] = { ...value, subcategories: [...value.subcategories] };
+  // Transform API categories for the category selector
+  const categoriesForSelector = allCategories.reduce((acc, category) => {
+    // Group by parent category or use "Other" as default
+    const groupName = category.parent_category || "Other";
+    
+    if (!acc[groupName]) {
+      acc[groupName] = {
+        icon: FileText, // Default icon
+        subcategories: []
+      };
+    }
+    
+    acc[groupName].subcategories.push(category.name);
     return acc;
   }, {});
 
-  customCategories.forEach(customCat => {
-    if (allCategories[customCat.group]) {
-      if (!allCategories[customCat.group].subcategories.includes(customCat.name)) {
-        allCategories[customCat.group].subcategories.push(customCat.name);
-      }
-    } else {
-      // New group from custom category, assign emoji
-      allCategories[customCat.group] = {
-        emoji: customCat.emoji, // Store emoji for new custom groups
-        subcategories: [customCat.name]
-      };
-    }
-  });
-
   const accounts = ["Checking", "Savings", "Credit Card"];
-  const goals = ["Vacation Fund", "New Car"];
   const reviewers = ["John Smith", "Sarah Johnson", "Mike Wilson", "Emma Davis"];
 
-  const filteredCategories = Object.entries(allCategories).reduce((acc, [category, { icon, emoji, subcategories }]) => {
+  // Show loading state when editing and rule is loading
+  if (isEditing && ruleLoading) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading rule...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const filteredCategories = Object.entries(categoriesForSelector).reduce((acc, [category, { icon, emoji, subcategories }]) => {
     if (!categorySearch) {
       acc[category] = { icon, emoji, subcategories };
       return acc;
@@ -355,7 +469,9 @@ export default function RulesPage() {
           .data-[state=checked] { background-color: var(--color-primary) !important; border-color: var(--color-primary) !important; color: white; }
         `}</style>
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Create Rule</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {isEditing ? 'Edit Rule' : 'Create Rule'}
+        </h1>
       </div>
       
       <div className="bg-white p-6 rounded-lg border border-gray-200 space-y-4">
@@ -378,11 +494,14 @@ export default function RulesPage() {
           <h2 className="font-semibold text-lg text-gray-800">If a transaction matches...</h2>
           <div className="space-y-4">
             <CriteriaBlock title="Merchants" isEnabled={rule.conditions.merchants.enabled} onToggle={() => handleToggle('conditions', 'merchants')}>
-              <Select defaultValue="original_statement">
+              <Select 
+                value={rule.conditions.merchants.type}
+                onValueChange={(value) => handleMerchantChange('type', value)}
+              >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="original_statement">Original statement</SelectItem>
                   <SelectItem value="merchant_name">Merchant Name</SelectItem>
+                  <SelectItem value="original_description">Original Description</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -588,7 +707,7 @@ export default function RulesPage() {
                 </SelectContent>
               </Select>
             </CriteriaBlock>
-
+{/* 
             <CriteriaBlock title="Description" isEnabled={rule.conditions.description.enabled} onToggle={() => handleToggle('conditions', 'description')}>
               <div className="flex gap-3 items-center">
                 <Select
@@ -607,7 +726,7 @@ export default function RulesPage() {
                   onChange={e => handleDescriptionChange('value', e.target.value)}
                 />
               </div>
-            </CriteriaBlock>
+            </CriteriaBlock> */}
 
             <CriteriaBlock title="Date" isEnabled={rule.conditions.date.enabled} onToggle={() => handleToggle('conditions', 'date')}>
               <div className="flex gap-3 items-center">
@@ -800,7 +919,19 @@ export default function RulesPage() {
                      }))}
                    >
                      <SelectTrigger><SelectValue placeholder="Select a goal" /></SelectTrigger>
-                     <SelectContent>{goals.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
+                     <SelectContent>
+                       {allGoals && allGoals.length > 0 ? (
+                         allGoals.map(goal => (
+                           <SelectItem key={goal.id} value={goal.id}>
+                             {goal.name}
+                           </SelectItem>
+                         ))
+                       ) : (
+                         <div className="p-2 text-sm text-gray-500 text-center">
+                           No goals available
+                         </div>
+                       )}
+                     </SelectContent>
                    </Select>
                 </ActionRow>
                 <Separator />
@@ -856,11 +987,13 @@ export default function RulesPage() {
       </div>
       
       <div className="flex justify-end gap-3 pt-4">
-        <Button variant="outline">Cancel</Button>
-        <Button className="bg-emerald-600 hover:bg-emerald-700">Save Rule</Button>
+        <Button variant="outline" onClick={() => navigate('/rules')}>Cancel</Button>
+        <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleSaveRule}>
+          {isEditing ? 'Update Rule' : 'Save Rule'}
+        </Button>
       </div>
 
-      <CreateCategoryModal
+      <AddCategoryModal
         isOpen={showCreateCategoryModal}
         onClose={() => setShowCreateCategoryModal(false)}
         onSave={handleCreateCategory}
@@ -869,7 +1002,7 @@ export default function RulesPage() {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        message="Your new category has been created and selected!"
+        message={isEditing ? "Rule updated successfully!" : "Rule created successfully!"}
       />
 
       <CreateTagModal
@@ -886,7 +1019,7 @@ export default function RulesPage() {
         splits={rule.actions.split_transaction.splits}
         splitType={rule.actions.split_transaction.splitType}
         hideOriginal={rule.actions.split_transaction.hideOriginal}
-        allCategories={allCategories}
+        allCategories={categoriesForSelector}
         onCreateCategory={() => setShowCreateCategoryModal(true)}
       />
     </div>
