@@ -65,7 +65,7 @@ export default function RulesPage() {
     name: "New Rule",
     description: "",
     conditions: {
-      merchants: { enabled: true, matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
+      merchants: { enabled: true, type: 'merchant_name', matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
       amount: { enabled: true, transaction_type: 'expense', operator: 'greater_than', value1: 123, value2: null },
       categories: { enabled: true, values: [] },
       accounts: { enabled: false, values: [] },
@@ -214,6 +214,18 @@ export default function RulesPage() {
       };
     });
   };
+
+
+  const handleMerchantChange = (field, value) => {
+    setRule(prev => {
+      const newMerchantState = { ...prev.conditions.merchants, [field]: value };
+      return {
+        ...prev,
+        conditions: { ...prev.conditions, merchants: newMerchantState }
+      };
+    });
+  };
+
 
   const handleAmountChange = (field, value) => {
     setRule(prev => {
@@ -482,10 +494,14 @@ export default function RulesPage() {
           <h2 className="font-semibold text-lg text-gray-800">If a transaction matches...</h2>
           <div className="space-y-4">
             <CriteriaBlock title="Merchants" isEnabled={rule.conditions.merchants.enabled} onToggle={() => handleToggle('conditions', 'merchants')}>
-              <Select defaultValue="merchant_name">
+              <Select 
+                value={rule.conditions.merchants.type}
+                onValueChange={(value) => handleMerchantChange('type', value)}
+              >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="merchant_name">Merchant Name</SelectItem>
+                  <SelectItem value="original_description">Original Description</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -691,7 +707,7 @@ export default function RulesPage() {
                 </SelectContent>
               </Select>
             </CriteriaBlock>
-
+{/* 
             <CriteriaBlock title="Description" isEnabled={rule.conditions.description.enabled} onToggle={() => handleToggle('conditions', 'description')}>
               <div className="flex gap-3 items-center">
                 <Select
@@ -710,7 +726,7 @@ export default function RulesPage() {
                   onChange={e => handleDescriptionChange('value', e.target.value)}
                 />
               </div>
-            </CriteriaBlock>
+            </CriteriaBlock> */}
 
             <CriteriaBlock title="Date" isEnabled={rule.conditions.date.enabled} onToggle={() => handleToggle('conditions', 'date')}>
               <div className="flex gap-3 items-center">
