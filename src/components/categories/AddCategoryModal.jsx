@@ -9,43 +9,72 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
   const [formData, setFormData] = useState({
     name: '',
     parent_category: '',
-    budget_amount: ''
+    budget_amount: '',
+    encrypted_id: ''
   });
 
+  
+
   // Use the new hook
-  const { categories, isLoading: loadingCategories } = useCategories();
+  const { categoryHierarchy, loading: loadingCategories } = useCategories();
+
+  // Format category name by replacing underscores with spaces
+  const formatCategoryName = (name) => {
+    return name ? name.replace(/_/g, ' ').replace(/&nbsp;/g, ' ').trim() : name;
+  };
 
   useEffect(() => {
     if (category) {
       setFormData({
-        name: category.name || '',
+        name: category.name.replace(/&nbsp;/g, ' ').trim() || '',
         parent_category: category.parent_category || '',
-        budget_amount: category.budget_amount || ''
+        budget_amount: category.budget_amount || '',
+        encrypted_id: category.encrypted_id || ''
       });
     } else {
       setFormData({
         name: '',
         parent_category: '',
-        budget_amount: ''
+        budget_amount: '',
+        encrypted_id: ''
       });
     }
   }, [category]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Send the child category's enc_id as 'parent' to the backend
     onSave({
       ...formData,
+      parent: formData.parent_category, // This will be the child category's enc_id
       budget_amount: parseFloat(formData.budget_amount) || null
     });
   };
 
-  // Clean category names and exclude current category from parent options (for edit)
-  const parentOptions = categories
-    .map(cat => ({
-      ...cat,
-      name: cat.name ? cat.name.replace(/&nbsp;/g, ' ').trim() : cat.name
-    }))
-    .filter((cat) => !category || cat.id !== category.id);
+  // Create hierarchical options for display
+  const hierarchicalOptions = categoryHierarchy.flatMap(parent => {
+    const items = [];
+    
+    // Add parent as non-selectable header
+    items.push({
+      ...parent,
+      displayName: formatCategoryName(parent.name),
+      isParent: true,
+      selectable: false
+    });
+    
+    // Add children as selectable options with indentation
+    parent.children?.forEach(child => {
+      items.push({
+        ...child,
+        displayName: `  ${formatCategoryName(child.name)}`, // Indent with spaces and format name
+        isParent: false,
+        selectable: true
+      });
+    });
+    
+    return items;
+  }).filter((cat) => !category || cat.enc_id !== category.enc_id);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -61,7 +90,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
             <Label htmlFor="name" className="text-sm font-medium">Category Name</Label>
             <Input
               id="name"
-              value={formData.name}
+              value={formatCategoryName(formData.name)}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Coffee & Snacks"
               className="h-9"
@@ -80,8 +109,15 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
               disabled={loadingCategories}
             >
               <option value="">None</option>
-              {parentOptions.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              {hierarchicalOptions.map((cat) => (
+                <option 
+                  key={cat.enc_id} 
+                  value={cat.selectable ? cat.enc_id : ''}
+                  disabled={!cat.selectable}
+                  className={cat.isParent ? 'font-semibold text-gray-700' : 'text-gray-900'}
+                >
+                  {cat.displayName}
+                </option>
               ))}
             </select>
           </div>

@@ -89,6 +89,16 @@ export default function RulesPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedActionCategory, setSelectedActionCategory] = useState('');
+
+  // Helper function to get category name by ID
+  const getCategoryNameById = (categoryId) => {
+    if (!categoryId) return '';
+    for (const parent of categoryHierarchy) {
+      const child = parent.children?.find(c => c.enc_id === categoryId);
+      if (child) return formatCategoryName(child.name);
+    }
+    return categoryId; // Fallback to ID if not found
+  };
   const [customCategories, setCustomCategories] = useState([]);
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
@@ -96,7 +106,12 @@ export default function RulesPage() {
   // Use the hooks for tags, goals, and categories
   const { tags: allTags, createTag } = useTags();
   const { goals: allGoals } = useGoals();
-  const { categories: allCategories, createCategory } = useCategories();
+  const { categoryHierarchy, createCategory } = useCategories();
+
+  // Format category name by replacing underscores with spaces
+  const formatCategoryName = (name) => {
+    return name ? name.replace(/_/g, ' ').replace(/&nbsp;/g, ' ').trim() : name;
+  };
 
   // Load existing rule data when editing
   useEffect(() => {
@@ -104,17 +119,25 @@ export default function RulesPage() {
       try {
         const ruleData = JSON.parse(existingRule.rule_data || '{}');
         // Use the new decodeRuleData function to populate the form state
-        const decoded = decodeRuleData(ruleData, allTags, allCategories);
+        const decoded = decodeRuleData(ruleData, allTags, categoryHierarchy.flatMap(p => p.children || []));
         setRule({
           name: existingRule.name || "Rule",
           description: existingRule.description || "",
           ...decoded
         });
+        
+        // Set selected categories for display
+        if (decoded.conditions.categories.enabled && decoded.conditions.categories.values.length > 0) {
+          setSelectedCategory(decoded.conditions.categories.values[0]);
+        }
+        if (decoded.actions.update_category.enabled && decoded.actions.update_category.new_category) {
+          setSelectedActionCategory(decoded.actions.update_category.new_category);
+        }
       } catch (error) {
         console.error('Error parsing existing rule data:', error);
       }
     }
-  }, [isEditing, existingRule, ruleLoading, allTags, allCategories]);
+  }, [isEditing, existingRule, ruleLoading, allTags, categoryHierarchy]);
 
   const handleToggle = (type, key) => {
     setRule(prev => {
@@ -165,6 +188,7 @@ export default function RulesPage() {
     let rule_data;
     if (isSplitRule) {
       // For split rules (rule_type 2)
+      const allCategories = categoryHierarchy.flatMap(p => p.children || []);
       const splits = payloadSplitMapper(rule.actions.split_transaction, allTags, allCategories);
       rule_data = {
         ifs: payloadMapper(rule.conditions, allCategories),
@@ -172,6 +196,7 @@ export default function RulesPage() {
       };
     } else {
       // For regular rules (rule_type 1)
+      const allCategories = categoryHierarchy.flatMap(p => p.children || []);
       rule_data = {
         ifs: payloadMapper(rule.conditions, allCategories),
         thens: payloadActionMapper(rule.actions, allTags, allCategories)
@@ -288,21 +313,22 @@ export default function RulesPage() {
     try {
       const newCategory = await createCategory({
         name: categoryData.name,
-        parent_category: categoryData.parent_category || null
+        parent: categoryData.parent || categoryData.parent_category || null
       });
       
-      const newCategoryName = newCategory.name;
+      const newCategoryId = newCategory.enc_id || newCategory.id;
+      const newCategoryName = formatCategoryName(newCategory.name);
       
-      setSelectedCategory(newCategoryName);
-      setSelectedActionCategory(newCategoryName);
+      setSelectedCategory(newCategoryId);
+      setSelectedActionCategory(newCategoryId);
 
       setRule(prevRule => {
         const newRule = { ...prevRule };
         if (newRule.conditions.categories.enabled) {
-          newRule.conditions.categories = { ...newRule.conditions.categories, values: [newCategoryName] };
+          newRule.conditions.categories = { ...newRule.conditions.categories, values: [newCategoryId] };
         }
         if (newRule.actions.update_category.enabled) {
-          newRule.actions.update_category = { ...newRule.actions.update_category, new_category: newCategoryName };
+          newRule.actions.update_category = { ...newRule.actions.update_category, new_category: newCategoryId };
         }
         return newRule;
       });
@@ -400,19 +426,19 @@ export default function RulesPage() {
     }));
   };
 
-  // Transform API categories for the category selector
-  const categoriesForSelector = allCategories.reduce((acc, category) => {
-    // Group by parent category or use "Other" as default
-    const groupName = category.parent_category || "Other";
+  // Transform hierarchical categories for the category selector
+  const categoriesForSelector = categoryHierarchy.reduce((acc, parent) => {
+    const groupName = formatCategoryName(parent.name);
     
-    if (!acc[groupName]) {
-      acc[groupName] = {
-        icon: FileText, // Default icon
-        subcategories: []
-      };
-    }
+    acc[groupName] = {
+      icon: FileText, // Default icon
+      subcategories: (parent.children || []).map(child => ({
+        name: formatCategoryName(child.name),
+        enc_id: child.enc_id,
+        original_name: child.name
+      }))
+    };
     
-    acc[groupName].subcategories.push(category.name);
     return acc;
   }, {});
 
@@ -442,7 +468,7 @@ export default function RulesPage() {
     const lowerCaseSearch = categorySearch.toLowerCase();
     const categoryMatches = category.toLowerCase().includes(lowerCaseSearch);
     const matchingSubcategories = subcategories.filter(sub => 
-      sub.toLowerCase().includes(lowerCaseSearch)
+      sub.name.toLowerCase().includes(lowerCaseSearch)
     );
 
     if (categoryMatches || matchingSubcategories.length > 0) {
@@ -670,8 +696,8 @@ export default function RulesPage() {
                           {category}
                         </SelectLabel>
                         {subcategories.map(subcategory => (
-                          <SelectItem key={subcategory} value={subcategory} className="subcategory-item">
-                            {subcategory}
+                          <SelectItem key={subcategory.enc_id} value={subcategory.enc_id} className="subcategory-item">
+                            {subcategory.name}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -824,8 +850,8 @@ export default function RulesPage() {
                               {category}
                             </SelectLabel>
                             {subcategories.map(subcategory => (
-                              <SelectItem key={subcategory} value={subcategory} className="subcategory-item">
-                                {subcategory}
+                              <SelectItem key={subcategory.enc_id} value={subcategory.enc_id} className="subcategory-item">
+                                {subcategory.name}
                               </SelectItem>
                             ))}
                           </SelectGroup>

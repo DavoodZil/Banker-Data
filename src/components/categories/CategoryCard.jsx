@@ -15,6 +15,10 @@ export default function CategoryCard({ category, stats, onEdit, compact = false 
   const budgetPercentage = category.budget_amount ? (stats.totalSpent / category.budget_amount) * 100 : 0;
   const isOverBudget = budgetPercentage > 100;
 
+  const formatCategoryName = (name) => {
+    return name ? name.replace(/_/g, ' ').replace(/&nbsp;/g, ' ').trim() : name;
+  };
+
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 border-gray-100 hover:border-emerald-200 h-full bg-white">
       <CardContent className="p-5 h-full flex flex-col">
@@ -29,7 +33,7 @@ export default function CategoryCard({ category, stats, onEdit, compact = false 
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="text-base font-semibold text-gray-900 capitalize leading-tight truncate">
-                {category.name}
+                {formatCategoryName(category.name)}
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm text-gray-500">
