@@ -110,10 +110,8 @@ export const payloadMapper = (condition, allCategories = []) => {
         }, 'amount');
         if (mapped) allConditions.push([IF_AMOUNT, ...mapped]);
       } else if (key === 'categories') {
-        // Convert category names to IDs
-        (value.values || []).forEach(categoryName => {
-          const category = allCategories.find(c => c.name === categoryName);
-          const categoryId = category ? category.id : categoryName;
+        // Categories now come as enc_ids directly
+        (value.values || []).forEach(categoryId => {
           allConditions.push([IF_CATEGORY, categoryId]);
         });
       } else if (key === 'accounts') {
@@ -216,10 +214,8 @@ export const payloadActionMapper = (action, allTags = [], allCategories = []) =>
         case 'rename_merchant':
           return [THEN_ACTION_RENAME_MERCHANT, value.new_name];
         case 'update_category':
-          // Convert category name to ID
-          const category = allCategories.find(c => c.name === value.new_category);
-          const categoryId = category ? category.id : value.new_category;
-          return [THEN_ACTION_UPDATE_CATEGORY, categoryId];
+          // Category is already an enc_id
+          return [THEN_ACTION_UPDATE_CATEGORY, value.new_category];
         case 'add_tags':
           // Convert tag names to IDs
           const tagIds = convertTagNamesToIds(value.tags, allTags);
@@ -241,13 +237,10 @@ export const payloadSplitMapper = (splitData, allTags = [], allCategories = []) 
   }
   
   return splitData.splits.map(split => {
-    // Convert category name to ID
-    const category = allCategories.find(c => c.name === split.category);
-    const categoryId = category ? category.id : split.category;
-    
+    // Category is already an enc_id
     return {
       merchant: split.merchant || '',
-      category_id: categoryId,
+      category_id: split.category,
       amount: splitData.splitType === 'amount' ? parseFloat(split.amount) || 0 : parseFloat(split.percentage) || 0,
       percentage: splitData.splitType === 'percentage' ? parseFloat(split.percentage) || 0 : null,
       split_type: splitData.splitType,
@@ -346,11 +339,9 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
             case IF_CATEGORY: {
               formState.conditions.categories.enabled = true;
               const [categoryId] = rest;
-              // Convert category ID back to name
-              const category = allCategories.find(c => c.id === categoryId);
-              const categoryName = category ? category.name : categoryId;
-              if (!formState.conditions.categories.values.includes(categoryName)) {
-                formState.conditions.categories.values.push(categoryName);
+              // Categories are stored as enc_ids now
+              if (!formState.conditions.categories.values.includes(categoryId)) {
+                formState.conditions.categories.values.push(categoryId);
               }
               break;
             }
@@ -445,10 +436,8 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
           break;
         case THEN_ACTION_UPDATE_CATEGORY:
           formState.actions.update_category.enabled = true;
-          // Convert category ID back to name
-          const actionCategory = allCategories.find(c => c.id === value);
-          const actionCategoryName = actionCategory ? actionCategory.name : value;
-          formState.actions.update_category.new_category = actionCategoryName;
+          // Category is already stored as enc_id
+          formState.actions.update_category.new_category = value;
           break;
         case THEN_ACTION_ADD_TAG:
           formState.actions.add_tags.enabled = true;
@@ -480,15 +469,7 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
     formState.actions.split_transaction.splits = ruleData.splits.map((split, index) => ({
       id: index + 1,
       merchant: split.merchant || '',
-      category: (() => {
-        // Convert category ID back to name
-        const categoryId = split.category_id || split.category;
-        if (typeof categoryId === 'number' || (typeof categoryId === 'string' && !isNaN(categoryId))) {
-          const category = allCategories.find(c => c.id == categoryId);
-          return category ? category.name : '';
-        }
-        return categoryId || '';
-      })(),
+      category: split.category_id || split.category || '',
       amount: splitType === 'amount' ? (split.amount || '') : '',
       percentage: splitType === 'percentage' ? (split.percentage || split.amount || '') : '',
       tags: convertTagIdsToNames(Array.isArray(split.tags) ? split.tags : (split.tags ? [split.tags] : []), allTags),

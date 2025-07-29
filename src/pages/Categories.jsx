@@ -40,6 +40,7 @@ export default function Categories() {
   const handleAddCategory = async (categoryData) => {
     try {
       // Clean the name before sending to API
+      console.log(categoryData);
       const cleanedData = {
         ...categoryData,
         name: categoryData.name ? categoryData.name.replace(/&nbsp;/g, ' ').trim() : categoryData.name
