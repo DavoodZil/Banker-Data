@@ -36,16 +36,14 @@ export function useTransactions(initialFilters = {}) {
 
     try {
       const response = await transactionApi.list(params);
-      const { data, meta } = response.data;
-      
-      setTransactions(data || []);
+      const { data, meta } = response;
+      setTransactions(data.rowData || []);
       setPagination({
         page: meta?.page || params.page,
         limit: meta?.limit || params.limit,
         total: meta?.total || 0,
         totalPages: meta?.totalPages || Math.ceil((meta?.total || 0) / params.limit),
       });
-      
       return { data, meta };
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Failed to fetch transactions';

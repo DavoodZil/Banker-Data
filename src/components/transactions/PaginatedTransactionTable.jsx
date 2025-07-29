@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import React, { useMemo } from "react";
+import { AgGridReact } from 'ag-grid-react';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Edit, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { getAuthToken } from "@/utils/auth";
-import api from "@/services/api";
+import { useTransactions } from "@/hooks/api";
+
+// Import ag-Grid styles - using new Theming API
+import 'ag-grid-community/styles/ag-grid.css';
+
+// Register ag-Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const categoryColors = {
   groceries: "bg-green-50 text-green-700 border-green-200",
@@ -21,201 +27,315 @@ const categoryColors = {
   uncategorized: "bg-gray-50 text-gray-700 border-gray-200"
 };
 
-export default function PaginatedTransactionTable({
-  apiEndpoint = "42",
-  accounts = [],
-  pageSize = 50,
-  onEditTransaction
-}) {
-  // Prepend the base URL if only endpoint number is provided
-  const [transactions, setTransactions] = useState([]);
-  const [rowCount, setRowCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(0); // 0-based
-  const [error, setError] = useState(null);
+// Custom cell renderer for description column
+const DescriptionCellRenderer = ({ data, accounts }) => {
+  const isPositive = data.amountAmount > 0;
+  
+  return (
+    <div className="flex items-center gap-2">
+      <div className={`p-1 rounded-full ${isPositive ? 'bg-green-100' : 'bg-red-100'}`}>
+        {isPositive ? (
+          <ArrowUpRight className="w-3 h-3 text-green-600" />
+        ) : (
+          <ArrowDownRight className="w-3 h-3 text-red-600" />
+        )}
+      </div>
+      <div>
+        <div className="font-medium">
+          {data.description_custom || data.original_description || 'No description'}
+        </div>
+        {data.merchant_name_custom || data.merchant_name ? (
+          <div className="text-sm text-gray-500">
+            {data.merchant_name_custom || data.merchant_name}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
-  useEffect(() => {
-    fetchTransactions();
-    // eslint-disable-next-line
-  }, [page]);
-
-  const fetchTransactions = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const payload = {
-        startRow: page * pageSize,
-        endRow: (page + 1) * pageSize,
-        rowGroupCols: [],
-        valueCols: [],
-        pivotCols: [],
-        pivotMode: false,
-        groupKeys: [],
-        filterModel: {},
-        sortModel: [],
-        filteredBankAccounts: ""
-      };
-      const token = getAuthToken();
-      const headers = {
-        "Content-Type": "application/json"
-      };
-      
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-      
-      const response = await api.post('/ag-grid/42', payload, { headers });
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Authentication required. Please log in again.");
-        } else if (response.status === 403) {
-          throw new Error("Access denied. You don't have permission to view this data.");
-        } else {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-      }
-      
-      const data = await response.json();
-      setTransactions(data.rowData || []);
-      setRowCount(data.rowCount || 0);
-    } catch (err) {
-      setError(err.message);
-      setTransactions([]);
-      setRowCount(0);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const totalPages = Math.ceil(rowCount / pageSize);
-
+// Custom cell renderer for account column
+const AccountCellRenderer = ({ data, accounts }) => {
+  // Use nested bank_account object if available, otherwise fall back to accounts array
+  const accountName = data.bank_account?.account_name || 
+    accounts.find(a => a.id === data.account_id)?.account_name || 
+    'Unknown';
+  
   return (
     <div>
-      {/* {error && (
+      <div className="text-sm">
+        {accountName}
+      </div>
+      <div className="text-xs text-gray-500">
+        {data.bank_account?.institution_name || 'Bank Account'}
+      </div>
+    </div>
+  );
+};
+
+// Custom cell renderer for category column
+const CategoryCellRenderer = ({ data }) => {
+  // Use sub_category if not null, otherwise use personal_finance_category name
+  const categoryName = data.sub_category?.name || 
+    data.personal_finance_category?.name || 
+    data.category_id_custom || 
+    'uncategorized';
+  
+  return (
+    <Badge 
+      variant="outline" 
+      className={`${categoryColors[categoryName.toLowerCase()] || categoryColors.uncategorized} text-xs`}
+    >
+      {categoryName.replace(/_/g, ' ').toLowerCase()}
+    </Badge>
+  );
+};
+
+// Custom cell renderer for amount column
+const AmountCellRenderer = ({ data }) => {
+  const isPositive = data.amountAmount > 0;
+  
+  return (
+    <div className={`font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+      {isPositive ? '+' : ''}${Math.abs(data.amountAmount).toLocaleString()}
+    </div>
+  );
+};
+
+// Custom cell renderer for actions column
+const ActionsCellRenderer = ({ data, onEditTransaction }) => {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => onEditTransaction && onEditTransaction(data)}
+      className="h-8 w-8 p-0"
+    >
+      <Edit className="w-4 h-4" />
+    </Button>
+  );
+};
+
+export default function PaginatedTransactionTable({
+  accounts = [],
+  onEditTransaction
+}) {
+  // Use the organized hook for data fetching
+  const { transactions, loading, error } = useTransactions();
+
+  // Process transactions to convert amountAmount from string to number
+  const processedTransactions = useMemo(() => {
+    return (transactions || []).map(transaction => ({
+      ...transaction,
+      amountAmount: parseFloat(transaction.amountAmount) || 0
+    }));
+  }, [transactions]);
+
+  // ag-Grid configuration
+  const gridOptions = useMemo(() => ({
+    theme: 'ag-theme-alpine', // Use new Theming API
+    columnDefs: [
+      {
+        headerName: 'Date',
+        field: 'date',
+        width: 120,
+        cellRenderer: (params) => {
+          return params.value ? format(new Date(params.value), "MMM d, yyyy") : "-";
+        },
+        sortable: false,
+        filter: false
+      },
+      {
+        headerName: 'Description',
+        field: 'description_custom',
+        flex: 2,
+        cellRenderer: (params) => <DescriptionCellRenderer data={params.data} accounts={accounts} />,
+        sortable: false,
+        filter: false
+      },
+      {
+        headerName: 'Account',
+        field: 'account_id',
+        width: 150,
+        cellRenderer: (params) => <AccountCellRenderer data={params.data} accounts={accounts} />,
+        sortable: false,
+        filter: false
+      },
+      {
+        headerName: 'Category',
+        field: 'personal_finance_category.name',
+        width: 120,
+        cellRenderer: (params) => <CategoryCellRenderer data={params.data} />,
+        sortable: false,
+        filter: false
+      },
+      {
+        headerName: 'Amount',
+        field: 'amountAmount',
+        width: 120,
+        cellRenderer: (params) => <AmountCellRenderer data={params.data} />,
+        sortable: false,
+        filter: false,
+        type: 'numericColumn'
+      },
+      {
+        headerName: 'Type',
+        field: 'base_type',
+        width: 100,
+        sortable: false,
+        filter: false
+      },
+      {
+        headerName: 'Actions',
+        field: 'actions',
+        width: 80,
+        cellRenderer: (params) => <ActionsCellRenderer data={params.data} onEditTransaction={onEditTransaction} />,
+        sortable: false,
+        filter: false
+      }
+    ],
+    defaultColDef: {
+      resizable: true,
+      sortable: false,
+      filter: false
+    },
+    pagination: false,
+    rowData: processedTransactions,
+    rowHeight: 60,
+    headerHeight: 50,
+    suppressRowClickSelection: true,
+    suppressCellFocus: true,
+    suppressRowHoverHighlight: false,
+    animateRows: true,
+    loadingOverlayComponent: 'Loading...',
+    noRowsOverlayComponent: 'No transactions found matching your criteria',
+    onGridReady: (params) => {
+      params.api.sizeColumnsToFit();
+    },
+    onFirstDataRendered: (params) => {
+      params.api.sizeColumnsToFit();
+    }
+  }), [processedTransactions, accounts, onEditTransaction]);
+
+  return (
+    <div className="w-full h-full">
+      <style jsx>{`
+        .enhanced-grid {
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+          border: 1px solid #e5e7eb;
+        }
+        
+        .enhanced-grid .ag-header {
+          background-color: #f8fafc;
+          border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .enhanced-grid .ag-header-cell {
+          background-color: #f8fafc;
+          color: #374151;
+          font-weight: 600;
+          font-size: 14px;
+          padding: 12px 16px;
+          border-right: 1px solid #e5e7eb;
+        }
+        
+        .enhanced-grid .ag-header-cell:last-child {
+          border-right: none;
+        }
+        
+        .enhanced-grid .ag-row {
+          border-bottom: 1px solid #f3f4f6;
+          transition: background-color 0.15s ease;
+        }
+        
+        .enhanced-grid .ag-row:hover {
+          background-color: #f9fafb;
+        }
+        
+        .enhanced-grid .ag-row:nth-child(even) {
+          background-color: #fafbfc;
+        }
+        
+        .enhanced-grid .ag-row:nth-child(even):hover {
+          background-color: #f1f5f9;
+        }
+        
+        .enhanced-grid .ag-cell {
+          padding: 12px 16px;
+          font-size: 14px;
+          color: #374151;
+          border-right: 1px solid #f3f4f6;
+          vertical-align: middle;
+        }
+        
+        .enhanced-grid .ag-cell:last-child {
+          border-right: none;
+        }
+        
+        .enhanced-grid .ag-loading-overlay {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(2px);
+        }
+        
+        .enhanced-grid .ag-no-rows-overlay {
+          color: #6b7280;
+          font-size: 16px;
+          font-weight: 500;
+        }
+        
+        .enhanced-grid .ag-paging-panel {
+          background-color: #f8fafc;
+          border-top: 1px solid #e5e7eb;
+          padding: 12px 16px;
+        }
+        
+        .enhanced-grid .ag-paging-button {
+          background-color: #ffffff;
+          border: 1px solid #d1d5db;
+          color: #374151;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 14px;
+          transition: all 0.15s ease;
+        }
+        
+        .enhanced-grid .ag-paging-button:hover {
+          background-color: #f3f4f6;
+          border-color: #9ca3af;
+        }
+        
+        .enhanced-grid .ag-paging-button:disabled {
+          background-color: #f9fafb;
+          color: #9ca3af;
+          cursor: not-allowed;
+        }
+      `}</style>
+      
+      {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
           <span className="text-red-600">Error: {error}</span>
         </div>
-      )} */}
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50">
-              <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Account</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array(pageSize).fill(0).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell colSpan={7} className="py-6 text-center text-gray-400">Loading...</TableCell>
-                </TableRow>
-              ))
-            ) : transactions.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="py-8 text-center text-gray-500">
-                  No transactions found matching your criteria
-                </TableCell>
-              </TableRow>
-            ) : (
-              transactions.map((tx) => {
-                const account = accounts.find(a => a.id === tx.account_id);
-                const isPositive = tx.amountAmount > 0;
-                return (
-                  <TableRow key={tx.id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium">
-                      {tx.date ? format(new Date(tx.date), "MMM d, yyyy") : "-"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className={`p-1 rounded-full ${isPositive ? 'bg-green-100' : 'bg-red-100'}`}>
-                          {isPositive ? (
-                            <ArrowUpRight className="w-3 h-3 text-green-600" />
-                          ) : (
-                            <ArrowDownRight className="w-3 h-3 text-red-600" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="font-medium">
-                            {tx.description_custom || tx.description || 'No description'}
-                          </div>
-                          {tx.merchant && (
-                            <div className="text-sm text-gray-500">
-                              {tx.merchant}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        {account?.account_name || 'Unknown'}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {account?.institution_name}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant="outline" 
-                        className={`${categoryColors[tx.category_id_custom] || categoryColors.uncategorized} text-xs`}
-                      >
-                        {tx.category_id_custom}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className={`font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                        {isPositive ? '+' : ''}${Math.abs(tx.amountAmount).toLocaleString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>{tx.base_type}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEditTransaction && onEditTransaction(tx)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      {/* Pagination Controls */}
-      <div className="flex items-center justify-between px-6 py-4 border-t">
-        <div className="text-sm text-gray-700">
-          Showing {rowCount === 0 ? 0 : page * pageSize + 1} to {Math.min((page + 1) * pageSize, rowCount)} of {rowCount} transactions
+      )}
+      
+      {loading ? (
+        <div className="w-full h-[600px] flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="text-gray-600 font-medium">Loading transactions...</p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(p => Math.max(0, p - 1))}
-            disabled={page === 0 || isLoading}
-          >
-            Previous
-          </Button>
-          <span className="text-sm">Page {page + 1} of {totalPages || 1}</span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-            disabled={page >= totalPages - 1 || isLoading}
-          >
-            Next
-          </Button>
+      ) : (
+        <div className="w-full h-[600px] enhanced-grid">
+          <AgGridReact
+            {...gridOptions}
+            onGridReady={(params) => {
+              params.api.sizeColumnsToFit();
+            }}
+          />
         </div>
-      </div>
+      )}
     </div>
   );
 } 
