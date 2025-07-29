@@ -245,7 +245,7 @@ export function useCategories() {
   // Auto-fetch on mount
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   return {
     // State

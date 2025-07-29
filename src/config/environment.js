@@ -44,9 +44,7 @@ export const getApiBaseUrl = () => config.api.baseUrl;
 
 // Helper function for debug logging
 export const debugLog = (...args) => {
-  if (config.features.enableDebugMode) {
-    console.log('[DEBUG]', ...args);
-  }
+  
 };
 
 // Export environment type for TypeScript users (if needed later)
@@ -69,14 +67,5 @@ const validateEnvironment = () => {
 // Run validation
 validateEnvironment();
 
-// Log configuration in development
-if (config.app.isDevelopment) {
-  console.log('Environment Configuration:', {
-    environment: config.app.environment,
-    apiBaseUrl: config.api.baseUrl,
-    useMockData: config.api.useMockData,
-    features: config.features,
-  });
-}
-
+// Log configuration in developmen
 export default config;

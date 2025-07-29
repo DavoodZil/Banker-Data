@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useCategories } from "@/hooks/api";
+import { Loader2 } from "lucide-react";
 
-export default function AddCategoryModal({ isOpen, onClose, onSave, category }) {
+export default function AddCategoryModal({ isOpen, onClose, onSave, category, isSaving = false }) {
   const [formData, setFormData] = useState({
     name: '',
     parent_category: '',
@@ -25,9 +26,10 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
 
   useEffect(() => {
     if (category) {
+      const parentValue = category.parent_category || category.parent_id || '';
       setFormData({
         name: category.name.replace(/&nbsp;/g, ' ').trim() || '',
-        parent_category: category.parent_category || '',
+        parent_category: parentValue,
         budget_amount: category.budget_amount || '',
         encrypted_id: category.encrypted_id || ''
       });
@@ -43,38 +45,17 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Send the child category's enc_id as 'parent' to the backend
+    // Send the parent category's enc_id as 'parent' to the backend
     onSave({
       ...formData,
-      parent: formData.parent_category, // This will be the child category's enc_id
+      parent: formData.parent_category, // This will be the parent category's enc_id
       budget_amount: parseFloat(formData.budget_amount) || null
     });
   };
 
-  // Create hierarchical options for display
-  const hierarchicalOptions = categoryHierarchy.flatMap(parent => {
-    const items = [];
-    
-    // Add parent as non-selectable header
-    items.push({
-      ...parent,
-      displayName: formatCategoryName(parent.name),
-      isParent: true,
-      selectable: false
-    });
-    
-    // Add children as selectable options with indentation
-    parent.children?.forEach(child => {
-      items.push({
-        ...child,
-        displayName: `  ${formatCategoryName(child.name)}`, // Indent with spaces and format name
-        isParent: false,
-        selectable: true
-      });
-    });
-    
-    return items;
-  }).filter((cat) => !category || cat.enc_id !== category.enc_id);
+  // Create options for parent selection - only show parent categories
+  const parentOptions = categoryHierarchy.filter((cat) => !category || cat.enc_id !== category.enc_id);
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -109,14 +90,12 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
               disabled={loadingCategories}
             >
               <option value="">None</option>
-              {hierarchicalOptions.map((cat) => (
+              {parentOptions.map((parent) => (
                 <option 
-                  key={cat.enc_id} 
-                  value={cat.selectable ? cat.enc_id : ''}
-                  disabled={!cat.selectable}
-                  className={cat.isParent ? 'font-semibold text-gray-700' : 'text-gray-900'}
+                  key={parent.enc_id} 
+                  value={parent.enc_id}
                 >
-                  {cat.displayName}
+                  {formatCategoryName(parent.name)}
                 </option>
               ))}
             </select>
@@ -143,10 +122,11 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
           </div>
 
           <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={onClose} size="sm">
+            <Button type="button" variant="outline" onClick={onClose} size="sm" disabled={isSaving}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" size="sm">
+            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" size="sm" disabled={isSaving}>
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {category ? 'Update' : 'Create'} Category
             </Button>
           </DialogFooter>

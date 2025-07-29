@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(node:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run dev:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }
