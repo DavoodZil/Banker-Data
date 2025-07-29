@@ -125,7 +125,7 @@ export const merchantApi = {
 // Plaid API functions
 export const plaidApi = {
   getLinkToken: () => api.post('/bank-data/plaid/link-token'),
-  exchangePublicToken: (publicToken) => api.post('/bank-data/plaid/exchange-token', { public_token: publicToken }),
+  exchangePublicToken: (publicToken) => api.post('/plaid/callback', { public_token: publicToken }),
   getInstitutions: () => api.get('/bank-data/plaid/institutions'),
   syncTransactions: (itemId) => api.post(`/bank-data/plaid/items/${itemId}/sync`),
   removeItem: (itemId) => api.delete(`/bank-data/plaid/items/${itemId}`),
