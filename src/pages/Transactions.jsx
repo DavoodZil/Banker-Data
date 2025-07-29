@@ -348,7 +348,7 @@ export default function Transactions() {
             />
           </div>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-6 ">
           <TransactionList
             transactions={paginatedTransactions}
             accounts={accounts}
