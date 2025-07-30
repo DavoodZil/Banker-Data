@@ -1,11 +1,13 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useImperativeHandle, forwardRef, useState, useCallback, useEffect } from "react";
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { Edit, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { useTransactions } from "@/hooks/api";
+import { useCategories } from "@/hooks/api";
+import { transactionApi } from "@/api/client";
 
 // Import ag-Grid styles - using new Theming API
 import 'ag-grid-community/styles/ag-grid.css';
@@ -13,19 +15,32 @@ import 'ag-grid-community/styles/ag-grid.css';
 // Register ag-Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const categoryColors = {
-  groceries: "bg-green-50 text-green-700 border-green-200",
-  dining: "bg-yellow-50 text-yellow-700 border-yellow-200",
-  transportation: "bg-blue-50 text-blue-700 border-blue-200",
-  entertainment: "bg-purple-50 text-purple-700 border-purple-200",
-  utilities: "bg-red-50 text-red-700 border-red-200",
-  healthcare: "bg-cyan-50 text-cyan-700 border-cyan-200",
-  shopping: "bg-pink-50 text-pink-700 border-pink-200",
-  travel: "bg-lime-50 text-lime-700 border-lime-200",
-  income: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  investments: "bg-indigo-50 text-indigo-700 border-indigo-200",
-  uncategorized: "bg-gray-50 text-gray-700 border-gray-200"
-};
+// Generate color for category based on hash
+function getCategoryColor(categoryName, parentName) {
+  const colorClasses = [
+    "bg-green-50 text-green-700 border-green-200",
+    "bg-yellow-50 text-yellow-700 border-yellow-200",
+    "bg-blue-50 text-blue-700 border-blue-200",
+    "bg-purple-50 text-purple-700 border-purple-200",
+    "bg-red-50 text-red-700 border-red-200",
+    "bg-cyan-50 text-cyan-700 border-cyan-200",
+    "bg-pink-50 text-pink-700 border-pink-200",
+    "bg-lime-50 text-lime-700 border-lime-200",
+    "bg-emerald-50 text-emerald-700 border-emerald-200",
+    "bg-indigo-50 text-indigo-700 border-indigo-200",
+    "bg-orange-50 text-orange-700 border-orange-200",
+    "bg-teal-50 text-teal-700 border-teal-200"
+  ];
+  
+  // Use parent name for consistent colors within parent categories
+  const str = parentName || categoryName || 'uncategorized';
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  return colorClasses[Math.abs(hash) % colorClasses.length];
+}
 
 // Custom cell renderer for description column
 const DescriptionCellRenderer = ({ data, accounts }) => {
@@ -74,19 +89,31 @@ const AccountCellRenderer = ({ data, accounts }) => {
 };
 
 // Custom cell renderer for category column
-const CategoryCellRenderer = ({ data }) => {
+const CategoryCellRenderer = ({ data, categories }) => {
   // Use sub_category if not null, otherwise use personal_finance_category name
   const categoryName = data.sub_category?.name || 
     data.personal_finance_category?.name || 
     data.category_id_custom || 
     'uncategorized';
   
+  const parentName = data.personal_finance_category?.name || '';
+  
+  // Find category info from categories list if available
+  const category = categories?.find(c => 
+    c.name === categoryName || 
+    c.enc_id === data.category_id_custom
+  );
+  
+  const displayName = category ? 
+    `${category.parent_name} - ${category.name}` : 
+    categoryName.replace(/_/g, ' ').toLowerCase();
+  
   return (
     <Badge 
       variant="outline" 
-      className={`${categoryColors[categoryName.toLowerCase()] || categoryColors.uncategorized} text-xs`}
+      className={`${getCategoryColor(categoryName, parentName)} text-xs`}
     >
-      {categoryName.replace(/_/g, ' ').toLowerCase()}
+      {displayName}
     </Badge>
   );
 };
@@ -116,110 +143,186 @@ const ActionsCellRenderer = ({ data, onEditTransaction }) => {
   );
 };
 
-export default function PaginatedTransactionTable({
+const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable({
   accounts = [],
-  onEditTransaction
-}) {
-  // Use the organized hook for data fetching
-  const { transactions, loading, error } = useTransactions();
+  onEditTransaction,
+  filters = {}
+}, ref) {
+  const gridApiRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [noData, setNoData] = useState(false);
+  const [rowData, setRowData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalRows, setTotalRows] = useState(0);
+  const { childCategories } = useCategories();
 
-  // Process transactions to convert amountAmount from string to number
-  const processedTransactions = useMemo(() => {
-    return (transactions || []).map(transaction => ({
-      ...transaction,
-      amountAmount: parseFloat(transaction.amountAmount) || 0
-    }));
-  }, [transactions]);
+  // Function to load transactions with pagination
+  const loadTransactions = useCallback(async (page = currentPage, size = pageSize) => {
+    setLoading(true);
+    
+    const payload = {
+      ...filters,
+      startRow: page * size,
+      endRow: (page * size) + size,
+      sortModel: [],
+      filterModel: {},
+    };
 
-  // ag-Grid configuration
-  const gridOptions = useMemo(() => ({
-    theme: 'ag-theme-alpine', // Use new Theming API
-    columnDefs: [
-      {
-        headerName: 'Date',
-        field: 'date',
-        width: 120,
-        cellRenderer: (params) => {
-          return params.value ? format(new Date(params.value), "MMM d, yyyy") : "-";
-        },
-        sortable: false,
-        filter: false
+    try {
+      const response = await transactionApi.list(payload);
+      const { data } = response;
+      
+      // Process transactions to convert amount from string to number
+      const processedData = (data.rowData || []).map(transaction => ({
+        ...transaction,
+        amountAmount: parseFloat(transaction.amount || transaction.amountAmount) || 0
+      }));
+      
+      setRowData(processedData);
+      setTotalRows(data.rowCount || 0);
+      setNoData(processedData.length === 0);
+      
+    } catch (error) {
+      console.error('Failed to fetch transactions:', error);
+      setRowData([]);
+      setTotalRows(0);
+      setNoData(true);
+      
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, currentPage, pageSize]);
+
+  // Load data on mount and when filters, page, or pageSize change
+  useEffect(() => {
+    loadTransactions(currentPage, pageSize);
+  }, [filters, currentPage, pageSize]);
+
+  // Expose refresh method to parent
+  useImperativeHandle(ref, () => ({
+    refresh: loadTransactions
+  }));
+
+
+  // Column definitions
+  const columnDefs = useMemo(() => [
+    {
+      headerName: 'Date',
+      field: 'date',
+      width: 120,
+      cellRenderer: (params) => {
+        return params.value ? format(new Date(params.value), "MMM d, yyyy") : "-";
       },
-      {
-        headerName: 'Description',
-        field: 'description_custom',
-        flex: 2,
-        cellRenderer: (params) => <DescriptionCellRenderer data={params.data} accounts={accounts} />,
-        sortable: false,
-        filter: false
-      },
-      {
-        headerName: 'Account',
-        field: 'account_id',
-        width: 150,
-        cellRenderer: (params) => <AccountCellRenderer data={params.data} accounts={accounts} />,
-        sortable: false,
-        filter: false
-      },
-      {
-        headerName: 'Category',
-        field: 'personal_finance_category.name',
-        width: 120,
-        cellRenderer: (params) => <CategoryCellRenderer data={params.data} />,
-        sortable: false,
-        filter: false
-      },
-      {
-        headerName: 'Amount',
-        field: 'amountAmount',
-        width: 120,
-        cellRenderer: (params) => <AmountCellRenderer data={params.data} />,
-        sortable: false,
-        filter: false,
-        type: 'numericColumn'
-      },
-      {
-        headerName: 'Type',
-        field: 'base_type',
-        width: 100,
-        sortable: false,
-        filter: false
-      },
-      {
-        headerName: 'Actions',
-        field: 'actions',
-        width: 80,
-        cellRenderer: (params) => <ActionsCellRenderer data={params.data} onEditTransaction={onEditTransaction} />,
-        sortable: false,
-        filter: false
-      }
-    ],
-    defaultColDef: {
-      resizable: true,
-      sortable: false,
+      sortable: true,
       filter: false
     },
-    pagination: false,
-    rowData: processedTransactions,
-    rowHeight: 60,
-    headerHeight: 50,
-    suppressRowClickSelection: true,
-    suppressCellFocus: true,
-    suppressRowHoverHighlight: false,
-    animateRows: true,
-    loadingOverlayComponent: 'Loading...',
-    noRowsOverlayComponent: 'No transactions found matching your criteria',
-    onGridReady: (params) => {
-      params.api.sizeColumnsToFit();
+    {
+      headerName: 'Description',
+      field: 'description_custom',
+      flex: 2,
+      cellRenderer: (params) => <DescriptionCellRenderer data={params.data} accounts={accounts} />,
+      sortable: true,
+      filter: false
     },
-    onFirstDataRendered: (params) => {
-      params.api.sizeColumnsToFit();
+    {
+      headerName: 'Account',
+      field: 'account_id',
+      width: 150,
+      cellRenderer: (params) => <AccountCellRenderer data={params.data} accounts={accounts} />,
+      sortable: true,
+      filter: false
+    },
+    {
+      headerName: 'Category',
+      field: 'personal_finance_category.name',
+      width: 120,
+      cellRenderer: (params) => <CategoryCellRenderer data={params.data} categories={childCategories} />,
+      sortable: true,
+      filter: false
+    },
+    {
+      headerName: 'Amount',
+      field: 'amountAmount',
+      width: 120,
+      cellRenderer: (params) => <AmountCellRenderer data={params.data} />,
+      sortable: true,
+      filter: false,
+      type: 'numericColumn'
+    },
+    {
+      headerName: 'Type',
+      field: 'base_type',
+      width: 100,
+      sortable: true,
+      filter: false
+    },
+    {
+      headerName: 'Actions',
+      field: 'actions',
+      width: 80,
+      cellRenderer: (params) => <ActionsCellRenderer data={params.data} onEditTransaction={onEditTransaction} />,
+      sortable: false,
+      filter: false
     }
-  }), [processedTransactions, accounts, onEditTransaction]);
+  ], [accounts, onEditTransaction, childCategories]);
+
+  // Default column configuration
+  const defaultColDef = useMemo(() => ({
+    resizable: true,
+    sortable: true,
+    filter: false
+  }), []);
+
+  // Page size options
+  const pageSizes = [5, 10, 20, 50, 100];
+
+  // Skeleton loader component
+  const SkeletonTable = () => (
+    <div className="w-full space-y-4">
+      {/* Header skeleton */}
+      <div className="grid grid-cols-7 gap-4 p-4 bg-gray-50 rounded-t-lg">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <Skeleton key={i} className="h-6 w-full" />
+        ))}
+      </div>
+      
+      {/* Rows skeleton */}
+      {Array.from({ length: 10 }).map((_, rowIndex) => (
+        <div key={rowIndex} className="grid grid-cols-7 gap-4 p-4 border-b">
+          {Array.from({ length: 7 }).map((_, colIndex) => (
+            <div key={colIndex} className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              {colIndex === 1 && <Skeleton className="h-3 w-3/4" />}
+            </div>
+          ))}
+        </div>
+      ))}
+      
+      {/* Pagination skeleton */}
+      <div className="flex justify-between items-center p-4 bg-gray-50 rounded-b-lg">
+        <Skeleton className="h-6 w-32" />
+        <div className="flex gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-8 w-8" />
+          ))}
+        </div>
+        <Skeleton className="h-6 w-24" />
+      </div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="w-full h-full">
+        <SkeletonTable />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full">
-      <style jsx>{`
+      <style jsx="true">{`
         .enhanced-grid {
           border-radius: 8px;
           overflow: hidden;
@@ -239,6 +342,10 @@ export default function PaginatedTransactionTable({
           font-size: 14px;
           padding: 12px 16px;
           border-right: 1px solid #e5e7eb;
+        }
+        
+        .enhanced-grid .ag-header-cell .ag-header-cell-menu-button {
+          display: none !important;
         }
         
         .enhanced-grid .ag-header-cell:last-child {
@@ -288,54 +395,158 @@ export default function PaginatedTransactionTable({
         .enhanced-grid .ag-paging-panel {
           background-color: #f8fafc;
           border-top: 1px solid #e5e7eb;
-          padding: 12px 16px;
+          padding: 8px 16px;
+          font-size: 14px;
         }
         
         .enhanced-grid .ag-paging-button {
-          background-color: #ffffff;
-          border: 1px solid #d1d5db;
+          background-color: transparent;
+          border: none;
           color: #374151;
-          padding: 6px 12px;
+          padding: 4px 8px;
           border-radius: 4px;
           font-size: 14px;
+          min-width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           transition: all 0.15s ease;
         }
         
-        .enhanced-grid .ag-paging-button:hover {
+        .enhanced-grid .ag-paging-button:hover:not(:disabled) {
           background-color: #f3f4f6;
-          border-color: #9ca3af;
         }
         
         .enhanced-grid .ag-paging-button:disabled {
-          background-color: #f9fafb;
           color: #9ca3af;
           cursor: not-allowed;
         }
+        
+        .enhanced-grid .ag-icon {
+          font-size: 14px;
+          display: inline-block;
+        }
+        
+        /* Fix pagination arrow icons */
+        .enhanced-grid .ag-icon-first::before { content: '⟪'; }
+        .enhanced-grid .ag-icon-previous::before { content: '‹'; }
+        .enhanced-grid .ag-icon-next::before { content: '›'; }
+        .enhanced-grid .ag-icon-last::before { content: '⟫'; }
+        
+        .enhanced-grid .ag-icon-first,
+        .enhanced-grid .ag-icon-previous,
+        .enhanced-grid .ag-icon-next,
+        .enhanced-grid .ag-icon-last {
+          font-family: inherit;
+          font-size: 16px;
+          line-height: 1;
+        }
+        
+        /* Hide filter icons and menu icons */
+        .enhanced-grid .ag-header-cell-menu-button,
+        .enhanced-grid .ag-floating-filter-button {
+          display: none !important;
+        }
       `}</style>
       
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
-          <span className="text-red-600">Error: {error}</span>
-        </div>
-      )}
-      
-      {loading ? (
-        <div className="w-full h-[600px] flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600 font-medium">Loading transactions...</p>
-          </div>
-        </div>
-      ) : (
-        <div className="w-full h-[600px] enhanced-grid">
+      <div className="w-full space-y-4">
+        <div className="h-[500px] enhanced-grid">
           <AgGridReact
-            {...gridOptions}
+            theme="ag-theme-alpine"
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            rowModelType="clientSide"
+            rowData={rowData}
+            pagination={false}
+            rowHeight={60}
+            headerHeight={50}
+            suppressRowClickSelection={true}
+            suppressCellFocus={true}
+            suppressRowHoverHighlight={false}
+            animateRows={true}
+            suppressMenuHide={true}
+            suppressColumnMoveAnimation={true}
+            suppressDragLeaveHidesColumns={true}
+            noRowsOverlayComponent="No transactions found matching your criteria"
+            suppressNoRowsOverlay={rowData.length === 0}
             onGridReady={(params) => {
+              gridApiRef.current = params.api;
+              params.api.sizeColumnsToFit();
+            }}
+            onFirstDataRendered={(params) => {
               params.api.sizeColumnsToFit();
             }}
           />
         </div>
-      )}
+        
+        {/* Custom Pagination Controls */}
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">
+              Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalRows)} of {totalRows} entries
+            </span>
+            <select 
+              value={pageSize} 
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(0);
+              }}
+              className="px-3 py-1 border border-gray-300 rounded text-sm"
+            >
+              {[10, 20, 50, 100].map(size => (
+                <option key={size} value={size}>{size} per page</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(0)}
+              disabled={currentPage === 0 || loading}
+              className="h-8 w-8 p-0"
+            >
+              ⟪
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => prev - 1)}
+              disabled={currentPage === 0 || loading}
+              className="h-8 w-8 p-0"
+            >
+              ‹
+            </Button>
+            
+            <span className="px-3 py-1 text-sm">
+              Page {currentPage + 1} of {Math.ceil(totalRows / pageSize) || 1}
+            </span>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              disabled={currentPage >= Math.ceil(totalRows / pageSize) - 1 || loading}
+              className="h-8 w-8 p-0"
+            >
+              ›
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(Math.ceil(totalRows / pageSize) - 1)}
+              disabled={currentPage >= Math.ceil(totalRows / pageSize) - 1 || loading}
+              className="h-8 w-8 p-0"
+            >
+              ⟫
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
-} 
+});
+
+export default PaginatedTransactionTable;

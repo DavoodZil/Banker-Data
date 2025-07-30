@@ -4,7 +4,7 @@ import PaginatedTransactionTable from "./PaginatedTransactionTable";
 
 
 
-export default function TransactionList({ transactions, accounts, isLoading, onEditTransaction }) {
+export default function TransactionList({ transactions, accounts, isLoading, onEditTransaction, filters }) {
   if (isLoading) {
     return (
       <div className="space-y-4 p-4">
@@ -32,6 +32,7 @@ export default function TransactionList({ transactions, accounts, isLoading, onE
     <PaginatedTransactionTable
       accounts={accounts}
       onEditTransaction={onEditTransaction}
+      filters={filters}
     />
   );
 }

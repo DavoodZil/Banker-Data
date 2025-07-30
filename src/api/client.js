@@ -26,7 +26,7 @@ export const accountApi = {
 
 // Transaction API functions
 export const transactionApi = {
-  list: (params = {}) => api.get('/ag-grid/42'),
+  list: (payload = {}) => api.post('/ag-grid/42', payload),
   get: (id) => api.get(`/bank-data/transactions/${id}`),
   create: (data) => api.post('/bank-data/transactions', data),
   update: (id, data) => api.put(`/bank-data/transactions/${id}`, data),

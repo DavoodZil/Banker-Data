@@ -3,8 +3,10 @@ import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
+import { useCategories } from "@/hooks/api";
 
 export default function TransactionFilters({ filters, onFiltersChange, accounts }) {
+  const { childCategories, loading: categoriesLoading } = useCategories();
   const handleFilterChange = (key, value) => {
     onFiltersChange({
       ...filters,
@@ -45,16 +47,15 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Categories</SelectItem>
-          <SelectItem value="groceries">Groceries</SelectItem>
-          <SelectItem value="dining">Dining</SelectItem>
-          <SelectItem value="transportation">Transportation</SelectItem>
-          <SelectItem value="entertainment">Entertainment</SelectItem>
-          <SelectItem value="utilities">Utilities</SelectItem>
-          <SelectItem value="healthcare">Healthcare</SelectItem>
-          <SelectItem value="shopping">Shopping</SelectItem>
-          <SelectItem value="travel">Travel</SelectItem>
-          <SelectItem value="income">Income</SelectItem>
-          <SelectItem value="uncategorized">Uncategorized</SelectItem>
+          {categoriesLoading ? (
+            <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+          ) : (
+            childCategories.map((category) => (
+              <SelectItem key={category.enc_id} value={category.enc_id}>
+                {category.parent_name} - {category.name}
+              </SelectItem>
+            ))
+          )}
         </SelectContent>
       </Select>
 
