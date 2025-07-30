@@ -88,7 +88,16 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
     setIsPlaidOpen(false);
     setStep('loading');
     try {
-      await exchangePublicToken(public_token);
+      // Construct the payload with all required fields
+      const payload = {
+        public_token,
+        key: linkKey,
+        institutionName: metadata?.institution?.name || null,
+        institutionId: metadata?.institution?.institution_id || null,
+        metadata
+      };
+      
+      await exchangePublicToken(payload);
       setStep('success');
       onAddSuccess();
     } catch(err) {
@@ -96,7 +105,7 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
       setError("Failed to add your account after connection. Please try again.");
       setStep('error');
     }
-  }, [onAddSuccess, exchangePublicToken]);
+  }, [onAddSuccess, exchangePublicToken, linkKey]);
 
   // Effect to create the Plaid handler once we have the token and script
   useEffect(() => {

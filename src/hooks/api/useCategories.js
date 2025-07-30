@@ -11,6 +11,9 @@ import { useToast } from '@/components/ui/use-toast';
 
 export function useCategories() {
   const [categories, setCategories] = useState([]);
+  const [parentCategories, setParentCategories] = useState([]);
+  const [childCategories, setChildCategories] = useState([]);
+  const [categoryHierarchy, setCategoryHierarchy] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { toast } = useToast();
@@ -21,16 +24,60 @@ export function useCategories() {
     setError(null);
     try {
       const response = await categoryApi.list();
-      
+      console.log(response);
       // Handle the specific API response structure
-      if (response.data?.success && response.data?.data) {
-        const { categories: userCategories = [], yd_categories = [] } = response.data.data;
-        setCategories(userCategories);
-        return { categories: userCategories, yd_categories };
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        const parentData = response.data.data;
+        
+        // Extract parent categories (non-selectable)
+        const parentCategories = parentData.map(parent => ({
+          ...parent,
+          isParent: true,
+          selectable: false
+        }));
+        
+        // Extract child categories (selectable) with parent reference
+        const childCategories = parentData.flatMap(parent => 
+          parent.children.map(child => ({
+            ...child,
+            parent_id: parent.enc_id,
+            parent_name: parent.name,
+            isParent: false,
+            selectable: true
+          }))
+        );
+        
+        // Create hierarchy structure for display
+        const hierarchy = parentData.map(parent => ({
+          ...parent,
+          children: parent.children.map(child => ({
+            ...child,
+            parent_id: parent.enc_id,
+            parent_name: parent.name
+          }))
+        }));
+        
+        // All categories combined (for backward compatibility)
+        const allCategories = [...childCategories];
+        
+        setParentCategories(parentCategories);
+        setChildCategories(childCategories);
+        setCategoryHierarchy(hierarchy);
+        setCategories(allCategories);
+        
+        return { 
+          categories: allCategories, 
+          parentCategories, 
+          childCategories,
+          categoryHierarchy: hierarchy
+        };
       }
       
       setCategories([]);
-      return { categories: [], yd_categories: [] };
+      setParentCategories([]);
+      setChildCategories([]);
+      setCategoryHierarchy([]);
+      return { categories: [], parentCategories: [], childCategories: [], categoryHierarchy: [] };
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Failed to fetch categories';
       setError(errorMessage);
@@ -52,7 +99,7 @@ export function useCategories() {
     try {
       const response = await categoryApi.create({
         name: data.name,
-        parent: data.parent_category || null,
+        parent: data.parent || data.parent_category || null,
       });
       
       // Refresh categories after creation
@@ -198,11 +245,14 @@ export function useCategories() {
   // Auto-fetch on mount
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   return {
     // State
     categories,
+    parentCategories,
+    childCategories,
+    categoryHierarchy,
     loading,
     error,
     
@@ -217,8 +267,10 @@ export function useCategories() {
     
     // Computed values
     categoryCount: categories.length,
-    getCategoryById: (id) => categories.find(cat => cat.id === id),
+    getCategoryById: (id) => categories.find(cat => cat.enc_id === id || cat.id === id),
     getCategoriesByType: (type) => categories.filter(cat => cat.type === type),
+    getSelectableCategories: () => childCategories,
+    getNonSelectableCategories: () => parentCategories,
   };
 }
 

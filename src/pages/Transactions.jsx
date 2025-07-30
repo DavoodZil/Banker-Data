@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useTransactions } from "@/hooks/api";
 import { useAccounts } from "@/hooks/api";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, Download, Calendar, ArrowUpDown, RefreshCw, Upload } from "lucide-react";
-import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, subMonths, startOfDay, endOfDay } from "date-fns";
 // TODO: Implement these functions in the new API structure
 // import { syncTransactions } from "@/api/functions";
 // import { fetchFromNgrok } from "@/api/functions";
@@ -25,18 +25,78 @@ export default function Transactions() {
   const [lastSync, setLastSync] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTransaction, setSelectedTransaction] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
   const [filters, setFilters] = useState({
     account: 'all',
     category: 'all',
     dateRange: 'all', // Changed default from 'this_month' to 'all'
     amountRange: 'all'
   });
+  
+  // Convert filter values to payload format with separate filter fields
+  const filterPayload = useMemo(() => {
+    const payload = {
+      filterModel: {}, // Keep filterModel empty as per virtual card platform
+      filteredDescription: searchQuery || '',
+      filteredBankAccounts: filters.account !== 'all' ? filters.account : '',
+      filteredCategory: filters.category !== 'all' ? filters.category : '',
+      categoriesList: '', // Will be populated if needed
+      filteredAmount: '',
+      filteredDate: '',
+      fromDate: '2015-07-29', // Default wide date range
+      toDate: '2035-07-29'
+    };
+    
+    // Handle date range filter
+    if (filters.dateRange !== 'all') {
+      const now = new Date();
+      let dateFrom, dateTo;
+      
+      switch (filters.dateRange) {
+        case 'this_month':
+          dateFrom = startOfMonth(now);
+          dateTo = endOfMonth(now);
+          break;
+        case 'last_month':
+          const lastMonth = subMonths(now, 1);
+          dateFrom = startOfMonth(lastMonth);
+          dateTo = endOfMonth(lastMonth);
+          break;
+        case 'last_3_months':
+          dateFrom = startOfDay(subMonths(now, 3));
+          dateTo = endOfDay(now);
+          break;
+        case 'last_6_months':
+          dateFrom = startOfDay(subMonths(now, 6));
+          dateTo = endOfDay(now);
+          break;
+      }
+      
+      if (dateFrom && dateTo) {
+        payload.fromDate = format(dateFrom, 'yyyy-MM-dd');
+        payload.toDate = format(dateTo, 'yyyy-MM-dd');
+        payload.filteredDate = filters.dateRange; // Store the filter type
+      }
+    }
+    
+    // Handle amount range filter
+    if (filters.amountRange !== 'all') {
+      payload.filteredAmount = filters.amountRange;
+    }
+    
+    return payload;
+  }, [searchQuery, filters]);
   const [syncMethod, setSyncMethod] = useState('direct'); // 'direct' or 'ngrok'
 
-  // Use the new hooks
-  const { transactions, isLoading, error, refetch: refetchTransactions, updateTransaction } = useTransactions();
+  // Use the new hooks - don't pass initial filters, will be set via updateFilters
+  const { 
+    transactions, 
+    loading: isLoading, 
+    error, 
+    refetch: refetchTransactions, 
+    updateTransaction, 
+    updateFilters,
+    pagination 
+  } = useTransactions();
   const { accounts, refetch: refetchAccounts } = useAccounts();
 
   useEffect(() => {
@@ -152,68 +212,15 @@ export default function Transactions() {
     URL.revokeObjectURL(url);
   };
 
-  const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = !searchQuery || 
-      transaction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transaction.custom_description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transaction.merchant?.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesAccount = filters.account === 'all' || transaction.account_id === filters.account;
-
-    const matchesCategory = filters.category === 'all' || transaction.category === filters.category;
-
-    let matchesDate = true;
-    if (filters.dateRange !== 'all') { // Only apply date filtering if dateRange is not 'all'
-      const transactionDate = new Date(transaction.date);
-      const now = new Date();
-      
-      switch (filters.dateRange) {
-        case 'this_month':
-          matchesDate = transactionDate >= startOfMonth(now) && transactionDate <= endOfMonth(now);
-          break;
-        case 'last_month':
-          const lastMonth = subMonths(now, 1);
-          matchesDate = transactionDate >= startOfMonth(lastMonth) && transactionDate <= endOfMonth(lastMonth);
-          break;
-        case 'last_3_months':
-          matchesDate = transactionDate >= subMonths(now, 3);
-          break;
-        case 'last_6_months':
-          matchesDate = transactionDate >= subMonths(now, 6);
-          break;
-      }
-    }
-
-    let matchesAmount = true;
-    switch (filters.amountRange) {
-      case 'under_50':
-        matchesAmount = Math.abs(transaction.amount) < 50;
-        break;
-      case '50_to_200':
-        matchesAmount = Math.abs(transaction.amount) >= 50 && Math.abs(transaction.amount) <= 200;
-        break;
-      case 'over_200':
-        matchesAmount = Math.abs(transaction.amount) > 200;
-        break;
-    }
-
-    return matchesSearch && matchesAccount && matchesCategory && matchesDate && matchesAmount;
-  });
-
-  // Reset to first page when filters change
+  // Update filters when they change
   useEffect(() => {
-    setCurrentPage(1);
-  }, [filters, searchQuery]);
+    updateFilters(filterPayload);
+  }, [filterPayload, updateFilters]);
+  
+  // Transactions are filtered by the API
+  const filteredTransactions = transactions;
 
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
-
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+  // Reset to first page when filters change is now handled by useTransactions hook
 
   const totalSpent = filteredTransactions
     .filter(t => t.amount < 0)
@@ -295,7 +302,7 @@ export default function Transactions() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-900">
-              {filteredTransactions.length}
+              {pagination?.total || filteredTransactions.length}
             </div>
           </CardContent>
         </Card>
@@ -348,66 +355,14 @@ export default function Transactions() {
             />
           </div>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-6 ">
           <TransactionList
-            transactions={paginatedTransactions}
+            transactions={filteredTransactions}
             accounts={accounts}
-            isLoading={isLoading}
+            isLoading={false}
             onEditTransaction={setSelectedTransaction}
+            filters={filterPayload}
           />
-          
-          {/* Pagination Controls */}
-          {filteredTransactions.length > 0 && totalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t">
-              <div className="text-sm text-gray-700">
-                Showing {startIndex + 1} to {Math.min(endIndex, filteredTransactions.length)} of {filteredTransactions.length} transactions
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={currentPage === pageNum ? "default" : "outline"}
-                        size="sm"
-                        className="w-10 h-8"
-                        onClick={() => handlePageChange(pageNum)}
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
 

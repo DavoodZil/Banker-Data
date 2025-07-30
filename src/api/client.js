@@ -26,7 +26,7 @@ export const accountApi = {
 
 // Transaction API functions
 export const transactionApi = {
-  list: (params = {}) => api.get('/bank-data/transactions', { params }),
+  list: (payload = {}) => api.post('/ag-grid/42', payload),
   get: (id) => api.get(`/bank-data/transactions/${id}`),
   create: (data) => api.post('/bank-data/transactions', data),
   update: (id, data) => api.put(`/bank-data/transactions/${id}`, data),
@@ -125,7 +125,7 @@ export const merchantApi = {
 // Plaid API functions
 export const plaidApi = {
   getLinkToken: () => api.post('/bank-data/plaid/link-token'),
-  exchangePublicToken: (publicToken) => api.post('/bank-data/plaid/exchange-token', { public_token: publicToken }),
+  exchangePublicToken: (publicToken) => api.post('/api/plaid/callback', { public_token: publicToken }),
   getInstitutions: () => api.get('/bank-data/plaid/institutions'),
   syncTransactions: (itemId) => api.post(`/bank-data/plaid/items/${itemId}/sync`),
   removeItem: (itemId) => api.delete(`/bank-data/plaid/items/${itemId}`),

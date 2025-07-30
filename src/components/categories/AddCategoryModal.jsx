@@ -4,48 +4,58 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useCategories } from "@/hooks/api";
+import { Loader2 } from "lucide-react";
 
-export default function AddCategoryModal({ isOpen, onClose, onSave, category }) {
+export default function AddCategoryModal({ isOpen, onClose, onSave, category, isSaving = false }) {
   const [formData, setFormData] = useState({
     name: '',
     parent_category: '',
-    budget_amount: ''
+    budget_amount: '',
+    encrypted_id: ''
   });
 
+  
+
   // Use the new hook
-  const { categories, isLoading: loadingCategories } = useCategories();
+  const { categoryHierarchy, loading: loadingCategories } = useCategories();
+
+  // Format category name by replacing underscores with spaces
+  const formatCategoryName = (name) => {
+    return name ? name.replace(/_/g, ' ').replace(/&nbsp;/g, ' ').trim() : name;
+  };
 
   useEffect(() => {
     if (category) {
+      const parentValue = category.parent_category || category.parent_id || '';
       setFormData({
-        name: category.name || '',
-        parent_category: category.parent_category || '',
-        budget_amount: category.budget_amount || ''
+        name: category.name.replace(/&nbsp;/g, ' ').trim() || '',
+        parent_category: parentValue,
+        budget_amount: category.budget_amount || '',
+        encrypted_id: category.encrypted_id || ''
       });
     } else {
       setFormData({
         name: '',
         parent_category: '',
-        budget_amount: ''
+        budget_amount: '',
+        encrypted_id: ''
       });
     }
   }, [category]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Send the parent category's enc_id as 'parent' to the backend
     onSave({
       ...formData,
+      parent: formData.parent_category, // This will be the parent category's enc_id
       budget_amount: parseFloat(formData.budget_amount) || null
     });
   };
 
-  // Clean category names and exclude current category from parent options (for edit)
-  const parentOptions = categories
-    .map(cat => ({
-      ...cat,
-      name: cat.name ? cat.name.replace(/&nbsp;/g, ' ').trim() : cat.name
-    }))
-    .filter((cat) => !category || cat.id !== category.id);
+  // Create options for parent selection - only show parent categories
+  const parentOptions = categoryHierarchy.filter((cat) => !category || cat.enc_id !== category.enc_id);
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -61,7 +71,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
             <Label htmlFor="name" className="text-sm font-medium">Category Name</Label>
             <Input
               id="name"
-              value={formData.name}
+              value={formatCategoryName(formData.name)}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Coffee & Snacks"
               className="h-9"
@@ -80,8 +90,13 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
               disabled={loadingCategories}
             >
               <option value="">None</option>
-              {parentOptions.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              {parentOptions.map((parent) => (
+                <option 
+                  key={parent.enc_id} 
+                  value={parent.enc_id}
+                >
+                  {formatCategoryName(parent.name)}
+                </option>
               ))}
             </select>
           </div>
@@ -107,10 +122,11 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, category }) 
           </div>
 
           <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={onClose} size="sm">
+            <Button type="button" variant="outline" onClick={onClose} size="sm" disabled={isSaving}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" size="sm">
+            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" size="sm" disabled={isSaving}>
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {category ? 'Update' : 'Create'} Category
             </Button>
           </DialogFooter>

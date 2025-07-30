@@ -2,7 +2,7 @@
 import { useState, useEffect, createContext, useContext } from "react";
 
 const TOAST_LIMIT = 20;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_REMOVE_DELAY = 5000; // 5 seconds
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -110,7 +110,7 @@ function dispatch(action) {
   });
 }
 
-function toast({ ...props }) {
+function toast({ duration = TOAST_REMOVE_DELAY, ...props }) {
   const id = genId();
 
   const update = (props) =>
@@ -133,6 +133,11 @@ function toast({ ...props }) {
       },
     },
   });
+
+  // Auto-dismiss after duration
+  setTimeout(() => {
+    dismiss();
+  }, duration);
 
   return {
     id,
