@@ -9,9 +9,9 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { transactionApi } from '@/api/client';
 import { useToast } from '@/components/ui/use-toast';
 
-export function useTransactions(initialFilters = {}) {
+export function useTransactions(initialParams = {}) {
   const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with loading true
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -19,32 +19,49 @@ export function useTransactions(initialFilters = {}) {
     total: 0,
     totalPages: 0,
   });
-  const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState(initialParams || {});
   const { toast } = useToast();
 
-  // Fetch transactions with filters and pagination
+  // Fetch transactions with ag-grid style payload
   const fetchTransactions = useCallback(async (options = {}) => {
     setLoading(true);
     setError(null);
     
-    const params = {
-      page: options.page || pagination.page,
-      limit: options.limit || pagination.limit,
-      ...filters,
-      ...options.filters,
+    const startRow = ((options.page || pagination.page) - 1) * pagination.limit;
+    const endRow = startRow + pagination.limit;
+    
+    const payload = {
+      startRow,
+      endRow,
+      rowGroupCols: [],
+      valueCols: [],
+      pivotCols: [],
+      pivotMode: false,
+      groupKeys: [],
+      filterModel: filters.filterModel || {},
+      sortModel: options.sortModel || [],
+      fromDate: filters.fromDate || '2015-07-29',
+      toDate: filters.toDate || '2035-07-29',
+      filteredBankAccounts: filters.filteredBankAccounts || '',
+      categoriesList: filters.categoriesList || '',
+      filteredDescription: filters.filteredDescription || '',
+      filteredCategory: filters.filteredCategory || '',
+      filteredDate: filters.filteredDate || '',
+      filteredAmount: filters.filteredAmount || '',
+      ...options
     };
 
     try {
-      const response = await transactionApi.list(params);
-      const { data, meta } = response;
+      const response = await transactionApi.list(payload);
+      const { data } = response;
       setTransactions(data.rowData || []);
       setPagination({
-        page: meta?.page || params.page,
-        limit: meta?.limit || params.limit,
-        total: meta?.total || 0,
-        totalPages: meta?.totalPages || Math.ceil((meta?.total || 0) / params.limit),
+        page: options.page || pagination.page,
+        limit: pagination.limit,
+        total: data.rowCount || 0,
+        totalPages: Math.ceil((data.rowCount || 0) / pagination.limit),
       });
-      return { data, meta };
+      return { data };
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Failed to fetch transactions';
       setError(errorMessage);
@@ -56,13 +73,23 @@ export function useTransactions(initialFilters = {}) {
 
   // Update filters
   const updateFilters = useCallback((newFilters) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters(newFilters);
     setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
   }, []);
 
   // Clear filters
   const clearFilters = useCallback(() => {
-    setFilters({});
+    setFilters({
+      filterModel: {},
+      fromDate: '2015-07-29',
+      toDate: '2035-07-29',
+      filteredBankAccounts: '',
+      categoriesList: '',
+      filteredDescription: '',
+      filteredCategory: '',
+      filteredDate: '',
+      filteredAmount: ''
+    });
     setPagination(prev => ({ ...prev, page: 1 }));
   }, []);
 
@@ -261,7 +288,7 @@ export function useTransactions(initialFilters = {}) {
   // Auto-fetch on mount and filter changes
   useEffect(() => {
     fetchTransactions();
-  }, [filters]); // Only re-fetch when filters change
+  }, [fetchTransactions]); // Re-fetch when fetchTransactions changes (which includes filters)
 
   return {
     // State
