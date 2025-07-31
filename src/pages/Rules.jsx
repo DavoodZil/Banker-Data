@@ -65,9 +65,9 @@ export default function RulesPage() {
     name: "New Rule",
     description: "",
     conditions: {
-      merchants: { enabled: true, type: 'merchant_name', matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
-      amount: { enabled: true, transaction_type: 'expense', operator: 'greater_than', value1: 123, value2: null },
-      categories: { enabled: true, values: [] },
+      merchants: { enabled: false, type: 'merchant_name', matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
+      amount: { enabled: false, transaction_type: 'expense', operator: 'greater_than', value1: 123, value2: null },
+      categories: { enabled: false, values: [] },
       accounts: { enabled: false, values: [] },
       description: { enabled: false, match_type: 'contains', value: '' }, // <-- Add description condition
       date: { enabled: false, match_type: 'after', value1: '', value2: '' }, // <-- Add date condition
