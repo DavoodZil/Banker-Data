@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect, useMemo } from "react";
-import { useTransactions } from "@/hooks/api";
-import { useAccounts } from "@/hooks/api";
+import { useTransactions, useAccounts } from "@/hooks/api";
+import { useDebounceWithLoading } from "@/hooks/api/useDebounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Download, Calendar, ArrowUpDown, RefreshCw, Upload } from "lucide-react";
+import { Search, Filter, Download, Calendar, ArrowUpDown, RefreshCw, Upload, Loader2 } from "lucide-react";
 import { format, startOfMonth, endOfMonth, subMonths, startOfDay, endOfDay } from "date-fns";
 // TODO: Implement these functions in the new API structure
 // import { syncTransactions } from "@/api/functions";
@@ -24,6 +24,7 @@ export default function Transactions() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
+  const { debouncedValue: debouncedSearchQuery, isDebouncing } = useDebounceWithLoading(searchQuery, 500); // 500ms delay for search
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [filters, setFilters] = useState({
     account: 'all',
@@ -36,7 +37,7 @@ export default function Transactions() {
   const filterPayload = useMemo(() => {
     const payload = {
       filterModel: {}, // Keep filterModel empty as per virtual card platform
-      filteredDescription: searchQuery || '',
+      filteredDescription: debouncedSearchQuery || '',
       filteredBankAccounts: filters.account !== 'all' ? filters.account : '',
       filteredCategory: filters.category !== 'all' ? filters.category : '',
       categoriesList: '', // Will be populated if needed
@@ -84,7 +85,7 @@ export default function Transactions() {
     }
     
     return payload;
-  }, [searchQuery, filters]);
+  }, [debouncedSearchQuery, filters]);
   const [syncMethod, setSyncMethod] = useState('direct'); // 'direct' or 'ngrok'
 
   // Use the new hooks - don't pass initial filters, will be set via updateFilters
@@ -344,8 +345,11 @@ export default function Transactions() {
                   placeholder="Search transactions..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 pr-10"
                 />
+                {isDebouncing && (
+                  <Loader2 className="w-4 h-4 absolute right-3 top-3 text-gray-400 animate-spin" />
+                )}
               </div>
             </div>
             <TransactionFilters

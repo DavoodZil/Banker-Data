@@ -226,6 +226,13 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
       filter: false
     },
     {
+      headerName: 'Merchant',
+      field: 'merchant_name',
+      flex: 2,
+      sortable: true,
+      filter: false
+    },
+    {
       headerName: 'Account',
       field: 'account_id',
       width: 150,
