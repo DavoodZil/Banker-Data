@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { getAuthToken, getBaseUrl } from '@/utils/auth';
 import { config, debugLog } from '@/config/environment';
-import { toast } from '@/components/ui/use-toast';
 
 // Create axios instance with base configuration
 const api = axios.create({
@@ -120,19 +119,7 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
     
-    // Show toast notification for other errors
-    const errorMessage = getErrorMessage(error);
-    const errorTitle = error.response?.status 
-      ? `Error ${error.response.status}` 
-      : 'Request Failed';
-    
-    toast({
-      variant: 'destructive',
-      title: errorTitle,
-      description: errorMessage,
-      duration: 5000,
-    });
-    
+    // Pass error through for handling in the calling code
     return Promise.reject(error);
   }
 );
