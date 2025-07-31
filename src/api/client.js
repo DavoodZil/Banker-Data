@@ -29,7 +29,7 @@ export const transactionApi = {
   list: (payload = {}) => api.post('/ag-grid/42', payload),
   get: (id) => api.get(`/bank-data/transactions/${id}`),
   create: (data) => api.post('/bank-data/transactions', data),
-  update: (id, data) => api.put(`/bank-data/transactions/${id}`, data),
+  update: (data) => api.put(`/bank-data/update-transaction`, data),
   patch: (id, data) => api.patch(`/bank-data/transactions/${id}`, data),
   delete: (id) => api.delete(`/bank-data/transactions/${id}`),
   

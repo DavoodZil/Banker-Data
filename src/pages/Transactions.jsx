@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useTransactions } from "@/hooks/api";
 import { useDebounceWithLoading } from "@/hooks/api/useDebounce";
 import { useBankData } from "@/hooks/useBankData";
@@ -27,6 +27,7 @@ export default function Transactions() {
   const [searchQuery, setSearchQuery] = useState('');
   const { debouncedValue: debouncedSearchQuery, isDebouncing } = useDebounceWithLoading(searchQuery, 500); // 500ms delay for search
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const transactionListRef = useRef(null);
   const [filters, setFilters] = useState({
     account: 'all',
     category: 'all',
@@ -184,8 +185,19 @@ export default function Transactions() {
   };
 
   const handleUpdateTransaction = async (transactionId, updates) => {
-    await updateTransaction(transactionId, updates);
-    loadData();
+    const payload = {
+      transactionId: transactionId,
+      categoryId: updates.category,
+      description: updates.description,  
+      merchantName: updates.merchantName,
+    }
+    await updateTransaction(payload);
+    
+    // Refresh the transaction table directly
+    if (transactionListRef.current?.refresh) {
+      transactionListRef.current.refresh();
+    }
+    
     setSelectedTransaction(null);
   };
 
@@ -365,6 +377,7 @@ export default function Transactions() {
         </CardHeader>
         <CardContent className="p-6 ">
           <TransactionList
+            ref={transactionListRef}
             transactions={filteredTransactions}
             accounts={accounts}
             isLoading={false}
