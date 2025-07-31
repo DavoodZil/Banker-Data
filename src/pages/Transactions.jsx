@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, useMemo } from "react";
-import { useTransactions, useAccounts } from "@/hooks/api";
+import { useTransactions } from "@/hooks/api";
 import { useDebounceWithLoading } from "@/hooks/api/useDebounce";
+import { useBankData } from "@/hooks/useBankData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,17 +99,20 @@ export default function Transactions() {
     updateFilters,
     pagination 
   } = useTransactions();
-  const { accounts, refetch: refetchAccounts } = useAccounts();
+  const { bankData, isLoading: bankDataLoading, error: bankDataError, refetch: refetchBankData } = useBankData();
+
+  // Extract accounts from bankData
+  const accounts = bankData?.accounts || [];
 
   useEffect(() => {
-    // Data is automatically loaded by the hooks
+    // Data is automatically loaded by the useBankData hook
     setLastSync(new Date());
   }, []);
 
   const loadData = async () => {
     await Promise.all([
       refetchTransactions(),
-      refetchAccounts()
+      refetchBankData()
     ]);
     setLastSync(new Date());
   };
