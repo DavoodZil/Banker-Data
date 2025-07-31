@@ -1,10 +1,10 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaginatedTransactionTable from "./PaginatedTransactionTable";
 
 
 
-export default function TransactionList({ transactions, accounts, isLoading, onEditTransaction, filters }) {
+const TransactionList = forwardRef(function TransactionList({ transactions, accounts, isLoading, onEditTransaction, filters }, ref) {
   if (isLoading) {
     return (
       <div className="space-y-4 p-4">
@@ -30,9 +30,12 @@ export default function TransactionList({ transactions, accounts, isLoading, onE
   // Use PaginatedTransactionTable for server-side pagination
   return (
     <PaginatedTransactionTable
+      ref={ref}
       accounts={accounts}
       onEditTransaction={onEditTransaction}
       filters={filters}
     />
   );
-}
+});
+
+export default TransactionList;
