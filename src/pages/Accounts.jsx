@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { useAccounts } from "@/hooks/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Building, CreditCard, PiggyBank, TrendingUp, Eye, EyeOff, Trash2, AlertTriangle, RefreshCw, CheckCircle, Wallet } from "lucide-react";
@@ -40,21 +39,30 @@ export default function Accounts() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Use the new hooks
-  const { accounts, isLoading, error, refetch } = useAccounts();
-  const { bankData, isLoading: bankDataLoading, error: bankDataError, refetch: refetchBankData } = useBankData();
+  // Use bank data hook only
+  const { bankData, isLoading, error, refetch: refetchBankData } = useBankData();
+
+  // Extract accounts from bank data structure
+  const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts) : [];
+  
+  // Debug log to see account structure
+  useEffect(() => {
+    if (accounts.length > 0) {
+      console.log('Accounts from /bank-data:', accounts);
+    }
+  }, [accounts]);
 
   // Set accounts when bank data is available
   useEffect(() => {
-    if (bankDataError) {
-      console.error('Bank Data Error in Accounts component:', bankDataError);
+    if (error) {
+      console.error('Bank Data Error in Accounts component:', error);
     }
-  }, [bankDataError]);
+  }, [error]);
 
   const loadAccounts = async () => {
     try {
-      // Refetch accounts using the hook
-      await refetch();
+      // Refetch bank data
+      await refetchBankData();
     } catch (error) {
       console.error('Error loading accounts:', error);
     }
@@ -124,17 +132,17 @@ export default function Accounts() {
 
   const calculateTotalByType = (type) => {
     return accounts
-      .filter(account => account.account_type === type)
-      .reduce((sum, account) => sum + account.balance, 0);
+      .filter(account => (account.account_type || account.type) === type)
+      .reduce((sum, account) => sum + (account.balance || 0), 0);
   };
 
   const accountsByType = {
-    checking: accounts.filter(a => a.type === 'checking'),
-    savings: accounts.filter(a => a.type === 'savings'),
-    credit: accounts.filter(a => a.type === 'credit'),
-    investment: accounts.filter(a => a.type === 'investment'),
-    loan: accounts.filter(a => a.type === 'loan'),
-    cash: accounts.filter(a => a.type === 'cash')
+    checking: accounts.filter(a => (a.type || a.account_type) === 'checking'),
+    savings: accounts.filter(a => (a.type || a.account_type) === 'savings'),
+    credit: accounts.filter(a => (a.type || a.account_type) === 'credit'),
+    investment: accounts.filter(a => (a.type || a.account_type) === 'investment'),
+    loan: accounts.filter(a => (a.type || a.account_type) === 'loan'),
+    cash: accounts.filter(a => (a.type || a.account_type) === 'cash')
   };
 
   const typeConfig = {
@@ -159,12 +167,12 @@ export default function Accounts() {
           <Button
             variant="outline"
             onClick={refetchBankData}
-            disabled={bankDataLoading}
+            disabled={isLoading}
             size="sm"
             className="gap-2 text-xs"
           >
-            <RefreshCw className={`w-4 h-4 ${bankDataLoading ? 'animate-spin' : ''}`} />
-            {bankDataLoading ? 'Loading...' : 'Bank Data'}
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            {isLoading ? 'Loading...' : 'Bank Data'}
           </Button>
           <Button
             variant="outline"
@@ -216,67 +224,65 @@ export default function Accounts() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
-        {Object.entries(typeConfig).map(([type, config]) => {
-          const total = calculateTotalByType(type);
-          const count = accountsByType[type] ? accountsByType[type].length : 0; // Ensure accountsByType[type] exists
-          
-          if(count === 0) return null;
-
-          return (
-            <div key={type} className="bg-white rounded-lg border border-gray-100 p-3 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`p-1.5 rounded-lg ${config.bgColor}`}>
-                  <config.icon className={`w-4 h-4 ${config.color}`} />
-                </div>
-                <span className="text-xs font-medium text-gray-700 capitalize">
-                  {config.label}
-                </span>
+      {accounts.length > 0 && (
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
+              <div className="p-1.5 rounded-lg bg-blue-100">
+                <CreditCard className="w-4 h-4 text-blue-600" />
               </div>
-              <div className="text-lg font-bold text-gray-900">
-                {showBalances ? `$${total.toLocaleString('en-US')}` : '•••••'}
-              </div>
-              <p className="text-xs text-gray-500">{count} account{count !== 1 ? 's' : ''}</p>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Connected Accounts
+              </h2>
+              <span className="text-sm text-gray-500">
+                ({accounts.length})
+              </span>
             </div>
-          );
-        })}
-      </div>
-
-      <div className="space-y-6">
-        {Object.entries(accountsByType).map(([type, typeAccounts]) => {
-          if (typeAccounts.length === 0) return null;
-          
-          const config = typeConfig[type];
-          
-          return (
-            <div key={type} className="space-y-3">
-              <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-                <div className={`p-1.5 rounded-lg ${config.bgColor}`}>
-                  <config.icon className={`w-4 h-4 ${config.color}`} />
-                </div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {config.label}
-                </h2>
-                <span className="text-sm text-gray-500">
-                  ({typeAccounts.length})
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {typeAccounts.map((account) => (
-                   <Link to={createPageUrl(`AccountDetails?id=${account.id}`)} key={account.id} className="no-underline">
-                      <AccountCard
-                        account={account}
-                        showBalance={showBalances}
-                        onUpdate={loadAccounts}
-                      />
-                   </Link>
-                ))}
-              </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {accounts.map((account) => (
+                <Link to={createPageUrl(`AccountDetails?id=${account.id}`)} key={account.id} className="no-underline">
+                  <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all duration-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="w-4 h-4 text-gray-600" />
+                        <span className="text-sm font-medium text-gray-700">Account</span>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        account.status === 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      }`}>
+                        {account.status === 0 ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-sm leading-tight">
+                      {account.name}
+                    </h3>
+                    <p className="text-xs text-gray-500">ID: {account.id}</p>
+                  </div>
+                </Link>
+              ))}
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
+      )}
+
+      {isLoading && (
+        <Card className="bg-white card-shadow border-0 text-center py-16">
+          <CardContent className="space-y-6">
+            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
+              <RefreshCw className="w-10 h-10 text-blue-400 animate-spin" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Loading accounts...
+              </h3>
+              <p className="text-gray-500">
+                Please wait while we fetch your account information.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {accounts.length === 0 && !isLoading && (
         <Card className="bg-white card-shadow border-0 text-center py-16">

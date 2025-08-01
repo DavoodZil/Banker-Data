@@ -5,7 +5,7 @@
  * Follows React best practices for data fetching.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { accountApi } from '@/api/client';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -203,14 +203,21 @@ export function useAccounts() {
     }
   }, [toast]);
 
+  // Auto-fetch accounts on mount
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
+
   return {
     // State
     accounts,
     loading,
+    isLoading: loading, // Alias for consistency
     error,
     
     // Actions
     fetchAccounts,
+    refetch: fetchAccounts, // Alias for consistency
     getAccount,
     createAccount,
     updateAccount,
