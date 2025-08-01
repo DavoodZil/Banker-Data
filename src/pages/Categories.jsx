@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useCategories } from "@/hooks/api";
-import { useTransactions } from "@/hooks/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import CategoryCard from "../components/categories/CategoryCard";
 import AddCategoryModal from "../components/categories/AddCategoryModal";
+import CategorySummaryCards from "../components/categories/CategorySummaryCards";
 
 // Skeleton component for category cards
 function CategoryCardSkeleton() {
@@ -66,17 +66,13 @@ export default function Categories() {
 
   // Use the new hooks
   const { categories, loading: isLoading, error, fetchCategories: refetchCategories, createCategory, updateCategory } = useCategories();
-  const { transactions, refetch: refetchTransactions } = useTransactions();
 
   useEffect(() => {
     // Data is automatically loaded by the hooks
   }, []);
 
   const loadData = async () => {
-    await Promise.all([
-      refetchCategories(),
-      refetchTransactions()
-    ]);
+    await refetchCategories();
   };
 
   const handleAddCategory = async (categoryData) => {
@@ -119,16 +115,12 @@ export default function Categories() {
     }
   };
 
-  const getCategoryStats = (categoryName) => {
-    const categoryTransactions = transactions.filter(t => t.category === categoryName);
-    const totalSpent = categoryTransactions
-      .filter(t => t.amount < 0)
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    
+  const getCategoryStats = (category) => {
+    // Use the transactions_count from the category data itself
     return {
-      transactionCount: categoryTransactions.length,
-      totalSpent,
-      averageAmount: categoryTransactions.length > 0 ? totalSpent / categoryTransactions.length : 0
+      transactionCount: category.transactions_count || 0,
+      totalSpent: 0, // This will be provided by the API summary
+      averageAmount: 0
     };
   };
 
@@ -155,16 +147,12 @@ export default function Categories() {
     category.name && category.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalSpent = transactions
-    .filter(t => t.amount < 0)
-    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
   const categoriesWithSpending = filteredCategories
     .map(category => ({
       ...category,
-      stats: getCategoryStats(category.name)
+      stats: getCategoryStats(category)
     }))
-    .sort((a, b) => b.stats.totalSpent - a.stats.totalSpent);
+    .sort((a, b) => (b.transactions_count || 0) - (a.transactions_count || 0));
 
   return (
     <div className="p-4 lg:p-6 space-y-6 max-w-7xl mx-auto">
@@ -200,62 +188,7 @@ export default function Categories() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {isLoading ? (
-          <>
-            {Array.from({ length: 4 }).map((_, index) => (
-              <Card key={index} className="bg-white border-gray-100">
-                <CardContent className="p-4">
-                  <Skeleton className="h-3 w-20 mb-2" />
-                  <Skeleton className="h-8 w-16" />
-                </CardContent>
-              </Card>
-            ))}
-          </>
-        ) : (
-          <>
-            <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Total Categories
-                </div>
-                <div className="text-2xl font-bold text-gray-900">{allCategories.length}</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Total Spent
-                </div>
-                <div className="text-2xl font-bold text-red-600">${totalSpent.toLocaleString()}</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Active Categories
-                </div>
-                <div className="text-2xl font-bold text-emerald-600">
-                  {categoriesWithSpending.filter(c => c.stats.totalSpent > 0).length}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Avg per Category
-                </div>
-                <div className="text-2xl font-bold text-gray-900">
-                  ${categoriesWithSpending.length > 0 ? (totalSpent / categoriesWithSpending.filter(c => c.stats.totalSpent > 0).length).toLocaleString(undefined, {maximumFractionDigits: 0}) : '0'}
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        )}
-      </div>
+      <CategorySummaryCards filters={{}} />
 
       {/* Categories Grid */}
       {isLoading ? (

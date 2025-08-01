@@ -22,6 +22,7 @@ export {
   useCategorySearch, 
   useCategoryBudget 
 } from './useCategories';
+export { useCategorySummary } from './useCategorySummary';
 
 // Rule hooks
 export { useRules, useRule, useRuleTest } from './useRules';
