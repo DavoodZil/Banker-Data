@@ -102,8 +102,8 @@ export default function Transactions() {
   } = useTransactions();
   const { bankData, isLoading: bankDataLoading, error: bankDataError, refetch: refetchBankData } = useBankData();
 
-  // Extract accounts from bankData
-  const accounts = bankData?.accounts || [];
+  // Extract accounts from bankData structure
+  const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts) : [];
 
   useEffect(() => {
     // Data is automatically loaded by the useBankData hook
