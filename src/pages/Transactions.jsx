@@ -41,10 +41,9 @@ export default function Transactions() {
     const payload = {
       filterModel: {}, // Keep filterModel empty as per virtual card platform
       filteredDescription: debouncedSearchQuery || '',
-      filteredBankAccounts: filters.account !== 'all' ? filters.account : '',
+      filteredBankAccounts: filters.account !== 'all' ? [filters.account] : "",
       filteredCategory: filters.category !== 'all' ? filters.category : '',
       categoriesList: '', // Will be populated if needed
-      filteredAmount: '',
       filteredDate: '',
       fromDate: '2015-07-29', // Default wide date range
       toDate: '2035-07-29'
@@ -84,7 +83,20 @@ export default function Transactions() {
     
     // Handle amount range filter
     if (filters.amountRange !== 'all') {
-      payload.filteredAmount = filters.amountRange;
+      switch (filters.amountRange) {
+        case 'under_50':
+          payload.minimumAmount = '0';
+          payload.maximumAmount = '49.99';
+          break;
+        case '50_to_200':
+          payload.minimumAmount = '50.00';
+          payload.maximumAmount = '200.00';
+          break;
+        case 'over_200':
+          payload.minimumAmount = '200.01';
+          payload.maximumAmount = '999999.99'; // Large number for "over" range
+          break;
+      }
     }
     
     return payload;
