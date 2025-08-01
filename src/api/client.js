@@ -44,6 +44,7 @@ export const transactionApi = {
   getStatistics: (params) => api.get('/bank-data/transactions/statistics', { params }),
   getSpendingByCategory: (params) => api.get('/bank-data/transactions/spending-by-category', { params }),
   getSpendingByMerchant: (params) => api.get('/bank-data/transactions/spending-by-merchant', { params }),
+  getTotalsAggrid: (payload) => api.post('/bank-data/transactions-total', payload),
 };
 
 // Category API functions

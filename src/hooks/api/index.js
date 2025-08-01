@@ -14,6 +14,7 @@ export {
   useTransactionSearch, 
   useTransactionStats 
 } from './useTransactions';
+export { useTransactionTotals } from './useTransactionTotals';
 
 // Category hooks
 export { 

@@ -5,7 +5,7 @@ import { useDebounceWithLoading } from "@/hooks/api/useDebounce";
 import { useBankData } from "@/hooks/useBankData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, Download, Calendar, ArrowUpDown, RefreshCw, Upload, Loader2 } from "lucide-react";
@@ -20,6 +20,7 @@ import { createPageUrl } from '@/utils';
 import TransactionFilters from "../components/transactions/TransactionFilters";
 import TransactionList from "../components/transactions/TransactionList";
 import TransactionEditModal from "../components/transactions/TransactionEditModal";
+import TransactionTotalsCards from "../components/transactions/TransactionTotalsCards";
 
 export default function Transactions() {
   const [isSyncing, setIsSyncing] = useState(false);
@@ -237,16 +238,6 @@ export default function Transactions() {
   // Transactions are filtered by the API
   const filteredTransactions = transactions;
 
-  // Reset to first page when filters change is now handled by useTransactions hook
-
-  const totalSpent = filteredTransactions
-    .filter(t => t.amount < 0)
-    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-  const totalIncome = filteredTransactions
-    .filter(t => t.amount > 0)
-    .reduce((sum, t) => sum + t.amount, 0);
-
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -310,46 +301,7 @@ export default function Transactions() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="card-shadow border-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Transactions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
-              {pagination?.total || filteredTransactions.length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow border-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Income
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">
-              +${totalIncome.toLocaleString()}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow border-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Spent
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              -${totalSpent.toLocaleString()}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <TransactionTotalsCards filters={filterPayload} />
 
       <Card className="card-shadow border-0">
         <CardHeader>
