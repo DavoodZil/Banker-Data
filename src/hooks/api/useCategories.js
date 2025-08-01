@@ -36,24 +36,32 @@ export function useCategories() {
           selectable: false
         }));
         
-        // Extract child categories (selectable) with parent reference
+        // Extract user categories (actual selectable categories) with parent reference
         const childCategories = parentData.flatMap(parent => 
-          parent.children.map(child => ({
-            ...child,
-            parent_id: parent.enc_id,
-            parent_name: parent.name,
-            isParent: false,
-            selectable: true
-          }))
+          parent.children.flatMap(child => 
+            (child.user_category || []).map(userCat => ({
+              ...userCat,
+              parent_id: parent.enc_id,
+              parent_name: parent.name,
+              system_category_id: child.enc_id,
+              system_category_name: child.name,
+              isParent: false,
+              selectable: true,
+              // Include additional user category info
+              budget_amount: userCat.budget_amount,
+              transactions_count: userCat.transactions_count
+            }))
+          )
         );
         
-        // Create hierarchy structure for display
+        // Create hierarchy structure for display with user categories
         const hierarchy = parentData.map(parent => ({
           ...parent,
           children: parent.children.map(child => ({
             ...child,
             parent_id: parent.enc_id,
-            parent_name: parent.name
+            parent_name: parent.name,
+            user_categories: child.user_category || []
           }))
         }));
         
