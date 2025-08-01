@@ -35,7 +35,7 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
           <SelectItem value="all">All Accounts</SelectItem>
           {accounts.map((account) => (
             <SelectItem key={account.id} value={account.id}>
-              {account.account_name}
+              {account.name || account.account_name}
             </SelectItem>
           ))}
         </SelectContent>
