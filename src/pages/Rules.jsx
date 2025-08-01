@@ -430,13 +430,29 @@ export default function RulesPage() {
   const categoriesForSelector = categoryHierarchy.reduce((acc, parent) => {
     const groupName = formatCategoryName(parent.name);
     
+    // Get all user categories from all children of this parent
+    const userCategories = (parent.children || []).flatMap(child => 
+      (child.user_categories || child.user_category || []).map(userCat => ({
+        name: userCat.name,
+        enc_id: userCat.id,
+        original_name: userCat.name,
+        isUserCategory: true,
+        selectable: true // Make user categories selectable
+      }))
+    );
+    
+    // Also include system categories (selectable)
+    const systemCategories = (parent.children || []).map(child => ({
+      name: formatCategoryName(child.name),
+      enc_id: child.enc_id,
+      original_name: child.name,
+      isUserCategory: false,
+      selectable: true
+    }));
+    
     acc[groupName] = {
       icon: FileText, // Default icon
-      subcategories: (parent.children || []).map(child => ({
-        name: formatCategoryName(child.name),
-        enc_id: child.enc_id,
-        original_name: child.name
-      }))
+      subcategories: [...userCategories, ...systemCategories]
     };
     
     return acc;
@@ -697,7 +713,12 @@ export default function RulesPage() {
                         </SelectLabel>
                         {subcategories.map(subcategory => (
                           <SelectItem key={subcategory.enc_id} value={subcategory.enc_id} className="subcategory-item">
-                            {subcategory.name}
+                            <div className="flex items-center justify-between w-full">
+                              <span>{subcategory.name}</span>
+                              {subcategory.isUserCategory && (
+                                <span className="text-xs text-gray-500 ml-2">(custom)</span>
+                              )}
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -851,7 +872,12 @@ export default function RulesPage() {
                             </SelectLabel>
                             {subcategories.map(subcategory => (
                               <SelectItem key={subcategory.enc_id} value={subcategory.enc_id} className="subcategory-item">
-                                {subcategory.name}
+                                <div className="flex items-center justify-between w-full">
+                                  <span>{subcategory.name}</span>
+                                  {subcategory.isUserCategory && (
+                                    <span className="text-xs text-gray-500 ml-2">(custom)</span>
+                                  )}
+                                </div>
                               </SelectItem>
                             ))}
                           </SelectGroup>
