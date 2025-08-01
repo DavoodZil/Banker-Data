@@ -59,6 +59,7 @@ export const categoryApi = {
   getHierarchy: () => api.get('/bank-data/categories/hierarchy'),
   getPopular: (limit = 10) => api.get('/bank-data/categories/popular', { params: { limit } }),
   merge: (sourceId, targetId) => api.post('/bank-data/categories/merge', { source_id: sourceId, target_id: targetId }),
+  getSummary: (payload = {}) => api.post('/bank-data/category-summary', payload),
 };
 
 // Rule API functions
