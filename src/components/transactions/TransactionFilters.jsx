@@ -35,7 +35,7 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
           <SelectItem value="all">All Accounts</SelectItem>
           {accounts.map((account) => (
             <SelectItem key={account.id} value={account.id}>
-              {account.account_name}
+              {account.name || account.account_name}
             </SelectItem>
           ))}
         </SelectContent>
@@ -51,8 +51,15 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
             <SelectItem value="loading" disabled>Loading categories...</SelectItem>
           ) : (
             childCategories.map((category) => (
-              <SelectItem key={category.enc_id} value={category.enc_id}>
-                {category.parent_name} - {category.name}
+              <SelectItem key={category.id} value={category.id}>
+                <div className="flex justify-between w-full">
+                  <span>{category.parent_name} - {category.name}</span>
+                  {category.transactions_count > 0 && (
+                    <span className="text-xs text-gray-500 ml-2">
+                      ({category.transactions_count})
+                    </span>
+                  )}
+                </div>
               </SelectItem>
             ))
           )}

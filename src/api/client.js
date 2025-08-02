@@ -29,7 +29,7 @@ export const transactionApi = {
   list: (payload = {}) => api.post('/ag-grid/42', payload),
   get: (id) => api.get(`/bank-data/transactions/${id}`),
   create: (data) => api.post('/bank-data/transactions', data),
-  update: (id, data) => api.put(`/bank-data/transactions/${id}`, data),
+  update: (data) => api.put(`/bank-data/update-transaction`, data),
   patch: (id, data) => api.patch(`/bank-data/transactions/${id}`, data),
   delete: (id) => api.delete(`/bank-data/transactions/${id}`),
   
@@ -44,6 +44,7 @@ export const transactionApi = {
   getStatistics: (params) => api.get('/bank-data/transactions/statistics', { params }),
   getSpendingByCategory: (params) => api.get('/bank-data/transactions/spending-by-category', { params }),
   getSpendingByMerchant: (params) => api.get('/bank-data/transactions/spending-by-merchant', { params }),
+  getTotalsAggrid: (payload) => api.post('/bank-data/transactions-total', payload),
 };
 
 // Category API functions
@@ -58,6 +59,7 @@ export const categoryApi = {
   getHierarchy: () => api.get('/bank-data/categories/hierarchy'),
   getPopular: (limit = 10) => api.get('/bank-data/categories/popular', { params: { limit } }),
   merge: (sourceId, targetId) => api.post('/bank-data/categories/merge', { source_id: sourceId, target_id: targetId }),
+  getSummary: (payload = {}) => api.post('/bank-data/category-summary', payload),
 };
 
 // Rule API functions

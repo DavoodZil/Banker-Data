@@ -1,13 +1,14 @@
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useTransactions } from "@/hooks/api";
-import { useAccounts } from "@/hooks/api";
+import { useDebounceWithLoading } from "@/hooks/api/useDebounce";
+import { useBankData } from "@/hooks/useBankData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Download, Calendar, ArrowUpDown, RefreshCw, Upload } from "lucide-react";
+import { Search, Filter, Download, Calendar, ArrowUpDown, RefreshCw, Upload, Loader2 } from "lucide-react";
 import { format, startOfMonth, endOfMonth, subMonths, startOfDay, endOfDay } from "date-fns";
 // TODO: Implement these functions in the new API structure
 // import { syncTransactions } from "@/api/functions";
@@ -19,12 +20,15 @@ import { createPageUrl } from '@/utils';
 import TransactionFilters from "../components/transactions/TransactionFilters";
 import TransactionList from "../components/transactions/TransactionList";
 import TransactionEditModal from "../components/transactions/TransactionEditModal";
+import TransactionTotalsCards from "../components/transactions/TransactionTotalsCards";
 
 export default function Transactions() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
+  const { debouncedValue: debouncedSearchQuery, isDebouncing } = useDebounceWithLoading(searchQuery, 500); // 500ms delay for search
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const transactionListRef = useRef(null);
   const [filters, setFilters] = useState({
     account: 'all',
     category: 'all',
@@ -36,11 +40,10 @@ export default function Transactions() {
   const filterPayload = useMemo(() => {
     const payload = {
       filterModel: {}, // Keep filterModel empty as per virtual card platform
-      filteredDescription: searchQuery || '',
-      filteredBankAccounts: filters.account !== 'all' ? filters.account : '',
+      filteredDescription: debouncedSearchQuery || '',
+      filteredBankAccounts: filters.account !== 'all' ? [filters.account] : "",
       filteredCategory: filters.category !== 'all' ? filters.category : '',
       categoriesList: '', // Will be populated if needed
-      filteredAmount: '',
       filteredDate: '',
       fromDate: '2015-07-29', // Default wide date range
       toDate: '2035-07-29'
@@ -80,11 +83,24 @@ export default function Transactions() {
     
     // Handle amount range filter
     if (filters.amountRange !== 'all') {
-      payload.filteredAmount = filters.amountRange;
+      switch (filters.amountRange) {
+        case 'under_50':
+          payload.minimumAmount = '0';
+          payload.maximumAmount = '49.99';
+          break;
+        case '50_to_200':
+          payload.minimumAmount = '50.00';
+          payload.maximumAmount = '200.00';
+          break;
+        case 'over_200':
+          payload.minimumAmount = '200.01';
+          payload.maximumAmount = '999999.99'; // Large number for "over" range
+          break;
+      }
     }
     
     return payload;
-  }, [searchQuery, filters]);
+  }, [debouncedSearchQuery, filters]);
   const [syncMethod, setSyncMethod] = useState('direct'); // 'direct' or 'ngrok'
 
   // Use the new hooks - don't pass initial filters, will be set via updateFilters
@@ -97,17 +113,20 @@ export default function Transactions() {
     updateFilters,
     pagination 
   } = useTransactions();
-  const { accounts, refetch: refetchAccounts } = useAccounts();
+  const { bankData, isLoading: bankDataLoading, error: bankDataError, refetch: refetchBankData } = useBankData();
+
+  // Extract accounts from bankData structure
+  const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts) : [];
 
   useEffect(() => {
-    // Data is automatically loaded by the hooks
+    // Data is automatically loaded by the useBankData hook
     setLastSync(new Date());
   }, []);
 
   const loadData = async () => {
     await Promise.all([
       refetchTransactions(),
-      refetchAccounts()
+      refetchBankData()
     ]);
     setLastSync(new Date());
   };
@@ -179,8 +198,19 @@ export default function Transactions() {
   };
 
   const handleUpdateTransaction = async (transactionId, updates) => {
-    await updateTransaction(transactionId, updates);
-    loadData();
+    const payload = {
+      transactionId: transactionId,
+      categoryId: updates.category,
+      description: updates.description,  
+      merchantName: updates.merchantName,
+    }
+    await updateTransaction(payload);
+    
+    // Refresh the transaction table directly
+    if (transactionListRef.current?.refresh) {
+      transactionListRef.current.refresh();
+    }
+    
     setSelectedTransaction(null);
   };
 
@@ -219,16 +249,6 @@ export default function Transactions() {
   
   // Transactions are filtered by the API
   const filteredTransactions = transactions;
-
-  // Reset to first page when filters change is now handled by useTransactions hook
-
-  const totalSpent = filteredTransactions
-    .filter(t => t.amount < 0)
-    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-  const totalIncome = filteredTransactions
-    .filter(t => t.amount > 0)
-    .reduce((sum, t) => sum + t.amount, 0);
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -293,46 +313,7 @@ export default function Transactions() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="card-shadow border-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Transactions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
-              {pagination?.total || filteredTransactions.length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow border-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Income
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">
-              +${totalIncome.toLocaleString()}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow border-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Spent
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              -${totalSpent.toLocaleString()}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <TransactionTotalsCards filters={filterPayload} />
 
       <Card className="card-shadow border-0">
         <CardHeader>
@@ -344,8 +325,11 @@ export default function Transactions() {
                   placeholder="Search transactions..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 pr-10"
                 />
+                {isDebouncing && (
+                  <Loader2 className="w-4 h-4 absolute right-3 top-3 text-gray-400 animate-spin" />
+                )}
               </div>
             </div>
             <TransactionFilters
@@ -357,6 +341,7 @@ export default function Transactions() {
         </CardHeader>
         <CardContent className="p-6 ">
           <TransactionList
+            ref={transactionListRef}
             transactions={filteredTransactions}
             accounts={accounts}
             isLoading={false}

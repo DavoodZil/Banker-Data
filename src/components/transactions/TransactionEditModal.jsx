@@ -2,39 +2,35 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Edit, Tag, Calendar, DollarSign } from "lucide-react";
+import { Edit, Calendar, DollarSign, Search, FileText } from "lucide-react";
 import { format } from "date-fns";
+import { useCategories } from "@/hooks/api";
 
-const categories = [
-  'groceries', 'dining', 'transportation', 'entertainment', 
-  'utilities', 'healthcare', 'shopping', 'travel', 
-  'income', 'investments', 'insurance', 'education', 
-  'gifts', 'subscriptions', 'uncategorized'
-];
 
 export default function TransactionEditModal({ transaction, isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
-    custom_description: '',
+    description: '',
+    merchantName: '',
     category: '',
-    subcategory: '',
-    merchant: '',
-    notes: '',
-    tags: []
+    amount: 0
   });
+  const [categorySearch, setCategorySearch] = useState('');
+  const { categoryHierarchy, loading: categoriesLoading } = useCategories();
+
+  // Format category name by replacing underscores with spaces
+  const formatCategoryName = (name) => {
+    return name ? name.replace(/_/g, ' ').replace(/&nbsp;/g, ' ').trim() : name;
+  };
 
   useEffect(() => {
     if (transaction) {
       setFormData({
-        custom_description: transaction.custom_description || '',
-        category: transaction.category || '',
-        subcategory: transaction.subcategory || '',
-        merchant: transaction.merchant || '',
-        notes: transaction.notes || '',
-        tags: transaction.tags || []
+        description: transaction.description_custom || transaction.original_description || '',
+        merchantName: transaction.merchant_name_custom || transaction.merchant_name || '',
+        category: transaction.category_id_custom || '',
+        amount: Math.abs(parseFloat(transaction.amountAmount || transaction.amount || 0))
       });
     }
   }, [transaction]);
@@ -44,141 +40,206 @@ export default function TransactionEditModal({ transaction, isOpen, onClose, onS
     onSave(transaction.id, formData);
   };
 
-  const handleTagAdd = (tag) => {
-    if (tag && !formData.tags.includes(tag)) {
-      setFormData({
-        ...formData,
-        tags: [...formData.tags, tag]
-      });
+  // Transform hierarchical categories for the category selector
+  const categoriesForSelector = categoryHierarchy.reduce((acc, parent) => {
+    const groupName = formatCategoryName(parent.name);
+    
+    // Get children categories
+    const children = parent.children || [];
+    
+    // Only add parent if it has children (since parent categories shouldn't be selectable)
+    if (children.length > 0) {
+      acc[groupName] = {
+        icon: FileText,
+        emoji: parent.emoji,
+        subcategories: children.map(child => ({
+          name: formatCategoryName(child.name),
+          enc_id: child.enc_id,
+          original_name: child.name
+        }))
+      };
     }
-  };
+    
+    return acc;
+  }, {});
 
-  const handleTagRemove = (tagToRemove) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags.filter(tag => tag !== tagToRemove)
-    });
-  };
+  // Filter categories based on search
+  const filteredCategories = Object.entries(categoriesForSelector).reduce((acc, [category, { icon, emoji, subcategories }]) => {
+    if (!categorySearch) {
+      acc[category] = { icon, emoji, subcategories };
+      return acc;
+    }
+
+    const lowerCaseSearch = categorySearch.toLowerCase();
+    const categoryMatches = category.toLowerCase().includes(lowerCaseSearch);
+    const matchingSubcategories = subcategories.filter(sub => 
+      sub.name.toLowerCase().includes(lowerCaseSearch)
+    );
+
+    if (categoryMatches || matchingSubcategories.length > 0) {
+      acc[category] = { 
+        icon, 
+        emoji,
+        subcategories: categoryMatches ? subcategories : matchingSubcategories 
+      };
+    }
+
+    return acc;
+  }, {});
 
   if (!transaction) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Edit className="w-5 h-5" />
-            Edit Transaction
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-4">
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Calendar className="w-4 h-4 text-gray-500" />
-              <span className="font-medium">
-                {format(new Date(transaction.date), "MMMM d, yyyy")}
-              </span>
+    <>
+      <style>{`
+        .category-search { 
+          position: sticky; 
+          top: 0; 
+          z-index: 10; 
+          background: white; 
+          padding: 8px; 
+          border-bottom: 1px solid #e5e7eb; 
+          margin: -8px -8px 8px -8px; 
+        }
+        .category-header { 
+          font-weight: 600; 
+          color: #374151; 
+          padding: 8px 12px; 
+          background-color: #f9fafb; 
+          border-bottom: 1px solid #e5e7eb; 
+        }
+        .subcategory-item { 
+          padding-left: 24px; 
+          display: flex; 
+          align-items: center; 
+          gap: 8px; 
+        }
+        .subcategory-item::before { 
+          content: "•"; 
+          color: #9ca3af; 
+          font-weight: bold; 
+          width: 8px; 
+        }
+      `}</style>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="w-5 h-5" />
+              Edit Transaction
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="w-4 h-4 text-gray-500" />
+                <span className="font-medium">
+                  {format(new Date(transaction.date), "MMMM d, yyyy")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="w-4 h-4 text-gray-500" />
+                <span className={`font-semibold ${transaction.amountAmount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {transaction.amountAmount > 0 ? '+' : ''}${Math.abs(transaction.amountAmount || transaction.amount || 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="text-sm text-gray-600">
+                Original: {transaction.original_description || transaction.description}
+              </div>
             </div>
-            <div className="flex items-center gap-2 mb-2">
-              <DollarSign className="w-4 h-4 text-gray-500" />
-              <span className={`font-semibold ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
-              </span>
-            </div>
-            <div className="text-sm text-gray-600">
-              Original: {transaction.description}
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="custom_description">Custom Description</Label>
+              <Label htmlFor="description">Description</Label>
               <Input
-                id="custom_description"
-                value={formData.custom_description}
-                onChange={(e) => setFormData({...formData, custom_description: e.target.value})}
-                placeholder="Enter a custom description..."
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                placeholder="Enter description..."
+                required
               />
             </div>
 
+            {/* Merchant Name */}
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select 
-                value={formData.category} 
-                onValueChange={(value) => setFormData({...formData, category: value})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      <span className="capitalize">{category}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="merchant">Merchant</Label>
+              <Label htmlFor="merchantName">Merchant Name</Label>
               <Input
-                id="merchant"
-                value={formData.merchant}
-                onChange={(e) => setFormData({...formData, merchant: e.target.value})}
+                id="merchantName"
+                value={formData.merchantName}
+                onChange={(e) => setFormData({...formData, merchantName: e.target.value})}
                 placeholder="Enter merchant name..."
               />
             </div>
 
+            {/* Category */}
             <div className="space-y-2">
-              <Label htmlFor="subcategory">Subcategory</Label>
-              <Input
-                id="subcategory"
-                value={formData.subcategory}
-                onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
-                placeholder="Enter subcategory..."
-              />
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => setFormData({...formData, category: value})}
+                disabled={categoriesLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  <div className="sticky top-0 z-10 bg-white p-2 border-b">
+                    <div className="relative">
+                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <Input
+                        placeholder="Search categories..."
+                        value={categorySearch}
+                        onChange={(e) => setCategorySearch(e.target.value)}
+                        className="pl-9 h-8"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onFocus={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="max-h-48 overflow-y-auto">
+                    {Object.entries(filteredCategories).map(([category, { icon: CategoryIcon, emoji, subcategories }]) => (
+                      <SelectGroup key={category}>
+                        <SelectLabel className="category-header flex items-center gap-2">
+                          {emoji ? <span className="text-xl leading-none">{emoji}</span> : <CategoryIcon className="w-4 h-4" />}
+                          {category}
+                        </SelectLabel>
+                        {subcategories.map(subcategory => (
+                          <SelectItem key={subcategory.enc_id} value={subcategory.enc_id} className="subcategory-item">
+                            {subcategory.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                    
+                    {Object.keys(filteredCategories).length === 0 && categorySearch && (
+                      <div className="text-center py-4 text-gray-500 text-sm">
+                        No categories found
+                      </div>
+                    )}
+                  </div>
+                </SelectContent>
+              </Select>
             </div>
 
+            {/* Amount */}
             <div className="space-y-2">
-              <Label>Tags</Label>
-              <div className="flex flex-wrap gap-1 mb-2">
-                {formData.tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="gap-1">
-                    <Tag className="w-3 h-3" />
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => handleTagRemove(tag)}
-                      className="ml-1 text-gray-500 hover:text-gray-700"
-                    >
-                      ×
-                    </button>
-                  </Badge>
-                ))}
+              <Label htmlFor="amount">Amount</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                <Input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({...formData, amount: parseFloat(e.target.value) || 0})}
+                  placeholder="0.00"
+                  className="pl-7"
+                  required
+                />
               </div>
-              <Input
-                placeholder="Add tags (press Enter)"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleTagAdd(e.target.value.trim());
-                    e.target.value = '';
-                  }
-                }}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                placeholder="Add any notes about this transaction..."
-                rows={3}
-              />
             </div>
 
             <DialogFooter>
@@ -193,5 +254,6 @@ export default function TransactionEditModal({ transaction, isOpen, onClose, onS
         </div>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

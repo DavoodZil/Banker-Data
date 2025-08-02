@@ -14,6 +14,7 @@ export {
   useTransactionSearch, 
   useTransactionStats 
 } from './useTransactions';
+export { useTransactionTotals } from './useTransactionTotals';
 
 // Category hooks
 export { 
@@ -21,6 +22,7 @@ export {
   useCategorySearch, 
   useCategoryBudget 
 } from './useCategories';
+export { useCategorySummary } from './useCategorySummary';
 
 // Rule hooks
 export { useRules, useRule, useRuleTest } from './useRules';
