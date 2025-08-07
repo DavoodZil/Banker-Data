@@ -24,7 +24,6 @@ export function useCategories() {
     setError(null);
     try {
       const response = await categoryApi.list();
-      console.log(response);
       // Handle the specific API response structure
       if (response.data && response.data.data && response.data.data.length > 0) {
         const parentData = response.data.data;

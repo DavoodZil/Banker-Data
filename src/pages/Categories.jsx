@@ -79,7 +79,6 @@ export default function Categories() {
     setIsSaving(true);
     try {
       // Clean the name before sending to API
-      console.log(categoryData);
       const cleanedData = {
         ...categoryData,
         name: categoryData.name ? categoryData.name.replace(/&nbsp;/g, ' ').trim() : categoryData.name

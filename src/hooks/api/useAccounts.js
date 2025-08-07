@@ -20,8 +20,8 @@ export function useAccounts() {
     setLoading(true);
     setError(null);
     try {
-      const response = await accountApi.list(params);
-      const data = response.data;
+      // const response = await accountApi.list(params);
+      const data = [];
       setAccounts(data);
       return data;
     } catch (err) {
