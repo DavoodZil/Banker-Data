@@ -139,7 +139,6 @@ export default function Transactions() {
       if (syncMethod === 'ngrok') {
         response = await fetchFromNgrok();
         if (response.data && response.data.success) {
-          console.log(response.data.message || "Transactions synced successfully via Ngrok!");
           await loadData();
         } else {
           const errorDetails = response.data;
@@ -154,7 +153,6 @@ export default function Transactions() {
       } else { // Direct sync
         response = await syncTransactions();
         if (response.data && response.data.success) {
-            console.log(response.data.message || "Transactions synced successfully!");
             await loadData();
         } else {
             console.error("Sync failed:", response.data?.error || response.data?.details || "Unknown error");
@@ -180,7 +178,6 @@ export default function Transactions() {
     try {
       const response = await triggerWebhookSync();
       if (response.data && response.data.success) {
-        console.log("Webhook sync triggered successfully!");
         // Wait a moment for webhook processing, then reload
         setTimeout(async () => {
           await loadData();

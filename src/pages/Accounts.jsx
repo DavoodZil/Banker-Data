@@ -47,9 +47,6 @@ export default function Accounts() {
   
   // Debug log to see account structure
   useEffect(() => {
-    if (accounts.length > 0) {
-      console.log('Accounts from /bank-data:', accounts);
-    }
   }, [accounts]);
 
   // Set accounts when bank data is available
@@ -73,7 +70,6 @@ export default function Accounts() {
     try {
       const response = await syncTransactions();
       if (response.data && response.data.success) {
-        console.log(response.data.message || "Transactions synced successfully!");
         loadAccounts();
       } else {
         const errorMessage = response.data?.message || response.data?.error || "Unknown error during sync";
@@ -106,7 +102,6 @@ export default function Accounts() {
     setIsVerifying(true);
     try {
       const response = await verifyPlaidIntegration();
-      console.log('Verification Results:', response.data);
       
       const { summary, overall_status } = response.data;
       const statusMessages = {

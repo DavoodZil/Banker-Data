@@ -52,7 +52,6 @@ api.interceptors.request.use(
 
 // Helper function to get user-friendly error message
 const getErrorMessage = (error) => {
-  console.log(error);
   if (error.response?.data?.errorMsg) {
     return error.response.data.errorMsg;
   }

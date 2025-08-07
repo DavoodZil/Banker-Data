@@ -19,7 +19,6 @@ export const useCategorySummary = (filters = {}) => {
     try {
       const response = await categoryApi.getSummary(filterPayload);
       
-      console.log('Category summary response:', response.data);
       
       // Handle the response structure
       if (response.data && response.data.success && response.data.data) {

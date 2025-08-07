@@ -39,7 +39,6 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
     if (!newRuleName || selectedAccounts.length === 0 || !targetEntity) return;
 
     // This would need to be implemented in the API
-    console.warn('EntityRule.create() not implemented in new API structure');
     
     // Reset form
     setNewRuleName("");
@@ -49,7 +48,6 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
   
   const handleDeleteRule = async (ruleId) => {
     // This would need to be implemented in the API
-    console.warn('EntityRule.delete() not implemented in new API structure');
   };
 
   const getAccountName = (accountId) => accounts.find(a => a.id === accountId)?.account_name || 'Unknown Account';

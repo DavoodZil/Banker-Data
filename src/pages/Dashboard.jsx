@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   TrendingUp,
   DollarSign,
@@ -12,95 +13,63 @@ import {
   ArrowDownRight,
   Plus,
   RefreshCw,
-  Target,
-  AlertTriangle
+  Target
 } from "lucide-react";
-import { format, startOfMonth, endOfMonth } from "date-fns";
+import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useBankData } from "@/hooks/useBankData";
 import AccountOverview from "../components/dashboard/AccountOverview";
 
 export default function Dashboard() {
-  const { bankData, isLoading, error, refetch } = useBankData();
+  const { bankData, isLoading, error, refetch, dashboardSummary, fetchDashboardSummary } = useBankData();
   const [isSyncing, setIsSyncing] = React.useState(false);
   const [lastSync, setLastSync] = React.useState(new Date());
 
   // Extract data safely with the correct structure
   const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts) : [];
-  const categories = bankData?.data?.categories || {};
-  const providerAccounts = bankData?.data?.providerAccounts || [];
 
-  // Metrics calculations updated for new structure
-  const calculateNetWorth = () => {
-    return accounts.reduce((sum, account) => {
-      const balance = parseFloat(account.current_balance) || 0;
-      // Assuming credit/loan accounts have negative balances
-      return sum + balance;
-    }, 0);
-  };
+  // Use dashboard summary data from API
+  const summary = dashboardSummary || {};
+  
+  // Extract values from API response with fallbacks
+  const netWorth = summary.net_worth?.amount || 0;
+  const netWorthFormatted = summary.net_worth?.formatted_amount || '$0';
+  const netWorthChangeText = summary.net_worth?.change_text || '0% this month';
+  const netWorthTrend = summary.net_worth?.trend || 'neutral';
+  
+  const monthlyIncome = summary.monthly_income?.amount || '0.00';
+  const monthlyIncomeFormatted = summary.monthly_income?.formatted_amount || '$0';
+  const monthlyIncomeStatus = summary.monthly_income?.status || 'On track';
+  const monthlyIncomeTrend = summary.monthly_income?.trend || 'neutral';
+  
+  const monthlySpending = summary.monthly_spending?.amount || '0.00';
+  const monthlySpendingFormatted = summary.monthly_spending?.formatted_amount || '$0';
+  const monthlySpendingChangeText = summary.monthly_spending?.change_text || '0% vs last month';
+  const monthlySpendingTrend = summary.monthly_spending?.trend || 'neutral';
+  
+  const totalAccounts = summary.total_accounts?.count || 0;
+  const activeAccounts = summary.total_accounts?.active_count || 0;
+  const accountsStatusText = summary.total_accounts?.status_text || '0 active';
 
-  const calculateMonthlySpending = () => {
-    // Since transactions are not in this response, we'll use a mock calculation
-    // In a real implementation, you'd need to fetch transactions separately
-    const monthStart = startOfMonth(new Date());
-    const monthEnd = endOfMonth(new Date());
-    
-    // Mock calculation based on account balances (this is just for demo)
-    const totalBalance = accounts.reduce((sum, account) => {
-      return sum + (parseFloat(account.current_balance) || 0);
-    }, 0);
-    
-    // Mock monthly spending as 20% of total balance
-    return Math.abs(totalBalance * 0.2);
-  };
-
-  const calculateMonthlyIncome = () => {
-    // Mock calculation since transactions are not available
-    const totalBalance = accounts.reduce((sum, account) => {
-      return sum + (parseFloat(account.current_balance) || 0);
-    }, 0);
-    
-    // Mock monthly income as 30% of total balance
-    return totalBalance * 0.3;
-  };
-
-  const calculateTotalBudget = () => {
-    // Since categories don't have budget amounts in this structure,
-    // we'll use a mock calculation
-    const totalBalance = accounts.reduce((sum, account) => {
-      return sum + (parseFloat(account.current_balance) || 0);
-    }, 0);
-    
-    // Mock budget as 50% of total balance
-    return totalBalance * 0.5;
-  };
-
-  const calculateBudgetUtilization = () => {
-    const totalBudget = calculateTotalBudget();
-    const monthlySpending = calculateMonthlySpending();
-    return totalBudget > 0 ? (monthlySpending / totalBudget) * 100 : 0;
-  };
-
-  const netWorth = calculateNetWorth();
-  const monthlySpending = calculateMonthlySpending();
-  const monthlyIncome = calculateMonthlyIncome();
-  const totalBudget = calculateTotalBudget();
-  const budgetUtilization = calculateBudgetUtilization();
-
-  const getNetWorthTrend = () => {
-    const currentNetWorth = netWorth;
-    const lastMonthNetWorth = currentNetWorth * 0.97; // Mock 3% growth
-    const change = currentNetWorth - lastMonthNetWorth;
-    const changePercent = lastMonthNetWorth > 0 ? (change / lastMonthNetWorth) * 100 : 0;
-    return {
-      change,
-      changePercent,
-      isPositive: change >= 0
-    };
-  };
-
-  const netWorthTrend = getNetWorthTrend();
+  // Skeleton component for summary cards
+  const SummaryCardSkeleton = () => (
+    <Card className="card-shadow-lg border-0 bg-gradient-to-br from-gray-50 to-slate-50">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="w-8 h-8 rounded-lg" />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-8 w-24 mb-2" />
+        <div className="flex items-center gap-1">
+          <Skeleton className="w-4 h-4" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   // Transform accounts to match expected format for AccountOverview
   const transformedAccounts = accounts.map(account => ({
@@ -132,7 +101,18 @@ export default function Dashboard() {
           <Button
             variant="outline"
             size="sm"
-            onClick={refetch}
+            onClick={async () => {
+              setIsSyncing(true);
+              try {
+                await refetch();
+                if (fetchDashboardSummary) {
+                  await fetchDashboardSummary();
+                }
+              } finally {
+                setIsSyncing(false);
+                setLastSync(new Date());
+              }
+            }}
             disabled={isSyncing || isLoading}
             className="gap-2"
           >
@@ -150,132 +130,150 @@ export default function Dashboard() {
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
-        <Card className="card-shadow-lg border-0 bg-gradient-to-br from-emerald-50 to-teal-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Net Worth
-              </CardTitle>
-              <div className="p-2 bg-emerald-100 rounded-lg">
-                <TrendingUp className="w-4 h-4 text-emerald-600" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
-              ${netWorth.toLocaleString()}
-            </div>
-            <div className="flex items-center gap-1 mt-1">
-              {netWorthTrend.isPositive ? (
-                <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-              ) : (
-                <ArrowDownRight className="w-4 h-4 text-red-500" />
-              )}
-              <span className={`text-sm font-medium ${netWorthTrend.isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
-                {netWorthTrend.isPositive ? '+' : ''}{netWorthTrend.changePercent.toFixed(1)}% this month
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        {isLoading ? (
+          // Show skeleton loaders when loading
+          Array(5).fill(0).map((_, i) => <SummaryCardSkeleton key={i} />)
+        ) : (
+          // Show actual cards when data is loaded
+          <>
+            <Card className="card-shadow-lg border-0 bg-gradient-to-br from-emerald-50 to-teal-50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Net Worth
+                  </CardTitle>
+                  <div className="p-2 bg-emerald-100 rounded-lg">
+                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">
+                  {netWorthFormatted}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  {netWorthTrend === 'up' ? (
+                    <ArrowUpRight className="w-4 h-4 text-emerald-500" />
+                  ) : netWorthTrend === 'down' ? (
+                    <ArrowDownRight className="w-4 h-4 text-red-500" />
+                  ) : (
+                    <span className="w-4 h-4 text-gray-400">—</span>
+                  )}
+                  <span className={`text-sm font-medium ${netWorthTrend === 'up' ? 'text-emerald-600' : netWorthTrend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
+                    {netWorthChangeText}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="card-shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Monthly Income
-              </CardTitle>
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <DollarSign className="w-4 h-4 text-blue-600" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
-              ${monthlyIncome.toLocaleString()}
-            </div>
-            <div className="flex items-center gap-1 mt-1">
-              <ArrowUpRight className="w-4 h-4 text-blue-500" />
-              <span className="text-sm text-blue-600 font-medium">
-                On track
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="card-shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Monthly Income
+                  </CardTitle>
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <DollarSign className="w-4 h-4 text-blue-600" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">
+                  {monthlyIncomeFormatted}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  {monthlyIncomeTrend === 'up' ? (
+                    <ArrowUpRight className="w-4 h-4 text-blue-500" />
+                  ) : monthlyIncomeTrend === 'down' ? (
+                    <ArrowDownRight className="w-4 h-4 text-red-500" />
+                  ) : (
+                    <span className="w-4 h-4 text-gray-400">—</span>
+                  )}
+                  <span className={`text-sm font-medium ${monthlyIncomeTrend === 'up' ? 'text-blue-600' : monthlyIncomeTrend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
+                    {monthlyIncomeStatus}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="card-shadow-lg border-0 bg-gradient-to-br from-orange-50 to-red-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Monthly Spending
-              </CardTitle>
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <CreditCard className="w-4 h-4 text-orange-600" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
-              ${monthlySpending.toLocaleString()}
-            </div>
-            <div className="flex items-center gap-1 mt-1">
-              <ArrowDownRight className="w-4 h-4 text-orange-500" />
-              <span className="text-sm text-orange-600 font-medium">
-                -5% vs last month
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="card-shadow-lg border-0 bg-gradient-to-br from-orange-50 to-red-50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Monthly Spending
+                  </CardTitle>
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <CreditCard className="w-4 h-4 text-orange-600" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">
+                  {monthlySpendingFormatted}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  {monthlySpendingTrend === 'up' ? (
+                    <ArrowUpRight className="w-4 h-4 text-red-500" />
+                  ) : monthlySpendingTrend === 'down' ? (
+                    <ArrowDownRight className="w-4 h-4 text-orange-500" />
+                  ) : (
+                    <span className="w-4 h-4 text-gray-400">—</span>
+                  )}
+                  <span className={`text-sm font-medium ${monthlySpendingTrend === 'up' ? 'text-red-600' : monthlySpendingTrend === 'down' ? 'text-orange-600' : 'text-gray-600'}`}>
+                    {monthlySpendingChangeText}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="card-shadow-lg border-0 bg-gradient-to-br from-purple-50 to-pink-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Budget Used
-              </CardTitle>
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Target className="w-4 h-4 text-purple-600" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
-              {budgetUtilization.toFixed(0)}%
-            </div>
-            <div className="flex items-center gap-1 mt-1">
-              {budgetUtilization > 90 ? (
-                <AlertTriangle className="w-4 h-4 text-red-500" />
-              ) : (
-                <Target className="w-4 h-4 text-purple-500" />
-              )}
-              <span className={`text-sm font-medium ${budgetUtilization > 90 ? 'text-red-600' : 'text-purple-600'}`}>
-                of ${totalBudget.toLocaleString()} budget
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="card-shadow-lg border-0 bg-gradient-to-br from-purple-50 to-pink-50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Budget Used
+                  </CardTitle>
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <Target className="w-4 h-4 text-purple-600" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">
+                  —
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <Target className="w-4 h-4 text-purple-500" />
+                  <span className="text-sm font-medium text-purple-600">
+                    Budget data coming soon
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="card-shadow-lg border-0 bg-gradient-to-br from-gray-50 to-slate-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Total Accounts
-              </CardTitle>
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <PiggyBank className="w-4 h-4 text-gray-600" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
-              {accounts.length}
-            </div>
-            <div className="flex items-center gap-1 mt-1">
-              <Badge variant="secondary" className="text-xs">
-                {accounts.filter(a => a.status === 1).length} active
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="card-shadow-lg border-0 bg-gradient-to-br from-gray-50 to-slate-50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Total Accounts
+                  </CardTitle>
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <PiggyBank className="w-4 h-4 text-gray-600" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">
+                  {totalAccounts}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <Badge variant="secondary" className="text-xs">
+                    {accountsStatusText}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       {/* Accounts Section */}

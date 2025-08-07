@@ -76,7 +76,6 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
   // Effect to handle link token errors
   useEffect(() => {
     if (linkTokenError) {
-      console.error("Plaid init error:", linkTokenError);
       setError("Could not connect to Plaid. Please try again later.");
       setStep('error');
     }
@@ -101,7 +100,6 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
       setStep('success');
       onAddSuccess();
     } catch(err) {
-      console.error("Error exchanging token:", err);
       setError("Failed to add your account after connection. Please try again.");
       setStep('error');
     }
@@ -115,23 +113,19 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
 
     // Check if Plaid is available
     if (!window.Plaid) {
-      console.error('Plaid is not available on window object');
       setError('Plaid connection service is not available. Please refresh the page and try again.');
       setStep('error');
       return;
     }
 
-    console.log('Creating Plaid handler with token:', linkToken);
     
     try {
       const handler = window.Plaid.create({
         token: linkToken,
         onSuccess,
         onExit: (err, metadata) => {
-          console.log('Plaid exit:', err, metadata);
           setIsPlaidOpen(false);
           if (err) {
-            console.error("Plaid exit error:", err, metadata);
             setError('The connection process was closed unexpectedly.');
             setStep('error');
           }
@@ -140,16 +134,13 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
 
       setPlaidHandler(handler);
       setStep('ready');
-      console.log('Plaid handler created successfully');
 
       return () => {
         if (handler) {
-          console.log('Destroying Plaid handler');
           handler.destroy();
         }
       };
     } catch (error) {
-      console.error('Error creating Plaid handler:', error);
       setError('Failed to initialize Plaid connection. Please try again.');
       setStep('error');
     }
@@ -159,12 +150,10 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
   
   const handleOpenPlaid = () => {
     if (isReady) {
-      console.log('Opening Plaid modal...');
       setIsPlaidOpen(true);
       try {
         plaidHandler.open();
       } catch (error) {
-        console.error('Error opening Plaid modal:', error);
         setIsPlaidOpen(false);
         setError('Failed to open Plaid connection. Please try again.');
         setStep('error');
