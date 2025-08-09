@@ -11,6 +11,7 @@ const AuthHelper = () => {
   };
 
   const authenticated = isAuthenticated();
+  const baseUrl = getBaseUrl();
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -37,7 +38,7 @@ const AuthHelper = () => {
             <Globe className="w-4 h-4 text-purple-600" />
             <span className="text-sm font-medium">Base URL:</span>
             <span className="text-sm text-gray-600">
-              https://staging.api.ocw.sebipay.com/api/v4
+              {baseUrl}
             </span>
           </div>
         </div>
