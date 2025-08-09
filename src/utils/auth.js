@@ -28,7 +28,7 @@ export const removeAuthToken = () => {
  * @returns {string|null} The stored base URL or null if not found
  */
 export const getBaseUrl = () => {
-  return sessionStorage.getItem("base_url");
+  return sessionStorage.getItem("base_url") || "https://staging.api.ocw.sebipay.com/api/v4";
 };
 
 /**

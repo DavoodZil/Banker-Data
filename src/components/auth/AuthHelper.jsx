@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { setAuthToken, setBaseUrl, isAuthenticated } from '@/utils/auth';
+import { setAuthToken, setBaseUrl, isAuthenticated, getBaseUrl } from '@/utils/auth';
 import { CheckCircle, AlertCircle, Key, Globe } from 'lucide-react';
 
 const AuthHelper = () => {
