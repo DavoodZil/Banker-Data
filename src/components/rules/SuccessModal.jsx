@@ -1,7 +1,7 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { CheckCircle } from "lucide-react";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { CheckCircle } from 'lucide-react';
 
 export default function SuccessModal({ isOpen, onClose, message }) {
   return (
@@ -15,11 +15,9 @@ export default function SuccessModal({ isOpen, onClose, message }) {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Success!
             </h3>
-            <p className="text-gray-600">
-              {message}
-            </p>
+            <p className="text-gray-600">{message}</p>
           </div>
-          <Button 
+          <Button
             onClick={onClose}
             className="bg-emerald-600 hover:bg-emerald-700"
           >

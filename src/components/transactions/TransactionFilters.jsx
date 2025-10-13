@@ -1,16 +1,25 @@
+import React from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Filter, X } from 'lucide-react';
+import { useCategories } from '@/hooks/api';
 
-import React from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Filter, X } from "lucide-react";
-import { useCategories } from "@/hooks/api";
-
-export default function TransactionFilters({ filters, onFiltersChange, accounts }) {
+export default function TransactionFilters({
+  filters,
+  onFiltersChange,
+  accounts,
+}) {
   const { childCategories, loading: categoriesLoading } = useCategories();
   const handleFilterChange = (key, value) => {
     onFiltersChange({
       ...filters,
-      [key]: value
+      [key]: value,
     });
   };
 
@@ -19,15 +28,20 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
       account: 'all',
       category: 'all',
       dateRange: 'all', // Changed from 'this_month' to 'all'
-      amountRange: 'all'
+      amountRange: 'all',
     });
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => value !== 'all'); // Updated condition
+  const hasActiveFilters = Object.values(filters).some(
+    (value) => value !== 'all'
+  ); // Updated condition
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Select value={filters.account} onValueChange={(value) => handleFilterChange('account', value)}>
+      <Select
+        value={filters.account}
+        onValueChange={(value) => handleFilterChange('account', value)}
+      >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="All Accounts" />
         </SelectTrigger>
@@ -41,19 +55,26 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
         </SelectContent>
       </Select>
 
-      <Select value={filters.category} onValueChange={(value) => handleFilterChange('category', value)}>
+      <Select
+        value={filters.category}
+        onValueChange={(value) => handleFilterChange('category', value)}
+      >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="All Categories" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Categories</SelectItem>
           {categoriesLoading ? (
-            <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+            <SelectItem value="loading" disabled>
+              Loading categories...
+            </SelectItem>
           ) : (
             childCategories.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 <div className="flex justify-between w-full">
-                  <span>{category.parent_name} - {category.name}</span>
+                  <span>
+                    {category.parent_name} - {category.name}
+                  </span>
                   {category.transactions_count > 0 && (
                     <span className="text-xs text-gray-500 ml-2">
                       ({category.transactions_count})
@@ -66,12 +87,16 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
         </SelectContent>
       </Select>
 
-      <Select value={filters.dateRange} onValueChange={(value) => handleFilterChange('dateRange', value)}>
+      <Select
+        value={filters.dateRange}
+        onValueChange={(value) => handleFilterChange('dateRange', value)}
+      >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Date Range" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Time</SelectItem> {/* Moved 'All Time' to the top */}
+          <SelectItem value="all">All Time</SelectItem>{' '}
+          {/* Moved 'All Time' to the top */}
           <SelectItem value="this_month">This Month</SelectItem>
           <SelectItem value="last_month">Last Month</SelectItem>
           <SelectItem value="last_3_months">Last 3 Months</SelectItem>
@@ -79,7 +104,10 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
         </SelectContent>
       </Select>
 
-      <Select value={filters.amountRange} onValueChange={(value) => handleFilterChange('amountRange', value)}>
+      <Select
+        value={filters.amountRange}
+        onValueChange={(value) => handleFilterChange('amountRange', value)}
+      >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Amount Range" />
         </SelectTrigger>
@@ -92,7 +120,12 @@ export default function TransactionFilters({ filters, onFiltersChange, accounts 
       </Select>
 
       {hasActiveFilters && (
-        <Button variant="outline" size="sm" onClick={clearFilters} className="gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={clearFilters}
+          className="gap-1"
+        >
           <X className="w-3 h-3" />
           Clear
         </Button>

@@ -1,6 +1,6 @@
 /**
  * useAccounts Hook
- * 
+ *
  * Custom hook for account operations.
  * Follows React best practices for data fetching.
  */
@@ -16,27 +16,31 @@ export function useAccounts() {
   const { toast } = useToast();
 
   // Fetch all accounts
-  const fetchAccounts = useCallback(async (params = {}) => {
-    setLoading(true);
-    setError(null);
-    try {
-      // const response = await accountApi.list(params);
-      const data = [];
-      setAccounts(data);
-      return data;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to fetch accounts';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const fetchAccounts = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      setError(null);
+      try {
+        // const response = await accountApi.list(params);
+        const data = [];
+        setAccounts(data);
+        return data;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to fetch accounts';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
   // Get single account
   const getAccount = useCallback(async (id) => {
@@ -46,7 +50,8 @@ export function useAccounts() {
       const response = await accountApi.get(id);
       return response.data;
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to fetch account';
+      const errorMessage =
+        err.response?.data?.message || 'Failed to fetch account';
       setError(errorMessage);
       throw err;
     } finally {
@@ -55,153 +60,179 @@ export function useAccounts() {
   }, []);
 
   // Create account
-  const createAccount = useCallback(async (data) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await accountApi.create(data);
-      const newAccount = response.data;
-      setAccounts(prev => [...prev, newAccount]);
-      toast({
-        title: 'Success',
-        description: 'Account created successfully',
-      });
-      return newAccount;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to create account';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const createAccount = useCallback(
+    async (data) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await accountApi.create(data);
+        const newAccount = response.data;
+        setAccounts((prev) => [...prev, newAccount]);
+        toast({
+          title: 'Success',
+          description: 'Account created successfully',
+        });
+        return newAccount;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to create account';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
   // Update account
-  const updateAccount = useCallback(async (id, data) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await accountApi.update(id, data);
-      const updatedAccount = response.data;
-      setAccounts(prev => prev.map(acc => acc.id === id ? updatedAccount : acc));
-      toast({
-        title: 'Success',
-        description: 'Account updated successfully',
-      });
-      return updatedAccount;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to update account';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const updateAccount = useCallback(
+    async (id, data) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await accountApi.update(id, data);
+        const updatedAccount = response.data;
+        setAccounts((prev) =>
+          prev.map((acc) => (acc.id === id ? updatedAccount : acc))
+        );
+        toast({
+          title: 'Success',
+          description: 'Account updated successfully',
+        });
+        return updatedAccount;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to update account';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
   // Delete account
-  const deleteAccount = useCallback(async (id) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await accountApi.delete(id);
-      setAccounts(prev => prev.filter(acc => acc.id !== id));
-      toast({
-        title: 'Success',
-        description: 'Account deleted successfully',
-      });
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to delete account';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const deleteAccount = useCallback(
+    async (id) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await accountApi.delete(id);
+        setAccounts((prev) => prev.filter((acc) => acc.id !== id));
+        toast({
+          title: 'Success',
+          description: 'Account deleted successfully',
+        });
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to delete account';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
   // Sync account with bank
-  const syncAccount = useCallback(async (id) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await accountApi.sync(id);
-      toast({
-        title: 'Success',
-        description: 'Account sync initiated',
-      });
-      // Refresh account data
-      await fetchAccounts();
-      return response.data;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to sync account';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast, fetchAccounts]);
+  const syncAccount = useCallback(
+    async (id) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await accountApi.sync(id);
+        toast({
+          title: 'Success',
+          description: 'Account sync initiated',
+        });
+        // Refresh account data
+        await fetchAccounts();
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to sync account';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast, fetchAccounts]
+  );
 
   // Get account balance history
-  const getBalanceHistory = useCallback(async (id, params = {}) => {
-    try {
-      const response = await accountApi.getBalanceHistory(id, params);
-      return response.data;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to fetch balance history';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    }
-  }, [toast]);
+  const getBalanceHistory = useCallback(
+    async (id, params = {}) => {
+      try {
+        const response = await accountApi.getBalanceHistory(id, params);
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to fetch balance history';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      }
+    },
+    [toast]
+  );
 
   // Connect Plaid account
-  const connectPlaidAccount = useCallback(async (plaidData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await accountApi.connectPlaid(plaidData);
-      const newAccount = response.data;
-      setAccounts(prev => [...prev, newAccount]);
-      toast({
-        title: 'Success',
-        description: 'Bank account connected successfully',
-      });
-      return newAccount;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to connect bank account';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const connectPlaidAccount = useCallback(
+    async (plaidData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await accountApi.connectPlaid(plaidData);
+        const newAccount = response.data;
+        setAccounts((prev) => [...prev, newAccount]);
+        toast({
+          title: 'Success',
+          description: 'Bank account connected successfully',
+        });
+        return newAccount;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to connect bank account';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
   // Auto-fetch accounts on mount
   useEffect(() => {
@@ -214,7 +245,7 @@ export function useAccounts() {
     loading,
     isLoading: loading, // Alias for consistency
     error,
-    
+
     // Actions
     fetchAccounts,
     refetch: fetchAccounts, // Alias for consistency
@@ -225,7 +256,7 @@ export function useAccounts() {
     syncAccount,
     getBalanceHistory,
     connectPlaidAccount,
-    
+
     // Computed values
     totalBalance: accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0),
     accountCount: accounts.length,
@@ -241,14 +272,15 @@ export function useAccount(accountId) {
 
   const fetchAccount = useCallback(async () => {
     if (!accountId) return;
-    
+
     setLoading(true);
     setError(null);
     try {
       const response = await accountApi.get(accountId);
       setAccount(response.data);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to fetch account';
+      const errorMessage =
+        err.response?.data?.message || 'Failed to fetch account';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -265,27 +297,31 @@ export function useAccount(accountId) {
     fetchAccount();
   }, [fetchAccount]);
 
-  const updateAccount = useCallback(async (data) => {
-    if (!accountId) return;
-    
-    try {
-      const response = await accountApi.update(accountId, data);
-      setAccount(response.data);
-      toast({
-        title: 'Success',
-        description: 'Account updated successfully',
-      });
-      return response.data;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to update account';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    }
-  }, [accountId, toast]);
+  const updateAccount = useCallback(
+    async (data) => {
+      if (!accountId) return;
+
+      try {
+        const response = await accountApi.update(accountId, data);
+        setAccount(response.data);
+        toast({
+          title: 'Success',
+          description: 'Account updated successfully',
+        });
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to update account';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      }
+    },
+    [accountId, toast]
+  );
 
   return {
     account,

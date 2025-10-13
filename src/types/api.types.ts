@@ -1,6 +1,6 @@
 /**
  * API Type Definitions
- * 
+ *
  * TypeScript types for API responses and requests.
  * Ready for when you migrate from .js to .ts files.
  */
@@ -224,7 +224,10 @@ export interface UseApiCallReturn<T> {
   data: T | null;
   loading: boolean;
   error: string | null;
-  execute: (apiFunction: () => Promise<any>, options?: any) => Promise<T | null>;
+  execute: (
+    apiFunction: () => Promise<any>,
+    options?: any
+  ) => Promise<T | null>;
   reset: () => void;
 }
 

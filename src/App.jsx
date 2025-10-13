@@ -1,24 +1,23 @@
-import './App.css'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { Toaster } from "@/components/ui/toaster"
-import { useEffect } from 'react'
-import { notifyReady, listenToParent } from '@/utils/iframeCommunication'
-import { handleAuthParams, clearAuth } from '@/utils/auth'
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
-import Layout from '@/pages/Layout'
+import './App.css';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Toaster } from '@/components/ui/toaster';
+import { useEffect } from 'react';
+import { notifyReady, listenToParent } from '@/utils/iframeCommunication';
+import { handleAuthParams, clearAuth } from '@/utils/auth';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import Layout from '@/pages/Layout';
 
-// Import pages
-import Dashboard from '@/pages/Dashboard'
-import Accounts from '@/pages/Accounts'
-import Transactions from '@/pages/Transactions'
-import Categories from '@/pages/Categories'
-import Rules from '@/pages/Rules'
-import RulesList from '@/pages/RulesList'
-import Entity from '@/pages/Entity'
-import Import from '@/pages/Import'
-import API from '@/pages/API'
-import Unauthorized from '@/pages/Unauthorized'
-import AuthTest from '@/pages/AuthTest'
+import Dashboard from '@/pages/Dashboard';
+import Accounts from '@/pages/Accounts';
+import Transactions from '@/pages/Transactions';
+import Categories from '@/pages/Categories';
+import Rules from '@/pages/Rules';
+import RulesList from '@/pages/RulesList';
+import Entity from '@/pages/Entity';
+import Import from '@/pages/Import';
+import API from '@/pages/API';
+import Unauthorized from '@/pages/Unauthorized';
+import AuthTest from '@/pages/AuthTest';
 import Reports from '@/pages/Reports';
 import Merchants from '@/pages/Merchants';
 import Goals from '@/pages/Goals';
@@ -33,24 +32,17 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    // Handle authentication parameters from URL
     handleAuthParams(location.search);
-    
-    // Notify parent that iframe is ready
+
     notifyReady();
-    
-    // Listen for messages from parent
+
     const cleanup = listenToParent((message) => {
-      
-      // Handle logout message from parent Angular app
       if (message.action === 'logout' || message.action === 'auth:logout') {
         clearAuth();
         window.location.href = '/unauthorized';
       }
-      
-      // Handle other parent messages here if needed
     });
-    
+
     return cleanup;
   }, [location.search]);
 
@@ -58,7 +50,7 @@ function App() {
     <>
       <Routes>
         <Route path="/unauthorized" element={<Unauthorized />} />
-        
+
         <Route
           path="/"
           element={
@@ -69,7 +61,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/dashboard"
           element={
@@ -80,7 +72,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/accounts"
           element={
@@ -91,7 +83,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/transactions"
           element={
@@ -102,7 +94,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/categories"
           element={
@@ -113,7 +105,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/rules"
           element={
@@ -124,7 +116,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/rules/create"
           element={
@@ -135,7 +127,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/rules/edit/:id"
           element={
@@ -146,7 +138,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/merchants"
           element={
@@ -157,7 +149,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/reports"
           element={
@@ -168,7 +160,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/goals"
           element={
@@ -179,7 +171,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/cashflow"
           element={
@@ -190,7 +182,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/budget"
           element={
@@ -201,7 +193,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/tag"
           element={
@@ -212,7 +204,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/tags"
           element={
@@ -223,7 +215,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/entity"
           element={
@@ -234,7 +226,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/group"
           element={
@@ -245,7 +237,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/import"
           element={
@@ -256,7 +248,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/api"
           element={
@@ -267,7 +259,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/reports"
           element={
@@ -278,7 +270,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/auth-test"
           element={
@@ -289,12 +281,12 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Toaster />
     </>
-  )
+  );
 }
 
-export default App 
+export default App;

@@ -108,7 +108,7 @@ The iframe can also receive messages from the parent Angular application:
 window.addEventListener('message', (event) => {
   if (event.data.source === 'angular-parent') {
     // Handle message from parent
-    console.log(event.data);
+    // Process the message data
   }
 });
 ```

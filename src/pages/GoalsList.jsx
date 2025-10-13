@@ -1,20 +1,34 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Search, Edit3, Trash2, Plus, Target, Hash
-} from 'lucide-react';
-import { useGoals } from "@/hooks/api";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Search, Edit3, Trash2, Plus, Target, Hash } from 'lucide-react';
+import { useGoals } from '@/hooks/api';
 
 const GoalCard = ({ goal, onEdit, onDelete }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -54,13 +68,14 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
           <span>ID: {goal.id}</span>
         </div> */}
       </CardContent>
-      
+
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Goal</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{goal.name}"? This action cannot be undone.
+              Are you sure you want to delete "{goal.name}"? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -84,7 +99,7 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
 const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
   const [formData, setFormData] = useState({
     name: goal?.name || '',
-    description: goal?.description || ''
+    description: goal?.description || '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,12 +108,12 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
     if (goal) {
       setFormData({
         name: goal.name || '',
-        description: goal.description || ''
+        description: goal.description || '',
       });
     } else {
       setFormData({
         name: '',
-        description: ''
+        description: '',
       });
     }
     setErrors({});
@@ -106,13 +121,13 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     const newErrors = {};
     if (!formData.name.trim()) {
       newErrors.name = 'Goal name is required';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -123,7 +138,7 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
       await onSave(formData);
       onClose();
     } catch (error) {
-      console.error('Error saving goal:', error);
+      // Error handling is done by the hook
     } finally {
       setIsSubmitting(false);
     }
@@ -136,7 +151,9 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
           <DialogHeader>
             <DialogTitle>{goal ? 'Edit Goal' : 'Create New Goal'}</DialogTitle>
             <DialogDescription>
-              {goal ? 'Update the goal details below.' : 'Enter the details for the new goal.'}
+              {goal
+                ? 'Update the goal details below.'
+                : 'Enter the details for the new goal.'}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -145,7 +162,9 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Enter goal name"
                 className={errors.name ? 'border-red-500' : ''}
               />
@@ -158,7 +177,9 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="Enter goal description"
                 rows={3}
               />
@@ -168,12 +189,16 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isSubmitting}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
-              {isSubmitting ? 'Saving...' : (goal ? 'Update Goal' : 'Create Goal')}
+              {isSubmitting
+                ? 'Saving...'
+                : goal
+                  ? 'Update Goal'
+                  : 'Create Goal'}
             </Button>
           </DialogFooter>
         </form>
@@ -186,12 +211,22 @@ export default function GoalsListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
-  const { goals, isLoading, error, createGoal, updateGoal, deleteGoal, refetch } = useGoals();
+  const {
+    goals,
+    isLoading,
+    error,
+    createGoal,
+    updateGoal,
+    deleteGoal,
+    refetch,
+  } = useGoals();
 
-  const filteredGoals = Array.isArray(goals) 
-    ? goals.filter(goal => 
-        goal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (goal?.description && goal.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredGoals = Array.isArray(goals)
+    ? goals.filter(
+        (goal) =>
+          goal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (goal?.description &&
+            goal.description.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : [];
 
@@ -214,7 +249,7 @@ export default function GoalsListPage() {
       await deleteGoal(goalId);
       refetch();
     } catch (error) {
-      console.error('Error deleting goal:', error);
+      // Error handling is done by the hook
     }
   };
 
@@ -292,10 +327,9 @@ export default function GoalsListPage() {
               {searchQuery ? 'No goals found' : 'No goals created yet'}
             </h3>
             <p className="text-gray-600 mb-4">
-              {searchQuery 
-                ? 'Try adjusting your search terms' 
-                : 'Create your first goal to track your financial progress'
-              }
+              {searchQuery
+                ? 'Try adjusting your search terms'
+                : 'Create your first goal to track your financial progress'}
             </p>
             {!searchQuery && (
               <Button

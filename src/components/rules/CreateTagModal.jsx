@@ -1,10 +1,16 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Tag } from "lucide-react";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Tag } from 'lucide-react';
 
 export default function CreateTagModal({ isOpen, onClose, onSave }) {
   const [name, setName] = useState('');
@@ -30,7 +36,10 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="tagName" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="tagName"
+              className="text-sm font-medium text-gray-700"
+            >
               Tag Name
             </Label>
             <Input
@@ -45,7 +54,10 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="tagDescription" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="tagDescription"
+              className="text-sm font-medium text-gray-700"
+            >
               Description (optional)
             </Label>
             <Textarea
@@ -62,8 +74,8 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="bg-emerald-600 hover:bg-emerald-700"
               disabled={!name.trim()}
             >

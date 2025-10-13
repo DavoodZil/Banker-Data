@@ -21,26 +21,32 @@ export const useAccessTokens = () => {
     }
   }, []);
 
-  const generateToken = useCallback(async (name) => {
-    try {
-      const response = await accessTokenApi.generate({ name });
-      await fetchTokens(); // Refresh the list
-      return response.data;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, [fetchTokens]);
+  const generateToken = useCallback(
+    async (name) => {
+      try {
+        const response = await accessTokenApi.generate({ name });
+        await fetchTokens(); // Refresh the list
+        return response.data;
+      } catch (err) {
+        setError(err.message);
+        throw err;
+      }
+    },
+    [fetchTokens]
+  );
 
-  const revokeToken = useCallback(async (tokenId) => {
-    try {
-      await accessTokenApi.revoke(tokenId);
-      await fetchTokens(); // Refresh the list
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, [fetchTokens]);
+  const revokeToken = useCallback(
+    async (tokenId) => {
+      try {
+        await accessTokenApi.revoke(tokenId);
+        await fetchTokens(); // Refresh the list
+      } catch (err) {
+        setError(err.message);
+        throw err;
+      }
+    },
+    [fetchTokens]
+  );
 
   useEffect(() => {
     fetchTokens();
@@ -54,4 +60,4 @@ export const useAccessTokens = () => {
     generateToken,
     revokeToken,
   };
-}; 
+};

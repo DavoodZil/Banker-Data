@@ -18,7 +18,9 @@ export default function Unauthorized() {
       <div className="max-w-md w-full space-y-6">
         <div className="p-6 bg-white rounded-lg shadow-lg text-center">
           <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Unauthorized Access</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">
+            Unauthorized Access
+          </h2>
           <p className="text-gray-600 mb-6">
             You need a valid token to access this application.
           </p>
@@ -29,7 +31,7 @@ export default function Unauthorized() {
             Return to Home
           </Link>
         </div>
-        
+
         <AuthHelper />
       </div>
     </div>

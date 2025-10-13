@@ -7,10 +7,13 @@ export const usePagination = (initialPage = 1, initialPageSize = 10) => {
 
   const totalPages = Math.ceil(totalItems / pageSize);
 
-  const goToPage = useCallback((page) => {
-    const validPage = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(validPage);
-  }, [totalPages]);
+  const goToPage = useCallback(
+    (page) => {
+      const validPage = Math.max(1, Math.min(page, totalPages));
+      setCurrentPage(validPage);
+    },
+    [totalPages]
+  );
 
   const goToNextPage = useCallback(() => {
     if (currentPage < totalPages) {
@@ -53,7 +56,7 @@ export const usePagination = (initialPage = 1, initialPageSize = 10) => {
     pageSize,
     totalItems,
     totalPages,
-    
+
     // Actions
     goToPage,
     goToNextPage,
@@ -63,11 +66,11 @@ export const usePagination = (initialPage = 1, initialPageSize = 10) => {
     changePageSize,
     updateTotalItems,
     reset,
-    
+
     // Computed values
     hasNextPage: currentPage < totalPages,
     hasPreviousPage: currentPage > 1,
     startIndex: (currentPage - 1) * pageSize,
     endIndex: Math.min(currentPage * pageSize, totalItems),
   };
-}; 
+};

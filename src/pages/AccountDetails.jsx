@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAccounts } from '@/hooks/api';
@@ -6,7 +5,14 @@ import { useTransactions } from '@/hooks/api';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Edit, CreditCard, PiggyBank, TrendingUp, Building } from 'lucide-react';
+import {
+  ArrowLeft,
+  Edit,
+  CreditCard,
+  PiggyBank,
+  TrendingUp,
+  Building,
+} from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import AccountDetailsChart from '../components/accounts/AccountDetailsChart';
@@ -35,8 +41,10 @@ export default function AccountDetailsPage() {
   const { transactions, refetch: refetchTransactions } = useTransactions();
 
   // Find the specific account and filter transactions
-  const account = accounts.find(acc => acc.id === accountId);
-  const accountTransactions = transactions.filter(tx => tx.account_id === accountId);
+  const account = accounts.find((acc) => acc.id === accountId);
+  const accountTransactions = transactions.filter(
+    (tx) => tx.account_id === accountId
+  );
   const isLoading = !account && accountId; // Show loading if we have an ID but no account found
 
   const handleUpdateAccount = async (updatedData) => {
@@ -45,7 +53,7 @@ export default function AccountDetailsPage() {
       await updateAccount(account.id, updatedData);
       setShowEditModal(false);
     } catch (error) {
-      console.error('Failed to update account:', error);
+      // Error handling is done by the hook
     }
   };
 
@@ -68,7 +76,7 @@ export default function AccountDetailsPage() {
     return (
       <div className="p-6 text-center text-gray-500">
         Account not found. Please check the ID or return to the accounts page.
-        <Link to={createPageUrl("Accounts")} className="mt-4 inline-block">
+        <Link to={createPageUrl('Accounts')} className="mt-4 inline-block">
           <Button>Back to Accounts</Button>
         </Link>
       </div>
@@ -81,7 +89,10 @@ export default function AccountDetailsPage() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <Button variant="ghost" asChild>
-          <Link to={createPageUrl("Accounts")} className="flex items-center gap-2 text-gray-600">
+          <Link
+            to={createPageUrl('Accounts')}
+            className="flex items-center gap-2 text-gray-600"
+          >
             <ArrowLeft className="w-4 h-4" />
             Back to Accounts
           </Link>
@@ -97,45 +108,68 @@ export default function AccountDetailsPage() {
           <IconComponent className="w-8 h-8 text-gray-700" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{account.account_name}</h1>
-          <p className="text-gray-500">{account.institution_name} •••• {account.account_number_last_four}</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {account.account_name}
+          </h1>
+          <p className="text-gray-500">
+            {account.institution_name} •••• {account.account_number_last_four}
+          </p>
         </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-500">Current Balance</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">
+              Current Balance
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-gray-900">
-              ${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              $
+              {account.balance.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
           </CardContent>
         </Card>
         {account.available_balance && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-500">Available Balance</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">
+                Available Balance
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold text-emerald-600">
-                ${account.available_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                $
+                {account.available_balance.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </CardContent>
           </Card>
         )}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-500">Account Type</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">
+              Account Type
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-gray-900 capitalize">{account.account_type}</p>
+            <p className="text-3xl font-bold text-gray-900 capitalize">
+              {account.account_type}
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      <AccountDetailsChart currentBalance={account.balance} transactions={accountTransactions} />
+      <AccountDetailsChart
+        currentBalance={account.balance}
+        transactions={accountTransactions}
+      />
 
       <RecentTransactionsList transactions={accountTransactions} />
 

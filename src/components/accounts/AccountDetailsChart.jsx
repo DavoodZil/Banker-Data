@@ -1,7 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 
 const calculateBalanceHistory = (currentBalance, transactions, days) => {
@@ -10,18 +18,26 @@ const calculateBalanceHistory = (currentBalance, transactions, days) => {
   const dateInterval = eachDayOfInterval({ start: startDate, end: endDate });
 
   const balanceData = new Map(
-    dateInterval.map(date => [format(date, 'yyyy-MM-dd'), { date: format(date, 'MMM dd'), balance: null }])
+    dateInterval.map((date) => [
+      format(date, 'yyyy-MM-dd'),
+      { date: format(date, 'MMM dd'), balance: null },
+    ])
   );
-  
-  balanceData.set(format(endDate, 'yyyy-MM-dd'), { date: format(endDate, 'MMM dd'), balance: currentBalance });
+
+  balanceData.set(format(endDate, 'yyyy-MM-dd'), {
+    date: format(endDate, 'MMM dd'),
+    balance: currentBalance,
+  });
 
   let runningBalance = currentBalance;
-  const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sortedTransactions = [...transactions].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
 
   for (const tx of sortedTransactions) {
     const txDate = startOfDay(new Date(tx.date));
-    if (txDate < startDate) break; 
-    
+    if (txDate < startDate) break;
+
     const dateKey = format(txDate, 'yyyy-MM-dd');
     if (balanceData.has(dateKey)) {
       if (balanceData.get(dateKey).balance === null) {
@@ -30,16 +46,18 @@ const calculateBalanceHistory = (currentBalance, transactions, days) => {
     }
     runningBalance -= tx.amount;
   }
-  
-  let lastKnownBalance = runningBalance;
-  const finalChartData = Array.from(balanceData.values()).sort((a,b) => new Date(a.date) - new Date(b.date));
 
-  for(let i = finalChartData.length - 1; i >= 0; i--) {
-      if(finalChartData[i].balance !== null) {
-          lastKnownBalance = finalChartData[i].balance;
-      } else {
-          finalChartData[i].balance = lastKnownBalance;
-      }
+  let lastKnownBalance = runningBalance;
+  const finalChartData = Array.from(balanceData.values()).sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
+
+  for (let i = finalChartData.length - 1; i >= 0; i--) {
+    if (finalChartData[i].balance !== null) {
+      lastKnownBalance = finalChartData[i].balance;
+    } else {
+      finalChartData[i].balance = lastKnownBalance;
+    }
   }
 
   return finalChartData;
@@ -81,8 +99,8 @@ export default function AccountDetailsChart({ currentBalance, transactions }) {
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -93,15 +111,24 @@ export default function AccountDetailsChart({ currentBalance, transactions }) {
               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
             />
             <Tooltip
-              formatter={(value) => [`$${value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, 'Balance']}
+              formatter={(value) => [
+                `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                'Balance',
+              ]}
               labelStyle={{ color: '#374151' }}
               contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid #e5e7eb',
-                borderRadius: '8px'
+                borderRadius: '8px',
               }}
             />
-            <Area type="monotone" dataKey="balance" stroke="#10b981" strokeWidth={2} fill="url(#balanceGradient)" />
+            <Area
+              type="monotone"
+              dataKey="balance"
+              stroke="#10b981"
+              strokeWidth={2}
+              fill="url(#balanceGradient)"
+            />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>

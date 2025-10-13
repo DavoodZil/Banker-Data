@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,7 +32,8 @@ export default function EditAccountModal({ isOpen, onClose, onSave, account }) {
         <DialogHeader>
           <DialogTitle>Edit Account Name</DialogTitle>
           <DialogDescription>
-            Change the display name for your account. This will not affect the name at your financial institution.
+            Change the display name for your account. This will not affect the
+            name at your financial institution.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -38,7 +46,9 @@ export default function EditAccountModal({ isOpen, onClose, onSave, account }) {
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button onClick={handleSave}>Save Changes</Button>
         </DialogFooter>
       </DialogContent>

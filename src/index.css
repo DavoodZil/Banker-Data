@@ -21,7 +21,6 @@
   z-index: 9998 !important;
 }
 
-
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -90,8 +89,6 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
-
-
 
 @layer base {
   :root {
@@ -164,8 +161,6 @@ button:focus-visible {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
-
-
 
 @layer base {
   * {

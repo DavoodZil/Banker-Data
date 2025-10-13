@@ -1,20 +1,42 @@
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Search, Edit3, Trash2, Plus, Tag, Hash
-} from 'lucide-react';
-import { useTags } from "@/hooks/api";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Search, Edit3, Trash2, Plus, Tag, Hash } from 'lucide-react';
+import { useTags } from '@/hooks/api';
+import { useToast } from '@/components/ui/use-toast';
 
+/**
+ * TagCard component for displaying individual tag information
+ * @param {Object} tag - The tag object containing name, description, etc.
+ * @param {Function} onEdit - Callback function to handle tag editing
+ * @param {Function} onDelete - Callback function to handle tag deletion
+ * @returns {JSX.Element} The rendered tag card component
+ */
 const TagCard = ({ tag, onEdit, onDelete }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -54,13 +76,14 @@ const TagCard = ({ tag, onEdit, onDelete }) => {
           <span>ID: {tag.id}</span>
         </div> */}
       </CardContent>
-      
+
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Tag</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{tag.name}"? This action cannot be undone.
+              Are you sure you want to delete "{tag.name}"? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -81,10 +104,18 @@ const TagCard = ({ tag, onEdit, onDelete }) => {
   );
 };
 
+/**
+ * TagFormModal component for creating and editing tags
+ * @param {boolean} isOpen - Whether the modal is open
+ * @param {Function} onClose - Callback function to close the modal
+ * @param {Object|null} tag - The tag object to edit (null for new tag)
+ * @param {Function} onSave - Callback function to save the tag
+ * @returns {JSX.Element} The rendered tag form modal component
+ */
 const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
   const [formData, setFormData] = useState({
     name: tag?.name || '',
-    description: tag?.description || ''
+    description: tag?.description || '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,26 +124,30 @@ const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
     if (tag) {
       setFormData({
         name: tag.name || '',
-        description: tag.description || ''
+        description: tag.description || '',
       });
     } else {
       setFormData({
         name: '',
-        description: ''
+        description: '',
       });
     }
     setErrors({});
   }, [tag, isOpen]);
 
+  /**
+   * Handles form submission for tag creation/editing
+   * @param {Event} e - The form submit event
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
+
     const newErrors = {};
     if (!formData.name.trim()) {
       newErrors.name = 'Tag name is required';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -123,7 +158,6 @@ const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
       await onSave(formData);
       onClose();
     } catch (error) {
-      console.error('Error saving tag:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -136,7 +170,9 @@ const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
           <DialogHeader>
             <DialogTitle>{tag ? 'Edit Tag' : 'Create New Tag'}</DialogTitle>
             <DialogDescription>
-              {tag ? 'Update the tag details below.' : 'Enter the details for the new tag.'}
+              {tag
+                ? 'Update the tag details below.'
+                : 'Enter the details for the new tag.'}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -145,7 +181,9 @@ const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Enter tag name"
                 className={errors.name ? 'border-red-500' : ''}
               />
@@ -158,7 +196,9 @@ const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="Enter tag description"
                 rows={3}
               />
@@ -168,12 +208,12 @@ const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isSubmitting}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
-              {isSubmitting ? 'Saving...' : (tag ? 'Update Tag' : 'Create Tag')}
+              {isSubmitting ? 'Saving...' : tag ? 'Update Tag' : 'Create Tag'}
             </Button>
           </DialogFooter>
         </form>
@@ -186,15 +226,24 @@ export default function TagsListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingTag, setEditingTag] = useState(null);
-  const { tags, isLoading, error, createTag, updateTag, deleteTag, refetch } = useTags();
+  const { tags, isLoading, error, createTag, updateTag, deleteTag, refetch } =
+    useTags();
+  const { toast } = useToast();
 
-  const filteredTags = Array.isArray(tags) 
-    ? tags.filter(tag => 
-        tag?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (tag?.description && tag.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredTags = Array.isArray(tags)
+    ? tags.filter(
+        (tag) =>
+          tag?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (tag?.description &&
+            tag.description.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : [];
 
+  /**
+   * Handles creating or updating a tag
+   * @param {Object} formData - The form data containing tag information
+   * @returns {Promise<void>}
+   */
   const handleCreateOrUpdate = async (formData) => {
     if (editingTag) {
       await updateTag(editingTag.id, formData);
@@ -204,34 +253,47 @@ export default function TagsListPage() {
     refetch();
   };
 
+  /**
+   * Handles editing a tag
+   * @param {Object} tag - The tag object to edit
+   * @returns {void}
+   */
   const handleEdit = (tag) => {
     setEditingTag(tag);
     setShowFormModal(true);
   };
 
+  /**
+   * Handles deleting a tag
+   * @param {string|number} tagId - The ID of the tag to delete
+   * @returns {Promise<void>}
+   */
   const handleDelete = async (tagId) => {
     try {
       await deleteTag(tagId);
       refetch();
-    } catch (error) {
-      console.error('Error deleting tag:', error);
-    }
+    } catch (error) {}
   };
 
+  /**
+   * Handles creating a new tag
+   * @description Opens the form modal for creating a new tag
+   * @returns {void}
+   */
   const handleCreate = () => {
     setEditingTag(null);
     setShowFormModal(true);
   };
 
-  if (error) {
-    return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Error loading tags: {error}</p>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'Error',
+        description: `Failed to load tags: ${error}`,
+        variant: 'destructive',
+      });
+    }
+  }, [error, toast]);
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 bg-gray-50/50">
@@ -292,10 +354,9 @@ export default function TagsListPage() {
               {searchQuery ? 'No tags found' : 'No tags created yet'}
             </h3>
             <p className="text-gray-600 mb-4">
-              {searchQuery 
-                ? 'Try adjusting your search terms' 
-                : 'Create your first tag to organize your transactions'
-              }
+              {searchQuery
+                ? 'Try adjusting your search terms'
+                : 'Create your first tag to organize your transactions'}
             </p>
             {!searchQuery && (
               <Button

@@ -1,6 +1,6 @@
 /**
  * API Hooks Index
- * 
+ *
  * Central export point for all API hooks.
  * These hooks follow React best practices for data fetching.
  */
@@ -9,18 +9,18 @@
 export { useAccounts, useAccount } from './useAccounts';
 
 // Transaction hooks
-export { 
-  useTransactions, 
-  useTransactionSearch, 
-  useTransactionStats 
+export {
+  useTransactions,
+  useTransactionSearch,
+  useTransactionStats,
 } from './useTransactions';
 export { useTransactionTotals } from './useTransactionTotals';
 
 // Category hooks
-export { 
-  useCategories, 
-  useCategorySearch, 
-  useCategoryBudget 
+export {
+  useCategories,
+  useCategorySearch,
+  useCategoryBudget,
 } from './useCategories';
 export { useCategorySummary } from './useCategorySummary';
 

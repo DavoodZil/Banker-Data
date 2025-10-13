@@ -1,6 +1,6 @@
 /**
  * useTransactions Hook
- * 
+ *
  * Custom hook for transaction operations.
  * Includes pagination, filtering, and bulk operations.
  */
@@ -23,58 +23,63 @@ export function useTransactions(initialParams = {}) {
   const { toast } = useToast();
 
   // Fetch transactions with ag-grid style payload
-  const fetchTransactions = useCallback(async (options = {}) => {
-    setLoading(true);
-    setError(null);
-    
-    const startRow = ((options.page || pagination.page) - 1) * pagination.limit;
-    const endRow = startRow + pagination.limit;
-    
-    const payload = {
-      startRow,
-      endRow,
-      rowGroupCols: [],
-      valueCols: [],
-      pivotCols: [],
-      pivotMode: false,
-      groupKeys: [],
-      filterModel: filters.filterModel || {},
-      sortModel: options.sortModel || [],
-      fromDate: filters.fromDate || '2015-07-29',
-      toDate: filters.toDate || '2035-07-29',
-      filteredBankAccounts: filters.filteredBankAccounts || '',
-      categoriesList: filters.categoriesList || '',
-      filteredDescription: filters.filteredDescription || '',
-      filteredCategory: filters.filteredCategory || '',
-      filteredDate: filters.filteredDate || '',
-      filteredAmount: filters.filteredAmount || '',
-      ...options
-    };
+  const fetchTransactions = useCallback(
+    async (options = {}) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await transactionApi.list(payload);
-      const { data } = response;
-      setTransactions(data.rowData || []);
-      setPagination({
-        page: options.page || pagination.page,
-        limit: pagination.limit,
-        total: data.rowCount || 0,
-        totalPages: Math.ceil((data.rowCount || 0) / pagination.limit),
-      });
-      return { data };
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to fetch transactions';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.page, pagination.limit, filters]);
+      const startRow =
+        ((options.page || pagination.page) - 1) * pagination.limit;
+      const endRow = startRow + pagination.limit;
+
+      const payload = {
+        startRow,
+        endRow,
+        rowGroupCols: [],
+        valueCols: [],
+        pivotCols: [],
+        pivotMode: false,
+        groupKeys: [],
+        filterModel: filters.filterModel || {},
+        sortModel: options.sortModel || [],
+        fromDate: filters.fromDate || '2015-07-29',
+        toDate: filters.toDate || '2035-07-29',
+        filteredBankAccounts: filters.filteredBankAccounts || '',
+        categoriesList: filters.categoriesList || '',
+        filteredDescription: filters.filteredDescription || '',
+        filteredCategory: filters.filteredCategory || '',
+        filteredDate: filters.filteredDate || '',
+        filteredAmount: filters.filteredAmount || '',
+        ...options,
+      };
+
+      try {
+        const response = await transactionApi.list(payload);
+        const { data } = response;
+        setTransactions(data.rowData || []);
+        setPagination({
+          page: options.page || pagination.page,
+          limit: pagination.limit,
+          total: data.rowCount || 0,
+          totalPages: Math.ceil((data.rowCount || 0) / pagination.limit),
+        });
+        return { data };
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to fetch transactions';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [pagination.page, pagination.limit, filters]
+  );
 
   // Update filters
   const updateFilters = useCallback((newFilters) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page
   }, []);
 
   // Clear filters
@@ -88,17 +93,20 @@ export function useTransactions(initialParams = {}) {
       filteredDescription: '',
       filteredCategory: '',
       filteredDate: '',
-      filteredAmount: ''
+      filteredAmount: '',
     });
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   }, []);
 
   // Pagination helpers
-  const goToPage = useCallback((page) => {
-    if (page >= 1 && page <= pagination.totalPages) {
-      fetchTransactions({ page });
-    }
-  }, [fetchTransactions, pagination.totalPages]);
+  const goToPage = useCallback(
+    (page) => {
+      if (page >= 1 && page <= pagination.totalPages) {
+        fetchTransactions({ page });
+      }
+    },
+    [fetchTransactions, pagination.totalPages]
+  );
 
   const nextPage = useCallback(() => {
     goToPage(pagination.page + 1);
@@ -109,181 +117,211 @@ export function useTransactions(initialParams = {}) {
   }, [goToPage, pagination.page]);
 
   // Create transaction
-  const createTransaction = useCallback(async (data) => {
-    try {
-      const response = await transactionApi.create(data);
-      const newTransaction = response.data;
-      
-      // Refresh list to maintain pagination
-      await fetchTransactions();
-      
-      toast({
-        title: 'Success',
-        description: 'Transaction created successfully',
-      });
-      
-      return newTransaction;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to create transaction';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    }
-  }, [fetchTransactions, toast]);
+  const createTransaction = useCallback(
+    async (data) => {
+      try {
+        const response = await transactionApi.create(data);
+        const newTransaction = response.data;
+
+        // Refresh list to maintain pagination
+        await fetchTransactions();
+
+        toast({
+          title: 'Success',
+          description: 'Transaction created successfully',
+        });
+
+        return newTransaction;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to create transaction';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      }
+    },
+    [fetchTransactions, toast]
+  );
 
   // Update transaction
-  const updateTransaction = useCallback(async (id, data) => {
-    try {
-      const response = await transactionApi.update(id, data);
-      const updatedTransaction = response.data;
-      
-      setTransactions(prev => 
-        prev.map(t => t.id === id ? updatedTransaction : t)
-      );
-      
-      toast({
-        title: 'Success',
-        description: 'Transaction updated successfully',
-      });
-      
-      return updatedTransaction;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to update transaction';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    }
-  }, [toast]);
+  const updateTransaction = useCallback(
+    async (id, data) => {
+      try {
+        const response = await transactionApi.update(id, data);
+        const updatedTransaction = response.data;
+
+        setTransactions((prev) =>
+          prev.map((t) => (t.id === id ? updatedTransaction : t))
+        );
+
+        toast({
+          title: 'Success',
+          description: 'Transaction updated successfully',
+        });
+
+        return updatedTransaction;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to update transaction';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      }
+    },
+    [toast]
+  );
 
   // Categorize transaction
-  const categorizeTransaction = useCallback(async (id, categoryId) => {
-    try {
-      const response = await transactionApi.categorize(id, categoryId);
-      const updatedTransaction = response.data;
-      
-      setTransactions(prev => 
-        prev.map(t => t.id === id ? updatedTransaction : t)
-      );
-      
-      return updatedTransaction;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to categorize transaction';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    }
-  }, [toast]);
+  const categorizeTransaction = useCallback(
+    async (id, categoryId) => {
+      try {
+        const response = await transactionApi.categorize(id, categoryId);
+        const updatedTransaction = response.data;
+
+        setTransactions((prev) =>
+          prev.map((t) => (t.id === id ? updatedTransaction : t))
+        );
+
+        return updatedTransaction;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to categorize transaction';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      }
+    },
+    [toast]
+  );
 
   // Bulk categorize
-  const bulkCategorize = useCallback(async (transactionIds, categoryId) => {
-    setLoading(true);
-    try {
-      const categorizations = transactionIds.map(id => ({
-        transactionId: id,
-        categoryId,
-      }));
-      
-      const response = await transactionApi.bulkCategorize({ categorizations });
-      
-      // Refresh list to get updated data
-      await fetchTransactions();
-      
-      toast({
-        title: 'Success',
-        description: `${transactionIds.length} transactions categorized successfully`,
-      });
-      
-      return response.data;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to categorize transactions';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchTransactions, toast]);
+  const bulkCategorize = useCallback(
+    async (transactionIds, categoryId) => {
+      setLoading(true);
+      try {
+        const categorizations = transactionIds.map((id) => ({
+          transactionId: id,
+          categoryId,
+        }));
+
+        const response = await transactionApi.bulkCategorize({
+          categorizations,
+        });
+
+        // Refresh list to get updated data
+        await fetchTransactions();
+
+        toast({
+          title: 'Success',
+          description: `${transactionIds.length} transactions categorized successfully`,
+        });
+
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to categorize transactions';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchTransactions, toast]
+  );
 
   // Delete transaction
-  const deleteTransaction = useCallback(async (id) => {
-    try {
-      await transactionApi.delete(id);
-      
-      setTransactions(prev => prev.filter(t => t.id !== id));
-      
-      toast({
-        title: 'Success',
-        description: 'Transaction deleted successfully',
-      });
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to delete transaction';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    }
-  }, [toast]);
+  const deleteTransaction = useCallback(
+    async (id) => {
+      try {
+        await transactionApi.delete(id);
+
+        setTransactions((prev) => prev.filter((t) => t.id !== id));
+
+        toast({
+          title: 'Success',
+          description: 'Transaction deleted successfully',
+        });
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to delete transaction';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      }
+    },
+    [toast]
+  );
 
   // Split transaction
-  const splitTransaction = useCallback(async (id, splits) => {
-    try {
-      const response = await transactionApi.split(id, splits);
-      
-      // Refresh to show new split transactions
-      await fetchTransactions();
-      
-      toast({
-        title: 'Success',
-        description: 'Transaction split successfully',
-      });
-      
-      return response.data;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to split transaction';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    }
-  }, [fetchTransactions, toast]);
+  const splitTransaction = useCallback(
+    async (id, splits) => {
+      try {
+        const response = await transactionApi.split(id, splits);
+
+        // Refresh to show new split transactions
+        await fetchTransactions();
+
+        toast({
+          title: 'Success',
+          description: 'Transaction split successfully',
+        });
+
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to split transaction';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      }
+    },
+    [fetchTransactions, toast]
+  );
 
   // Add tags
-  const addTags = useCallback(async (id, tagIds) => {
-    try {
-      const response = await transactionApi.addTags(id, tagIds);
-      const updatedTransaction = response.data;
-      
-      setTransactions(prev => 
-        prev.map(t => t.id === id ? updatedTransaction : t)
-      );
-      
-      return updatedTransaction;
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to add tags';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw err;
-    }
-  }, [toast]);
+  const addTags = useCallback(
+    async (id, tagIds) => {
+      try {
+        const response = await transactionApi.addTags(id, tagIds);
+        const updatedTransaction = response.data;
+
+        setTransactions((prev) =>
+          prev.map((t) => (t.id === id ? updatedTransaction : t))
+        );
+
+        return updatedTransaction;
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || 'Failed to add tags';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw err;
+      }
+    },
+    [toast]
+  );
 
   // Auto-fetch on mount and filter changes
   useEffect(() => {
@@ -297,7 +335,7 @@ export function useTransactions(initialParams = {}) {
     error,
     pagination,
     filters,
-    
+
     // Actions
     fetchTransactions,
     createTransaction,
@@ -307,11 +345,11 @@ export function useTransactions(initialParams = {}) {
     bulkCategorize,
     splitTransaction,
     addTags,
-    
+
     // Filter management
     updateFilters,
     clearFilters,
-    
+
     // Pagination
     goToPage,
     nextPage,
@@ -336,13 +374,12 @@ export function useTransactionSearch(debounceMs = 300) {
 
     setSearching(true);
     try {
-      const response = await transactionApi.list({ 
+      const response = await transactionApi.list({
         q: searchQuery,
-        limit: 10 
+        limit: 10,
       });
       setResults(response.data.data || []);
     } catch (err) {
-      console.error('Search failed:', err);
       setResults([]);
     } finally {
       setSearching(false);
@@ -350,19 +387,22 @@ export function useTransactionSearch(debounceMs = 300) {
   }, []);
 
   // Debounced search
-  const handleQueryChange = useCallback((newQuery) => {
-    setQuery(newQuery);
-    
-    // Clear existing timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-    
-    // Set new timer
-    debounceTimerRef.current = setTimeout(() => {
-      search(newQuery);
-    }, debounceMs);
-  }, [search, debounceMs]);
+  const handleQueryChange = useCallback(
+    (newQuery) => {
+      setQuery(newQuery);
+
+      // Clear existing timer
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      // Set new timer
+      debounceTimerRef.current = setTimeout(() => {
+        search(newQuery);
+      }, debounceMs);
+    },
+    [search, debounceMs]
+  );
 
   // Cleanup
   useEffect(() => {
@@ -395,11 +435,12 @@ export function useTransactionStats(params = {}) {
     setLoading(true);
     setError(null);
     try {
-      const [statsResponse, categoryResponse, merchantResponse] = await Promise.all([
-        transactionApi.getStatistics(params),
-        transactionApi.getSpendingByCategory(params),
-        transactionApi.getSpendingByMerchant(params),
-      ]);
+      const [statsResponse, categoryResponse, merchantResponse] =
+        await Promise.all([
+          transactionApi.getStatistics(params),
+          transactionApi.getSpendingByCategory(params),
+          transactionApi.getSpendingByMerchant(params),
+        ]);
 
       setStats({
         overview: statsResponse.data,

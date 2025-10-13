@@ -1,6 +1,6 @@
 /**
  * useDebounce Hook
- * 
+ *
  * Debounces a value for use in search inputs and other delayed operations.
  */
 
@@ -29,7 +29,7 @@ export function useDebounceWithLoading(value, delay = 300) {
 
   useEffect(() => {
     setIsDebouncing(true);
-    
+
     const timer = setTimeout(() => {
       setDebouncedValue(value);
       setIsDebouncing(false);

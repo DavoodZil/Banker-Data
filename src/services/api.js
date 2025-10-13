@@ -45,7 +45,6 @@ api.interceptors.request.use(
     return request;
   },
   (error) => {
-
     return Promise.reject(error);
   }
 );
@@ -55,15 +54,15 @@ const getErrorMessage = (error) => {
   if (error.response?.data?.errorMsg) {
     return error.response.data.errorMsg;
   }
-  
+
   if (error.response?.data?.error) {
     return error.response.data.error;
   }
-  
+
   if (error.response?.data?.message) {
     return error.response.data.message;
   }
-  
+
   switch (error.response?.status) {
     case 400:
       return 'Bad request. Please check your input.';
@@ -108,7 +107,7 @@ api.interceptors.response.use(
       url: error.config?.url,
       method: error.config?.method,
     });
-    
+
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
       // Clear authentication data and redirect to unauthorized page
@@ -117,7 +116,7 @@ api.interceptors.response.use(
       window.location.href = '/unauthorized';
       return Promise.reject(error);
     }
-    
+
     // Pass error through for handling in the calling code
     return Promise.reject(error);
   }

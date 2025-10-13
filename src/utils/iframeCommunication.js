@@ -11,9 +11,9 @@ export const sendIframeMessage = (action, data = {}) => {
       source: 'banker-data-iframe',
       action,
       data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     window.parent.postMessage(message, '*');
   }
 };
@@ -29,9 +29,9 @@ export const sendToParent = (action, data = {}) => {
       source: 'banker-data-iframe',
       action,
       data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     window.parent.postMessage(message, '*');
   }
 };
@@ -47,9 +47,9 @@ export const listenToParent = (callback) => {
       callback(event.data);
     }
   };
-  
+
   window.addEventListener('message', messageHandler);
-  
+
   // Return cleanup function
   return () => {
     window.removeEventListener('message', messageHandler);
@@ -65,12 +65,14 @@ export const listenToParent = (callback) => {
 export const requestFromParent = (action, data = {}) => {
   return new Promise((resolve, reject) => {
     const requestId = Date.now().toString();
-    
+
     const messageHandler = (event) => {
-      if (event.data.source === 'angular-parent' && 
-          event.data.requestId === requestId) {
+      if (
+        event.data.source === 'angular-parent' &&
+        event.data.requestId === requestId
+      ) {
         window.removeEventListener('message', messageHandler);
-        
+
         if (event.data.error) {
           reject(new Error(event.data.error));
         } else {
@@ -78,14 +80,14 @@ export const requestFromParent = (action, data = {}) => {
         }
       }
     };
-    
+
     window.addEventListener('message', messageHandler);
-    
+
     sendToParent(action, {
       ...data,
-      requestId
+      requestId,
     });
-    
+
     // Timeout after 10 seconds
     setTimeout(() => {
       window.removeEventListener('message', messageHandler);
@@ -102,12 +104,12 @@ export const notifyReady = () => {
     version: '1.0.0',
     features: [
       'accounts',
-      'transactions', 
+      'transactions',
       'categories',
       'rules',
       'tags',
-      'entities'
-    ]
+      'entities',
+    ],
   });
 };
 
@@ -136,4 +138,4 @@ if (typeof window !== 'undefined') {
   } else {
     notifyReady();
   }
-} 
+}

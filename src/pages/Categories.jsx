@@ -1,24 +1,31 @@
-
-import React, { useState, useEffect } from "react";
-import { useCategories } from "@/hooks/api";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Plus, Search, TrendingUp, TrendingDown, Target, MoreHorizontal, Loader2 } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { useCategories } from '@/hooks/api';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import {
+  Plus,
+  Search,
+  TrendingUp,
+  TrendingDown,
+  Target,
+  MoreHorizontal,
+  Loader2,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
+} from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
 
-import CategoryCard from "../components/categories/CategoryCard";
-import AddCategoryModal from "../components/categories/AddCategoryModal";
-import CategorySummaryCards from "../components/categories/CategorySummaryCards";
+import CategoryCard from '../components/categories/CategoryCard';
+import AddCategoryModal from '../components/categories/AddCategoryModal';
+import CategorySummaryCards from '../components/categories/CategorySummaryCards';
+import { useCallback } from 'react';
 
-// Skeleton component for category cards
 function CategoryCardSkeleton() {
   return (
     <Card className="bg-white border-gray-100 h-full">
@@ -64,92 +71,110 @@ export default function Categories() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Use the new hooks
-  const { categories, loading: isLoading, error, fetchCategories: refetchCategories, createCategory, updateCategory } = useCategories();
+  const {
+    categories,
+    loading: isLoading,
+    error,
+    fetchCategories: refetchCategories,
+    createCategory,
+    updateCategory,
+  } = useCategories();
 
-  useEffect(() => {
-    // Data is automatically loaded by the hooks
-  }, []);
+  useEffect(() => {}, []);
 
+  /**
+   * Loads category data from the API
+   * @description Fetches the latest category data and updates the component state
+   * @returns {Promise<void>}
+   */
   const loadData = async () => {
     await refetchCategories();
   };
 
+  /**
+   * Handles adding a new category
+   * @param {Object} categoryData - The category data to create
+   * @returns {Promise<void>}
+   */
   const handleAddCategory = async (categoryData) => {
     setIsSaving(true);
     try {
-      // Clean the name before sending to API
       const cleanedData = {
         ...categoryData,
-        name: categoryData.name ? categoryData.name.replace(/&nbsp;/g, ' ').trim() : categoryData.name
+        name: categoryData.name
+          ? categoryData.name.replace(/&nbsp;/g, ' ').trim()
+          : categoryData.name,
       };
       await createCategory(cleanedData);
       loadData();
       setShowAddModal(false);
     } catch (error) {
-      console.error('Failed to add category:', error);
-      // Error toast is handled by the hook
     } finally {
       setIsSaving(false);
     }
   };
 
+  const handleShowAddModal = useCallback(() => {
+    setShowAddModal(true);
+  }, []);
+
+  /**
+   * Handles updating an existing category
+   * @param {string|number} categoryId - The ID of the category to update
+   * @param {Object} updates - The updates to apply to the category
+   * @returns {Promise<void>}
+   */
   const handleUpdateCategory = async (categoryId, updates) => {
     setIsSaving(true);
     try {
-      // Clean the name before sending to API
       const cleanedUpdates = {
         id: categoryId,
-        name: updates.name ? updates.name.replace(/&nbsp;/g, ' ').trim() : updates.name,
-        yd_category_id: updates.budget_amount ? parseFloat(updates.budget_amount) : undefined
+        name: updates.name
+          ? updates.name.replace(/&nbsp;/g, ' ').trim()
+          : updates.name,
+        yd_category_id: updates.budget_amount
+          ? parseFloat(updates.budget_amount)
+          : undefined,
       };
       await updateCategory(categoryId, cleanedUpdates);
       loadData();
       setEditingCategory(null);
     } catch (error) {
-      console.error('Failed to update category:', error);
-      // Error toast is handled by the hook
     } finally {
       setIsSaving(false);
     }
   };
 
+  /**
+   * Gets statistics for a category
+   * @param {Object} category - The category object
+   * @returns {Object} Category statistics including transaction count and spending
+   */
   const getCategoryStats = (category) => {
-    // Use the transactions_count from the category data itself
     return {
       transactionCount: category.transactions_count || 0,
       totalSpent: 0, // This will be provided by the API summary
-      averageAmount: 0
+      averageAmount: 0,
     };
   };
 
-  const defaultCategories = [
-    { name: 'groceries', color: '#10b981', icon: '🛒' },
-    { name: 'dining', color: '#f59e0b', icon: '🍽️' },
-    { name: 'transportation', color: '#3b82f6', icon: '🚗' },
-    { name: 'entertainment', color: '#8b5cf6', icon: '🎬' },
-    { name: 'utilities', color: '#ef4444', icon: '⚡' },
-    { name: 'healthcare', color: '#06b6d4', icon: '🏥' },
-    { name: 'shopping', color: '#ec4899', icon: '🛍️' },
-    { name: 'travel', color: '#84cc16', icon: '✈️' },
-    { name: 'income', color: '#10b981', icon: '💰' },
-    { name: 'investments', color: '#6366f1', icon: '📊' }
-  ];
-
-  // Clean category names
-  const allCategories = categories.map(category => ({
+  const allCategories = categories.map((category) => ({
     ...category,
-    name: category.name ? category.name.replace(/&nbsp;/g, ' ').trim() : category.name
+    name: category.name
+      ? category.name.replace(/&nbsp;/g, ' ').trim()
+      : category.name,
   }));
 
-  const filteredCategories = allCategories.filter(category =>
-    category.name && category.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCategories = allCategories.filter(
+    (category) =>
+      category.name &&
+      category.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const categoriesWithSpending = filteredCategories
-    .map(category => ({
+    .map((category) => ({
       ...category,
-      stats: getCategoryStats(category)
+      stats: getCategoryStats(category),
     }))
     .sort((a, b) => (b.transactions_count || 0) - (a.transactions_count || 0));
 
@@ -158,13 +183,15 @@ export default function Categories() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Categories</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+            Categories
+          </h1>
           <p className="text-sm text-gray-500 mt-1">
             Organize your spending • {allCategories.length} categories
           </p>
         </div>
         <Button
-          onClick={() => setShowAddModal(true)}
+          onClick={handleShowAddModal}
           size="sm"
           className="bg-emerald-600 hover:bg-emerald-700 gap-2 px-4 py-2 shrink-0"
         >
@@ -200,7 +227,9 @@ export default function Categories() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {categoriesWithSpending.map((category, index) => (
             <CategoryCard
-              key={category.enc_id || category.id || `${category.name}-${index}`}
+              key={
+                category.enc_id || category.id || `${category.name}-${index}`
+              }
               category={category}
               stats={category.stats}
               onEdit={() => setEditingCategory(category)}
@@ -220,11 +249,13 @@ export default function Categories() {
                 No categories found
               </h3>
               <p className="text-sm text-gray-500 mb-4 max-w-sm mx-auto">
-                {searchQuery ? `No categories match "${searchQuery}"` : 'Create your first category to organize transactions'}
+                {searchQuery
+                  ? `No categories match "${searchQuery}"`
+                  : 'Create your first category to organize transactions'}
               </p>
               {!searchQuery && (
                 <Button
-                  onClick={() => setShowAddModal(true)}
+                  onClick={handleShowAddModal}
                   size="sm"
                   className="bg-emerald-600 hover:bg-emerald-700"
                 >
@@ -243,9 +274,10 @@ export default function Categories() {
           setShowAddModal(false);
           setEditingCategory(null);
         }}
-        onSave={editingCategory ? 
-          (data) => handleUpdateCategory(editingCategory.id, data) : 
-          handleAddCategory
+        onSave={
+          editingCategory
+            ? (data) => handleUpdateCategory(editingCategory.id, data)
+            : handleAddCategory
         }
         category={editingCategory}
         isSaving={isSaving}

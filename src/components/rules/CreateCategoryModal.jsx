@@ -1,35 +1,86 @@
-
-import React, { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import React, { useState, useMemo } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Search } from 'lucide-react';
 
 const availableEmojis = [
-  { emoji: "💰", name: "money bag" }, { emoji: "💳", name: "credit card" }, { emoji: "🏠", name: "house" }, { emoji: "🚗", name: "car" }, { emoji: "🍔", name: "hamburger" }, { emoji: "✈️", name: "airplane" }, { emoji: "🛍️", name: "shopping bags" }, { emoji: "💊", name: "pill" }, { emoji: "🎬", name: "clapper board" }, { emoji: "📱", name: "mobile phone" },
-  { emoji: "⚡", name: "high voltage" }, { emoji: "🎓", name: "graduation cap" }, { emoji: "🎁", name: "wrapped gift" }, { emoji: "🏥", name: "hospital" }, { emoji: "🍕", name: "pizza" }, { emoji: "☕", name: "coffee" }, { emoji: "🚌", name: "bus" }, { emoji: "🎮", name: "video game" }, { emoji: "📚", name: "books" }, { emoji: "💡", name: "light bulb" },
-  { emoji: "🎵", name: "musical note" }, { emoji: "🏃", name: "runner" }, { emoji: "💻", name: "laptop" }, { emoji: "🔧", name: "wrench" }, { emoji: "🎨", name: "artist palette" }, { emoji: "📈", name: "chart increasing" }, { emoji: "💎", name: "gem stone" }, { emoji: "🌟", name: "glowing star" }, { emoji: "🔥", name: "fire" }, { emoji: "❤️", name: "red heart" },
-  { emoji: "🎯", name: "direct hit" }, { emoji: "🌍", name: "globe" }, { emoji: "🏆", name: "trophy" }, { emoji: "⭐", name: "star" }, { emoji: "🚀", name: "rocket" }, { emoji: "💼", name: "briefcase" }, { emoji: "🏪", name: "convenience store" }, { emoji: "🎪", name: "circus tent" }, { emoji: "🎊", name: "confetti ball" }, { emoji: "🎈", name: "balloon" }
+  { emoji: '💰', name: 'money bag' },
+  { emoji: '💳', name: 'credit card' },
+  { emoji: '🏠', name: 'house' },
+  { emoji: '🚗', name: 'car' },
+  { emoji: '🍔', name: 'hamburger' },
+  { emoji: '✈️', name: 'airplane' },
+  { emoji: '🛍️', name: 'shopping bags' },
+  { emoji: '💊', name: 'pill' },
+  { emoji: '🎬', name: 'clapper board' },
+  { emoji: '📱', name: 'mobile phone' },
+  { emoji: '⚡', name: 'high voltage' },
+  { emoji: '🎓', name: 'graduation cap' },
+  { emoji: '🎁', name: 'wrapped gift' },
+  { emoji: '🏥', name: 'hospital' },
+  { emoji: '🍕', name: 'pizza' },
+  { emoji: '☕', name: 'coffee' },
+  { emoji: '🚌', name: 'bus' },
+  { emoji: '🎮', name: 'video game' },
+  { emoji: '📚', name: 'books' },
+  { emoji: '💡', name: 'light bulb' },
+  { emoji: '🎵', name: 'musical note' },
+  { emoji: '🏃', name: 'runner' },
+  { emoji: '💻', name: 'laptop' },
+  { emoji: '🔧', name: 'wrench' },
+  { emoji: '🎨', name: 'artist palette' },
+  { emoji: '📈', name: 'chart increasing' },
+  { emoji: '💎', name: 'gem stone' },
+  { emoji: '🌟', name: 'glowing star' },
+  { emoji: '🔥', name: 'fire' },
+  { emoji: '❤️', name: 'red heart' },
+  { emoji: '🎯', name: 'direct hit' },
+  { emoji: '🌍', name: 'globe' },
+  { emoji: '🏆', name: 'trophy' },
+  { emoji: '⭐', name: 'star' },
+  { emoji: '🚀', name: 'rocket' },
+  { emoji: '💼', name: 'briefcase' },
+  { emoji: '🏪', name: 'convenience store' },
+  { emoji: '🎪', name: 'circus tent' },
+  { emoji: '🎊', name: 'confetti ball' },
+  { emoji: '🎈', name: 'balloon' },
 ];
 
 const categoryGroups = [
-  "Income",
-  "Gifts & Donations", 
-  "Auto & Transport",
-  "Housing",
-  "Bills & Utilities",
-  "Food & Dining",
-  "Travel & Lifestyle",
-  "Personal",
-  "Shopping",
-  "Financial",
-  "Other",
-  "Business",
-  "Transfers"
+  'Income',
+  'Gifts & Donations',
+  'Auto & Transport',
+  'Housing',
+  'Bills & Utilities',
+  'Food & Dining',
+  'Travel & Lifestyle',
+  'Personal',
+  'Shopping',
+  'Financial',
+  'Other',
+  'Business',
+  'Transfers',
 ];
 
 export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
@@ -37,10 +88,10 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
     name: '',
     emoji: '💰',
     group: '',
-    excludeFromBudget: false
+    excludeFromBudget: false,
   });
   const [emojiPopoverOpen, setEmojiPopoverOpen] = useState(false);
-  const [emojiSearch, setEmojiSearch] = useState("");
+  const [emojiSearch, setEmojiSearch] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,20 +101,20 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
       name: '',
       emoji: '💰',
       group: '',
-      excludeFromBudget: false
+      excludeFromBudget: false,
     });
-    setEmojiSearch("");
+    setEmojiSearch('');
   };
 
   const handleEmojiSelect = (emoji) => {
-    setFormData({...formData, emoji: emoji});
+    setFormData({ ...formData, emoji: emoji });
     setEmojiPopoverOpen(false);
-    setEmojiSearch("");
+    setEmojiSearch('');
   };
 
   const filteredEmojis = useMemo(() => {
     const searchTerm = emojiSearch.toLowerCase().trim();
-    return availableEmojis.filter(item => 
+    return availableEmojis.filter((item) =>
       item.name.toLowerCase().includes(searchTerm)
     );
   }, [emojiSearch]);
@@ -72,18 +123,19 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            Create New Category
-          </DialogTitle>
+          <DialogTitle>Create New Category</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Emoji & Name Row */}
           <div className="flex items-start gap-3">
             {/* Emoji Selector */}
             <div className="space-y-2">
               <Label>Emoji</Label>
-              <Popover open={emojiPopoverOpen} onOpenChange={setEmojiPopoverOpen}>
+              <Popover
+                open={emojiPopoverOpen}
+                onOpenChange={setEmojiPopoverOpen}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     type="button"
@@ -96,15 +148,15 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
                 <PopoverContent className="w-80 p-3" align="start">
                   <div className="space-y-3">
                     <div className="relative">
-                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                       <Input 
-                         placeholder="Search emoji..."
-                         className="pl-9"
-                         value={emojiSearch}
-                         onChange={(e) => setEmojiSearch(e.target.value)}
-                         onMouseDown={(e) => e.stopPropagation()}
-                         onFocus={(e) => e.stopPropagation()}
-                       />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        placeholder="Search emoji..."
+                        className="pl-9"
+                        value={emojiSearch}
+                        onChange={(e) => setEmojiSearch(e.target.value)}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onFocus={(e) => e.stopPropagation()}
+                      />
                     </div>
                     <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto pr-2">
                       {filteredEmojis.length > 0 ? (
@@ -140,7 +192,9 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
               <Input
                 id="categoryName"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="e.g., Coffee Shops"
                 required
               />
@@ -161,9 +215,11 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
           {/* Group Section */}
           <div className="space-y-3">
             <Label>Group</Label>
-            <Select 
-              value={formData.group} 
-              onValueChange={(value) => setFormData({...formData, group: value})}
+            <Select
+              value={formData.group}
+              onValueChange={(value) =>
+                setFormData({ ...formData, group: value })
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a group" />
@@ -193,7 +249,9 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
               <Switch
                 id="excludeBudget"
                 checked={formData.excludeFromBudget}
-                onCheckedChange={(checked) => setFormData({...formData, excludeFromBudget: checked})}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, excludeFromBudget: checked })
+                }
               />
             </div>
           </div>
@@ -202,8 +260,8 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="bg-emerald-600 hover:bg-emerald-700"
               disabled={!formData.name.trim() || !formData.group}
             >
