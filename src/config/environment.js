@@ -5,7 +5,6 @@ export const config = {
     baseUrl:
       env.VITE_API_BASE_URL || 'https://app.onlinecheckwriter.com/api/v4',
     timeout: 30000,
-    useMockData: env.VITE_USE_MOCK_DATA === 'true',
   },
 
   features: {
@@ -26,11 +25,7 @@ export const config = {
   },
 };
 
-export const isUsingMockData = () => config.api.useMockData;
-
 export const getApiBaseUrl = () => config.api.baseUrl;
-
-export const debugLog = (...args) => {};
 
 const validateEnvironment = () => {
   const required = ['VITE_API_BASE_URL'];
