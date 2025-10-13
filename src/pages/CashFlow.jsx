@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 import { Waves } from 'lucide-react';
 
 export default function CashFlowPage() {
@@ -8,7 +8,9 @@ export default function CashFlowPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Cash Flow</h1>
-          <p className="text-gray-500 mt-1">Visualize your cash flow to understand your financial health.</p>
+          <p className="text-gray-500 mt-1">
+            Visualize your cash flow to understand your financial health.
+          </p>
         </div>
       </div>
       <Card className="card-shadow border-0 text-center py-24">
@@ -21,7 +23,8 @@ export default function CashFlowPage() {
               Feature Coming Soon!
             </h3>
             <p className="text-gray-500 max-w-md mx-auto">
-              This section is under construction. Soon you'll be able to see a detailed visualization of your income and expenses over time.
+              This section is under construction. Soon you'll be able to see a
+              detailed visualization of your income and expenses over time.
             </p>
           </div>
         </CardContent>

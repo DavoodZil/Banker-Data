@@ -25,7 +25,7 @@ export const useGoals = () => {
   const createGoal = useCallback(async (goalData) => {
     try {
       const response = await goalApi.create(goalData);
-      setGoals(prev => [...prev, response.data]);
+      setGoals((prev) => [...prev, response.data]);
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -37,7 +37,9 @@ export const useGoals = () => {
     try {
       // API expects data with id included
       const response = await goalApi.update({ ...goalData, id });
-      setGoals(prev => prev.map(goal => goal.id === id ? response.data : goal));
+      setGoals((prev) =>
+        prev.map((goal) => (goal.id === id ? response.data : goal))
+      );
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -49,7 +51,7 @@ export const useGoals = () => {
     try {
       // API expects data with id included
       await goalApi.delete({ id });
-      setGoals(prev => prev.filter(goal => goal.id !== id));
+      setGoals((prev) => prev.filter((goal) => goal.id !== id));
     } catch (err) {
       setError(err.message);
       throw err;

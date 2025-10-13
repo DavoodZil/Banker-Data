@@ -1,11 +1,9 @@
-// Authentication utilities for token-based auth flow
-
 /**
  * Get the stored authentication token
  * @returns {string|null} The stored token or null if not found
  */
 export const getAuthToken = () => {
-  return sessionStorage.getItem("app_token");
+  return sessionStorage.getItem('app_token');
 };
 
 /**
@@ -13,14 +11,14 @@ export const getAuthToken = () => {
  * @param {string} token - The token to store
  */
 export const setAuthToken = (token) => {
-  sessionStorage.setItem("app_token", token);
+  sessionStorage.setItem('app_token', token);
 };
 
 /**
  * Remove the authentication token
  */
 export const removeAuthToken = () => {
-  sessionStorage.removeItem("app_token");
+  sessionStorage.removeItem('app_token');
 };
 
 /**
@@ -28,7 +26,10 @@ export const removeAuthToken = () => {
  * @returns {string|null} The stored base URL or null if not found
  */
 export const getBaseUrl = () => {
-  return sessionStorage.getItem("base_url") || "https://staging.api.ocw.sebipay.com/api/v4";
+  return (
+    sessionStorage.getItem('base_url') ||
+    'https://staging.api.ocw.sebipay.com/api/v4'
+  );
 };
 
 /**
@@ -36,7 +37,7 @@ export const getBaseUrl = () => {
  * @param {string} baseUrl - The base URL to store
  */
 export const setBaseUrl = (baseUrl) => {
-  sessionStorage.setItem("base_url", baseUrl);
+  sessionStorage.setItem('base_url', baseUrl);
 };
 
 /**
@@ -51,8 +52,8 @@ export const isAuthenticated = () => {
  * Clear all authentication data
  */
 export const clearAuth = () => {
-  sessionStorage.removeItem("app_token");
-  sessionStorage.removeItem("base_url");
+  sessionStorage.removeItem('app_token');
+  sessionStorage.removeItem('base_url');
 };
 
 /**
@@ -61,10 +62,9 @@ export const clearAuth = () => {
  */
 export const handleAuthParams = (search) => {
   const searchParams = new URLSearchParams(search);
-  const token = searchParams.get("token");
-  const baseUrl = searchParams.get("baseUrl");
-  // const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxMDE5IiwianRpIjoiOTQ2NmY0MTZhZGIyM2VmOTUwMWJiNjNjNWVjYTU3YjM1NGYyNjAzMDg2MDZmNmY1YWE5N2JiYThmMzgzNTZkMDA4YjNlOWMwZmE1ZTAwNGMiLCJpYXQiOjE3NTQ2Mjk0NTYuMjMwMjMzLCJuYmYiOjE3NTQ2Mjk0NTYuMjMwMjM2LCJleHAiOjE3NTQ2NjU0NTYuMjE3MTcyLCJzdWIiOiIxMjAwNzgiLCJzY29wZXMiOltdfQ.NrsnCwKv40FzOy7P-QyZCC-U48Su5_f15cxJf8R6nHEUhgxu2i0RraP5deLGLyhTKs0box2UBWhWzcyHwp2mSBiHFzF9FU9Ces2ANk7GWSV9THwyc-tVaH0rdj9pQIK2NrCzlNz-TJ9zA-wOE2LoAHy4IprEFS16uEX3-uxTkdmTU_ir5BCKkSGitwmHEXWiJG55KgaxNqKDlbt8NWFcFG7UcrjSXxUzH1q75wj4mNmLbPgZfvE2_J9cHgC0nBV89rA3AZQXKx5olT0bvirn9-SGvsOVyui92yos9x1OybA8IaGC3HaouV9WoJ-6M6KCMshXVE_QCSOUS-ZcYKGj-L4xSmZvqbGd8adAoFkhTBWOTkzfovANddg5IPqcGaP_BAv-BvfR54by2i_EJmJLbSe1JH2h5tF9Zdwiyswbv1-kXTGcoIbtKDvRmooZm4XyFXna2dpdvE8rmHI6SFNRBzM1uj55T8m2iUpYMHTON__kiPKaN9mZjl6MgMAPxvGJPFQ0AAJqK3QwCF--x_8K4SsGKM4Gp3GzxGmIpQV5TlXHjXx_dZm9Oq_tpKY_sJ6TfwXM-bPAZCQP7r80U42M8ZbYDkkqDTllLR8wSMfzNJIKjOcK0-_B6KBX8a-x3t6VNCYoT692Mp9MA8yPDlR7XzwBkg7kL-1sq6IOYrgoCCA";
-  // const baseUrl = "https://OCW-13023-DANISH-2.api.ocw.sebipay.com/api/v4";
+  const token =
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxMDE5IiwianRpIjoiZGIyN2MyOWJmYzhjYWI3YzVhYjc5MTE3Y2MyY2U4NDhjNDIwMTY1NzI2MWVkMDI1MjU4ZWU2Y2I1YWRlZTVkMWVmZmY5MGM1YTMxZjAzZTAiLCJpYXQiOjE3NjAzNTUzMzMuMTQyMzUyLCJuYmYiOjE3NjAzNTUzMzMuMTQyMzU2LCJleHAiOjE3NjAzOTEzMzMuMTM0NDcsInN1YiI6IjEyMDExMSIsInNjb3BlcyI6W119.jygjUVL0oMamOt3650bURDFI28Y_kCG2C7V8H-iDyCU1VNB133qvMEhmmFGiCcvUA1lKr3hYhzIpI0ZBmsRjRed4rOFqW6eK5d1ec947OgLFlioMJ1WAxLby3j_mT3WyEx_8nZPpyR5cumwmsY8xnSwMXsZOeJ-rdqp6k0C9_zutMaL-zxRQqgNzxNggN63MjepFs67sDtCEC7s7QECyLmmrxI4EtReiQUvAUa5IOXidpEKwmD0NK82yhBNi3k9kz5yzxYmJ7TI59aOdLWiA9u_OfjE6MwJlTQJHPS2l0xTj4b_SRt2MtY5no4oZmc_dIZgTH-_Be21mFRg_GGpXJ-HutSK7HsCaLF7YUAiO5cmlj72BANa-lLlvbcTd7t_UJhYxivZ-6IGgB43wA7fc3QAT7nOZfx2usJrN5iCZh0e_itfaUHvksWK8GkK-ASK6KzYuwq1OD7ecXTDpaNhhm_JNOXvH0P2_FbFLZESnPKkPKs1ODHB_S_pxOt-6LA-WO10VDv9_d2ju1urb70kbdNlKORj4L-4getdzMkqbAt2e9stMD02pI-usDcmhyxV4PRVcySUIeDLHL0vZbxXNhgr5jI_iX0MoTa26L2bBKWxc8Cp8_8mUIlvhDfgRf-Nyij0brYDDKsuA4uWQ__LCKF00u-TWrI2Nz_qfZ3iy11g';
+  const baseUrl = 'https://OCW-13023-DANISH-2.api.ocw.sebipay.com/api/v4';
   if (token) {
     setAuthToken(token);
     if (baseUrl) {
@@ -73,7 +73,5 @@ export const handleAuthParams = (search) => {
     return true;
   }
 
-  
-
   return false;
-}; 
+};

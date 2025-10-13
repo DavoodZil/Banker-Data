@@ -10,19 +10,22 @@ export const useBankData = () => {
   const fetchBankData = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await api.get('/bank-data');
       setBankData(response.data);
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to fetch bank data');
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to fetch bank data'
+      );
       throw err;
     } finally {
       setIsLoading(false);
     }
   };
-
 
   const fetchDashboardSummary = async () => {
     setIsLoading(true);
@@ -32,7 +35,11 @@ export const useBankData = () => {
       setDashboardSummary(response.data.data);
       return response.data.data;
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to fetch dashboard summary');
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to fetch dashboard summary'
+      );
       throw err;
     } finally {
       setIsLoading(false);
@@ -52,6 +59,6 @@ export const useBankData = () => {
     dashboardSummary,
     fetchBankData,
     fetchDashboardSummary,
-    refetch: fetchBankData
+    refetch: fetchBankData,
   };
-}; 
+};

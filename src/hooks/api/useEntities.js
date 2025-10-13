@@ -23,7 +23,7 @@ export const useEntities = () => {
   const createEntity = useCallback(async (entityData) => {
     try {
       const response = await entityApi.create(entityData);
-      setEntities(prev => [...prev, response.data]);
+      setEntities((prev) => [...prev, response.data]);
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -34,7 +34,9 @@ export const useEntities = () => {
   const updateEntity = useCallback(async (id, entityData) => {
     try {
       const response = await entityApi.update(id, entityData);
-      setEntities(prev => prev.map(entity => entity.id === id ? response.data : entity));
+      setEntities((prev) =>
+        prev.map((entity) => (entity.id === id ? response.data : entity))
+      );
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -45,7 +47,7 @@ export const useEntities = () => {
   const deleteEntity = useCallback(async (id) => {
     try {
       await entityApi.delete(id);
-      setEntities(prev => prev.filter(entity => entity.id !== id));
+      setEntities((prev) => prev.filter((entity) => entity.id !== id));
     } catch (err) {
       setError(err.message);
       throw err;
@@ -106,16 +108,19 @@ export const useEntity = (id) => {
     }
   }, [id]);
 
-  const getEntityTransactions = useCallback(async (params) => {
-    if (!id) return;
-    try {
-      const response = await entityApi.getTransactions(id, params);
-      return response.data;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, [id]);
+  const getEntityTransactions = useCallback(
+    async (params) => {
+      if (!id) return;
+      try {
+        const response = await entityApi.getTransactions(id, params);
+        return response.data;
+      } catch (err) {
+        setError(err.message);
+        throw err;
+      }
+    },
+    [id]
+  );
 
   useEffect(() => {
     fetchEntity();
@@ -128,4 +133,4 @@ export const useEntity = (id) => {
     refetch: fetchEntity,
     getEntityTransactions,
   };
-}; 
+};

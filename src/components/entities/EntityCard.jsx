@@ -1,14 +1,20 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Briefcase, Building, Edit, Link2 } from 'lucide-react';
 
 const entityTypeIcons = {
   Business: Briefcase,
   Rental: Building,
-  "Personal Project": Briefcase,
-  Other: Briefcase
+  'Personal Project': Briefcase,
+  Other: Briefcase,
 };
 
 export default function EntityCard({ entity, accounts, onEdit }) {
@@ -24,31 +30,48 @@ export default function EntityCard({ entity, accounts, onEdit }) {
             </div>
             <div>
               <CardTitle className="text-lg">{entity.name}</CardTitle>
-              <Badge variant="outline" className="mt-1">{entity.type}</Badge>
+              <Badge variant="outline" className="mt-1">
+                {entity.type}
+              </Badge>
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500" onClick={() => onEdit(entity)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-500"
+            onClick={() => onEdit(entity)}
+          >
             <Edit className="w-4 h-4" />
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        {entity.description && <p className="text-sm text-gray-600 mb-4">{entity.description}</p>}
+        {entity.description && (
+          <p className="text-sm text-gray-600 mb-4">{entity.description}</p>
+        )}
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"><Link2 className="w-4 h-4" /> Linked Accounts</h4>
+          <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <Link2 className="w-4 h-4" /> Linked Accounts
+          </h4>
           {accounts.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {accounts.map(account => (
-                <Badge key={account.id} variant="secondary">{account.account_name}</Badge>
+              {accounts.map((account) => (
+                <Badge key={account.id} variant="secondary">
+                  {account.account_name}
+                </Badge>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No accounts linked. Go to "Manage Rules" to link accounts.</p>
+            <p className="text-sm text-gray-500">
+              No accounts linked. Go to "Manage Rules" to link accounts.
+            </p>
           )}
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full">View Transactions</Button>
+        <Button variant="outline" className="w-full">
+          View Transactions
+        </Button>
       </CardFooter>
     </Card>
   );

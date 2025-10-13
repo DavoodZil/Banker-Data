@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 import { Store } from 'lucide-react';
 
 export default function MerchantsPage() {
@@ -8,7 +8,9 @@ export default function MerchantsPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Merchants</h1>
-          <p className="text-gray-500 mt-1">View spending by merchant and manage merchant names.</p>
+          <p className="text-gray-500 mt-1">
+            View spending by merchant and manage merchant names.
+          </p>
         </div>
       </div>
       <Card className="card-shadow border-0 text-center py-24">
@@ -21,7 +23,8 @@ export default function MerchantsPage() {
               Feature Coming Soon!
             </h3>
             <p className="text-gray-500 max-w-md mx-auto">
-              This section is under construction. Soon you'll be able to analyze your spending by merchant and clean up merchant names.
+              This section is under construction. Soon you'll be able to analyze
+              your spending by merchant and clean up merchant names.
             </p>
           </div>
         </CardContent>

@@ -1,25 +1,49 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Search, Edit3, Trash2, Plus, Eye, EyeOff, Play, Settings,
-  Store, DollarSign, List, CreditCard, Tag, ClipboardCheck, Target, GitCommitHorizontal
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
+  Search,
+  Edit3,
+  Trash2,
+  Plus,
+  Eye,
+  EyeOff,
+  Play,
+  Settings,
+  Store,
+  DollarSign,
+  List,
+  CreditCard,
+  Tag,
+  ClipboardCheck,
+  Target,
+  GitCommitHorizontal,
 } from 'lucide-react';
-import { useRules } from "@/hooks/api";
+import { useRules } from '@/hooks/api';
 import { useNavigate } from 'react-router-dom';
 
 const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   // Parse rule data
   let ruleData = {};
   try {
     ruleData = JSON.parse(rule.rule_data || '{}');
   } catch (error) {
-    console.error('Error parsing rule data:', error);
+    // Handle parsing error gracefully
   }
 
   const conditions = ruleData.ifs || [];
@@ -27,25 +51,25 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
 
   const getConditionIcon = (type) => {
     const iconMap = {
-      'merchant': Store,
-      'amount': DollarSign,
-      'category': List,
-      'account': CreditCard,
-      'description': Eye,
-      'date': ClipboardCheck
+      merchant: Store,
+      amount: DollarSign,
+      category: List,
+      account: CreditCard,
+      description: Eye,
+      date: ClipboardCheck,
     };
     return iconMap[type] || Settings;
   };
 
   const getActionIcon = (type) => {
     const iconMap = {
-      'rename_merchant': Edit3,
-      'update_category': List,
-      'add_tags': Tag,
-      'hide_transaction': EyeOff,
-      'mark_for_review': ClipboardCheck,
-      'link_to_goal': Target,
-      'split_transaction': GitCommitHorizontal
+      rename_merchant: Edit3,
+      update_category: List,
+      add_tags: Tag,
+      hide_transaction: EyeOff,
+      mark_for_review: ClipboardCheck,
+      link_to_goal: Target,
+      split_transaction: GitCommitHorizontal,
     };
     return iconMap[type] || Settings;
   };
@@ -55,7 +79,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
     try {
       await onDelete(rule.id);
     } catch (error) {
-      console.error('Error deleting rule:', error);
+      // Error handling is done by the hook
     } finally {
       setIsDeleting(false);
     }
@@ -65,7 +89,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
     try {
       await onApply(rule.id);
     } catch (error) {
-      console.error('Error applying rule:', error);
+      // Error handling is done by the hook
     }
   };
 
@@ -112,7 +136,8 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete Rule</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete "{rule.name}"? This action cannot be undone.
+                    Are you sure you want to delete "{rule.name}"? This action
+                    cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -134,17 +159,30 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
         <div className="space-y-4">
           {/* Rule Type */}
           <div>
-            <Badge variant={rule.rule_type === 1 ? "default" : "secondary"}>
-              {rule.rule_type === 1 ? "Standard Rule" : rule.rule_type === 2 ? "Split Rule" : `Type ${rule.rule_type}`}
+            <Badge variant={rule.rule_type === 1 ? 'default' : 'secondary'}>
+              {rule.rule_type === 1
+                ? 'Standard Rule'
+                : rule.rule_type === 2
+                  ? 'Split Rule'
+                  : `Type ${rule.rule_type}`}
             </Badge>
           </div>
 
           {/* Basic Rule Info */}
           {(conditions.length > 0 || actions.length > 0) && (
             <div className="text-sm text-gray-600">
-              {conditions.length > 0 && <span>{conditions.length} condition{conditions.length !== 1 ? 's' : ''}</span>}
+              {conditions.length > 0 && (
+                <span>
+                  {conditions.length} condition
+                  {conditions.length !== 1 ? 's' : ''}
+                </span>
+              )}
               {conditions.length > 0 && actions.length > 0 && <span> • </span>}
-              {actions.length > 0 && <span>{actions.length} action{actions.length !== 1 ? 's' : ''}</span>}
+              {actions.length > 0 && (
+                <span>
+                  {actions.length} action{actions.length !== 1 ? 's' : ''}
+                </span>
+              )}
             </div>
           )}
 
@@ -159,14 +197,16 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
 
 export default function RulesListPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { rules, isLoading, error, deleteRule, applyRule, refetch } = useRules();
+  const { rules, isLoading, error, deleteRule, applyRule, refetch } =
+    useRules();
   const navigate = useNavigate();
 
-
-  const filteredRules = Array.isArray(rules) 
-    ? rules.filter(rule => 
-        rule?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (rule?.description && rule.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredRules = Array.isArray(rules)
+    ? rules.filter(
+        (rule) =>
+          rule?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (rule?.description &&
+            rule.description.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : [];
 
@@ -208,11 +248,7 @@ export default function RulesListPage() {
           <p className="text-gray-600 mt-1">Manage your transaction rules</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleApplyAll}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={handleApplyAll} className="gap-2">
             <Play className="w-4 h-4" />
             Apply All Rules
           </Button>
@@ -269,10 +305,9 @@ export default function RulesListPage() {
               {searchQuery ? 'No rules found' : 'No rules created yet'}
             </h3>
             <p className="text-gray-600 mb-4">
-              {searchQuery 
-                ? 'Try adjusting your search terms' 
-                : 'Create your first rule to automatically organize your transactions'
-              }
+              {searchQuery
+                ? 'Try adjusting your search terms'
+                : 'Create your first rule to automatically organize your transactions'}
             </p>
             {!searchQuery && (
               <Button

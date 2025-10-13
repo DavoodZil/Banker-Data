@@ -62,7 +62,7 @@ export default function CategorySummaryCards({ filters = {} }) {
           </div>
         </CardContent>
       </Card>
-      
+
       <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
         <CardContent className="p-4">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
@@ -73,7 +73,7 @@ export default function CategorySummaryCards({ filters = {} }) {
           </div>
         </CardContent>
       </Card>
-      
+
       <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
         <CardContent className="p-4">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
@@ -84,7 +84,7 @@ export default function CategorySummaryCards({ filters = {} }) {
           </div>
         </CardContent>
       </Card>
-      
+
       <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
         <CardContent className="p-4">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">

@@ -1,10 +1,19 @@
-
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
-import { format, subMonths, startOfMonth } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from 'recharts';
+import { format, subMonths, startOfMonth } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 export default function NetWorthChart({ accounts, transactions, isLoading }) {
   if (isLoading) {
@@ -27,7 +36,10 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
   const generateNetWorthData = () => {
     const currentDate = new Date();
     const currentNetWorth = accounts.reduce((sum, account) => {
-      if (account.account_type === 'credit' || account.account_type === 'loan') {
+      if (
+        account.account_type === 'credit' ||
+        account.account_type === 'loan'
+      ) {
         return sum - Math.abs(account.balance);
       }
       return sum + account.balance;
@@ -37,7 +49,7 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
     const data = [];
     for (let i = 5; i >= 0; i--) {
       const date = startOfMonth(subMonths(currentDate, i));
-      
+
       // Mock historical net worth with some realistic variation
       let netWorth;
       if (i === 0) {
@@ -54,7 +66,7 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
         date: format(date, 'MMM yyyy'),
         netWorth: Math.round(netWorth),
         assets: Math.round(netWorth * 1.3), // Mock assets value
-        liabilities: Math.round(netWorth * 0.3) // Mock liabilities value
+        liabilities: Math.round(netWorth * 0.3), // Mock liabilities value
       });
     }
 
@@ -62,7 +74,7 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
   };
 
   const chartData = generateNetWorthData();
-  
+
   // Calculate trend
   const currentValue = chartData[chartData.length - 1]?.netWorth || 0;
   const previousValue = chartData[chartData.length - 2]?.netWorth || 0;
@@ -86,10 +98,13 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
             <div className="text-2xl font-bold text-gray-900">
               ${currentValue.toLocaleString()}
             </div>
-            <div className={`text-sm font-medium flex items-center gap-1 ${
-              isPositive ? 'text-emerald-600' : 'text-red-600'
-            }`}>
-              {isPositive ? '↗' : '↘'} {isPositive ? '+' : ''}{changePercent.toFixed(1)}%
+            <div
+              className={`text-sm font-medium flex items-center gap-1 ${
+                isPositive ? 'text-emerald-600' : 'text-red-600'
+              }`}
+            >
+              {isPositive ? '↗' : '↘'} {isPositive ? '+' : ''}
+              {changePercent.toFixed(1)}%
             </div>
           </div>
         </div>
@@ -99,41 +114,44 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               stroke="#64748b"
               fontSize={12}
               tickLine={false}
             />
-            <YAxis 
+            <YAxis
               stroke="#64748b"
               fontSize={12}
               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
               tickLine={false}
             />
-            <Tooltip 
+            <Tooltip
               formatter={(value, name) => [
-                `$${value.toLocaleString()}`, 
-                name === 'netWorth' ? 'Net Worth' : 
-                name === 'assets' ? 'Assets' : 'Liabilities'
+                `$${value.toLocaleString()}`,
+                name === 'netWorth'
+                  ? 'Net Worth'
+                  : name === 'assets'
+                    ? 'Assets'
+                    : 'Liabilities',
               ]}
               labelStyle={{ color: '#374151' }}
               contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid #e5e7eb',
                 borderRadius: '8px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
               }}
             />
-            <Area 
-              type="monotone" 
-              dataKey="netWorth" 
-              stroke="#10b981" 
+            <Area
+              type="monotone"
+              dataKey="netWorth"
+              stroke="#10b981"
               strokeWidth={3}
               fill="url(#netWorthGradient)"
               dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
@@ -141,7 +159,7 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
             />
           </AreaChart>
         </ResponsiveContainer>
-        
+
         {/* Additional Stats */}
         <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-100">
           <div className="text-center">
@@ -158,7 +176,9 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
           </div>
           <div className="text-center">
             <div className="text-sm text-gray-500">6-Month Change</div>
-            <div className={`text-lg font-semibold ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
+            <div
+              className={`text-lg font-semibold ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}
+            >
               {isPositive ? '+' : ''}${change.toLocaleString()}
             </div>
           </div>

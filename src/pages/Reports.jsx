@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 import { AreaChart } from 'lucide-react';
 
 export default function ReportsPage() {
@@ -8,7 +8,9 @@ export default function ReportsPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
-          <p className="text-gray-500 mt-1">Analyze your spending and income with detailed reports.</p>
+          <p className="text-gray-500 mt-1">
+            Analyze your spending and income with detailed reports.
+          </p>
         </div>
       </div>
       <Card className="card-shadow border-0 text-center py-24">
@@ -21,7 +23,8 @@ export default function ReportsPage() {
               Feature Coming Soon!
             </h3>
             <p className="text-gray-500 max-w-md mx-auto">
-              This section is under construction. Soon you'll be able to generate insightful reports on your financial habits.
+              This section is under construction. Soon you'll be able to
+              generate insightful reports on your financial habits.
             </p>
           </div>
         </CardContent>

@@ -1,12 +1,28 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAccounts } from '@/hooks/api';
 
-export default function CreateManualAccountModal({ isOpen, onClose, onSuccess }) {
+export default function CreateManualAccountModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}) {
   const [accountName, setAccountName] = useState('');
   const [accountType, setAccountType] = useState('');
   const [balance, setBalance] = useState('');
@@ -24,7 +40,7 @@ export default function CreateManualAccountModal({ isOpen, onClose, onSuccess })
         account_name: accountName,
         account_type: accountType,
         balance: parseFloat(balance) || 0,
-        institution_name: institutionName || "Manual Account",
+        institution_name: institutionName || 'Manual Account',
         source: 'manual',
       });
       // Reset form
@@ -34,7 +50,7 @@ export default function CreateManualAccountModal({ isOpen, onClose, onSuccess })
       setInstitutionName('');
       onSuccess();
     } catch (error) {
-      console.error("Failed to create manual account:", error);
+      // Error handling is done by the hook
     } finally {
       setIsSaving(false);
     }
@@ -50,7 +66,13 @@ export default function CreateManualAccountModal({ isOpen, onClose, onSuccess })
           <div className="space-y-4 py-4">
             <div>
               <Label htmlFor="account-name">Account Name</Label>
-              <Input id="account-name" value={accountName} onChange={(e) => setAccountName(e.target.value)} placeholder="e.g., My Wallet, Vacation Savings" required />
+              <Input
+                id="account-name"
+                value={accountName}
+                onChange={(e) => setAccountName(e.target.value)}
+                placeholder="e.g., My Wallet, Vacation Savings"
+                required
+              />
             </div>
             <div>
               <Label htmlFor="account-type">Account Type</Label>
@@ -70,16 +92,33 @@ export default function CreateManualAccountModal({ isOpen, onClose, onSuccess })
             </div>
             <div>
               <Label htmlFor="balance">Current Balance</Label>
-              <Input id="balance" type="number" step="0.01" value={balance} onChange={(e) => setBalance(e.target.value)} placeholder="0.00" required />
+              <Input
+                id="balance"
+                type="number"
+                step="0.01"
+                value={balance}
+                onChange={(e) => setBalance(e.target.value)}
+                placeholder="0.00"
+                required
+              />
             </div>
             <div>
               <Label htmlFor="institution-name">Institution (Optional)</Label>
-              <Input id="institution-name" value={institutionName} onChange={(e) => setInstitutionName(e.target.value)} placeholder="e.g., Bank of Sock Drawer" />
+              <Input
+                id="institution-name"
+                value={institutionName}
+                onChange={(e) => setInstitutionName(e.target.value)}
+                placeholder="e.g., Bank of Sock Drawer"
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={isSaving}>{isSaving ? 'Saving...' : 'Create Account'}</Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Create Account'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -1,12 +1,17 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { setAuthToken, setBaseUrl, isAuthenticated, getBaseUrl } from '@/utils/auth';
+import {
+  setAuthToken,
+  setBaseUrl,
+  isAuthenticated,
+  getBaseUrl,
+} from '@/utils/auth';
 import { CheckCircle, AlertCircle, Key, Globe } from 'lucide-react';
 
 const AuthHelper = () => {
   const handleSetCredentials = () => {
-        // Reload the page to apply the authentication
+    // Reload the page to apply the authentication
     window.location.reload();
   };
 
@@ -30,31 +35,32 @@ const AuthHelper = () => {
           <div className="flex items-center gap-2">
             <Key className="w-4 h-4 text-blue-600" />
             <span className="text-sm font-medium">Status:</span>
-            <span className={`text-sm ${authenticated ? 'text-emerald-600' : 'text-orange-600'}`}>
+            <span
+              className={`text-sm ${authenticated ? 'text-emerald-600' : 'text-orange-600'}`}
+            >
               {authenticated ? 'Authenticated' : 'Not Authenticated'}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-purple-600" />
             <span className="text-sm font-medium">Base URL:</span>
-            <span className="text-sm text-gray-600">
-              {baseUrl}
-            </span>
+            <span className="text-sm text-gray-600">{baseUrl}</span>
           </div>
         </div>
-        
+
         {!authenticated && (
-          <Button 
+          <Button
             onClick={handleSetCredentials}
             className="w-full bg-emerald-600 hover:bg-emerald-700"
           >
             Set Credentials & Authenticate
           </Button>
         )}
-        
+
         {authenticated && (
           <div className="text-sm text-emerald-600 bg-emerald-50 p-3 rounded-lg">
-            ✓ Successfully authenticated! You can now access all protected routes.
+            ✓ Successfully authenticated! You can now access all protected
+            routes.
           </div>
         )}
       </CardContent>
@@ -62,4 +68,4 @@ const AuthHelper = () => {
   );
 };
 
-export default AuthHelper; 
+export default AuthHelper;

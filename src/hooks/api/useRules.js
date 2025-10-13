@@ -27,7 +27,7 @@ export const useRules = () => {
   const createRule = useCallback(async (ruleData) => {
     try {
       const response = await ruleApi.create(ruleData);
-      setRules(prev => [...prev, response.data]);
+      setRules((prev) => [...prev, response.data]);
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -38,7 +38,9 @@ export const useRules = () => {
   const updateRule = useCallback(async (id, ruleData) => {
     try {
       const response = await ruleApi.update(id, ruleData);
-      setRules(prev => prev.map(rule => rule.id === id ? response.data : rule));
+      setRules((prev) =>
+        prev.map((rule) => (rule.id === id ? response.data : rule))
+      );
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -49,7 +51,7 @@ export const useRules = () => {
   const deleteRule = useCallback(async (id) => {
     try {
       await ruleApi.delete(id);
-      setRules(prev => prev.filter(rule => rule.id !== id));
+      setRules((prev) => prev.filter((rule) => rule.id !== id));
     } catch (err) {
       setError(err.message);
       throw err;
@@ -127,13 +129,16 @@ export const useRule = (id) => {
 export const useRuleTest = () => {
   const { execute, isLoading, error } = useApiCall();
 
-  const testRule = useCallback(async (rule, transactions) => {
-    return execute(() => ruleApi.test(rule, transactions));
-  }, [execute]);
+  const testRule = useCallback(
+    async (rule, transactions) => {
+      return execute(() => ruleApi.test(rule, transactions));
+    },
+    [execute]
+  );
 
   return {
     testRule,
     isLoading,
     error,
   };
-}; 
+};

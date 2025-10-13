@@ -1,59 +1,77 @@
-
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useTransactions } from "@/hooks/api";
-import { useDebounceWithLoading } from "@/hooks/api/useDebounce";
-import { useBankData } from "@/hooks/useBankData";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Download, Calendar, ArrowUpDown, RefreshCw, Upload, Loader2 } from "lucide-react";
-import { format, startOfMonth, endOfMonth, subMonths, startOfDay, endOfDay } from "date-fns";
-// TODO: Implement these functions in the new API structure
-// import { syncTransactions } from "@/api/functions";
-// import { fetchFromNgrok } from "@/api/functions";
-// import { triggerWebhookSync } from "@/api/functions";
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useTransactions } from '@/hooks/api';
+import { useDebounceWithLoading } from '@/hooks/api/useDebounce';
+import { useBankData } from '@/hooks/useBankData';
+import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import {
+  Search,
+  Filter,
+  Download,
+  Calendar,
+  ArrowUpDown,
+  RefreshCw,
+  Upload,
+  Loader2,
+} from 'lucide-react';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  subMonths,
+  startOfDay,
+  endOfDay,
+} from 'date-fns';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
-import TransactionFilters from "../components/transactions/TransactionFilters";
-import TransactionList from "../components/transactions/TransactionList";
-import TransactionEditModal from "../components/transactions/TransactionEditModal";
-import TransactionTotalsCards from "../components/transactions/TransactionTotalsCards";
+import TransactionFilters from '../components/transactions/TransactionFilters';
+import TransactionList from '../components/transactions/TransactionList';
+import TransactionEditModal from '../components/transactions/TransactionEditModal';
+import TransactionTotalsCards from '../components/transactions/TransactionTotalsCards';
 
 export default function Transactions() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
-  const { debouncedValue: debouncedSearchQuery, isDebouncing } = useDebounceWithLoading(searchQuery, 500); // 500ms delay for search
+  const { toast } = useToast();
+  const { debouncedValue: debouncedSearchQuery, isDebouncing } =
+    useDebounceWithLoading(searchQuery, 500); // 500ms delay for search
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const transactionListRef = useRef(null);
   const [filters, setFilters] = useState({
     account: 'all',
     category: 'all',
     dateRange: 'all', // Changed default from 'this_month' to 'all'
-    amountRange: 'all'
+    amountRange: 'all',
   });
-  
-  // Convert filter values to payload format with separate filter fields
+
   const filterPayload = useMemo(() => {
     const payload = {
       filterModel: {}, // Keep filterModel empty as per virtual card platform
       filteredDescription: debouncedSearchQuery || '',
-      filteredBankAccounts: filters.account !== 'all' ? [filters.account] : "",
+      filteredBankAccounts: filters.account !== 'all' ? [filters.account] : '',
       filteredCategory: filters.category !== 'all' ? filters.category : '',
       categoriesList: '', // Will be populated if needed
       filteredDate: '',
       fromDate: '2015-07-29', // Default wide date range
-      toDate: '2035-07-29'
+      toDate: '2035-07-29',
     };
-    
-    // Handle date range filter
+
     if (filters.dateRange !== 'all') {
       const now = new Date();
       let dateFrom, dateTo;
-      
+
       switch (filters.dateRange) {
         case 'this_month':
           dateFrom = startOfMonth(now);
@@ -73,15 +91,14 @@ export default function Transactions() {
           dateTo = endOfDay(now);
           break;
       }
-      
+
       if (dateFrom && dateTo) {
         payload.fromDate = format(dateFrom, 'yyyy-MM-dd');
         payload.toDate = format(dateTo, 'yyyy-MM-dd');
         payload.filteredDate = filters.dateRange; // Store the filter type
       }
     }
-    
-    // Handle amount range filter
+
     if (filters.amountRange !== 'all') {
       switch (filters.amountRange) {
         case 'under_50':
@@ -98,136 +115,182 @@ export default function Transactions() {
           break;
       }
     }
-    
+
     return payload;
   }, [debouncedSearchQuery, filters]);
   const [syncMethod, setSyncMethod] = useState('direct'); // 'direct' or 'ngrok'
 
-  // Use the new hooks - don't pass initial filters, will be set via updateFilters
-  const { 
-    transactions, 
-    loading: isLoading, 
-    error, 
-    refetch: refetchTransactions, 
-    updateTransaction, 
+  const {
+    transactions,
+    loading: isLoading,
+    error,
+    refetch: refetchTransactions,
+    updateTransaction,
     updateFilters,
-    pagination 
+    pagination,
   } = useTransactions();
-  const { bankData, isLoading: bankDataLoading, error: bankDataError, refetch: refetchBankData } = useBankData();
+  const {
+    bankData,
+    isLoading: bankDataLoading,
+    error: bankDataError,
+    refetch: refetchBankData,
+  } = useBankData();
 
-  // Extract accounts from bankData structure
-  const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts) : [];
+  const accounts = bankData?.data?.accounts
+    ? Object.values(bankData.data.accounts)
+    : [];
 
   useEffect(() => {
-    // Data is automatically loaded by the useBankData hook
     setLastSync(new Date());
   }, []);
 
+  /**
+   * Loads transaction and account data
+   * @description Fetches both transaction and account data in parallel
+   * @returns {Promise<void>}
+   */
   const loadData = async () => {
-    await Promise.all([
-      refetchTransactions(),
-      refetchBankData()
-    ]);
+    await Promise.all([refetchTransactions(), refetchBankData()]);
     setLastSync(new Date());
   };
 
+  /**
+   * Handles synchronization of transactions
+   * @description Initiates a sync process to fetch latest transactions from connected accounts
+   * @returns {Promise<void>}
+   */
   const handleSyncTransactions = async () => {
     setIsSyncing(true);
     try {
       let response;
-      
+
       if (syncMethod === 'ngrok') {
         response = await fetchFromNgrok();
         if (response.data && response.data.success) {
           await loadData();
         } else {
           const errorDetails = response.data;
-          console.error("Ngrok Sync failed:", errorDetails);
-          const alertMessage = 
+          const alertMessage =
             `Ngrok Sync Failed: ${errorDetails?.message || 'Unknown error'}\n\n` +
             `Details: ${errorDetails?.error || 'N/A'}\n` +
             `URL Used: ${errorDetails?.ngrok_url || 'N/A'}\n\n` +
             `Suggestion: ${errorDetails?.suggestion || 'Please check your local server and ngrok tunnel, and ensure the NGROK_URL secret is up to date.'}`;
-          alert(alertMessage);
+          toast({
+            title: 'Ngrok Sync Failed',
+            description: alertMessage,
+            variant: 'destructive',
+          });
         }
-      } else { // Direct sync
+      } else {
+        // Direct sync
         response = await syncTransactions();
         if (response.data && response.data.success) {
-            await loadData();
+          await loadData();
         } else {
-            console.error("Sync failed:", response.data?.error || response.data?.details || "Unknown error");
-            alert(`Sync failed: ${response.data?.message || response.data?.error || "Unknown error"}`);
+          toast({
+            title: 'Sync Failed',
+            description:
+              response.data?.message || response.data?.error || 'Unknown error',
+            variant: 'destructive',
+          });
         }
       }
     } catch (error) {
-      console.error('Failed to sync transactions:', error);
-      
-      // Handle rate limit errors specifically
       if (error.response?.status === 429) {
-        alert('Rate limit exceeded. Please wait 2-3 minutes before trying to sync again.');
+        toast({
+          title: 'Rate Limit Exceeded',
+          description: 'Please wait 2-3 minutes before trying to sync again.',
+          variant: 'destructive',
+        });
       } else {
-        alert(`An unexpected error occurred during sync: ${error.message}`);
+        toast({
+          title: 'Sync Error',
+          description: `An unexpected error occurred during sync: ${error.message}`,
+          variant: 'destructive',
+        });
       }
     } finally {
       setIsSyncing(false);
     }
   };
 
+  /**
+   * Handles webhook trigger for transaction sync
+   * @description Triggers a webhook to initiate transaction synchronization
+   * @returns {Promise<void>}
+   */
   const handleWebhookTrigger = async () => {
     setIsSyncing(true);
     try {
       const response = await triggerWebhookSync();
       if (response.data && response.data.success) {
-        // Wait a moment for webhook processing, then reload
         setTimeout(async () => {
           await loadData();
         }, 2000);
       } else {
-        console.error("Webhook trigger failed:", response.data?.error || "Unknown error");
-        alert(`Webhook trigger failed: ${response.data?.message || "Unknown error"}`);
+        toast({
+          title: 'Webhook Trigger Failed',
+          description: response.data?.message || 'Unknown error',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
-      console.error('Failed to trigger webhook sync:', error);
-      alert(`Failed to trigger webhook sync: ${error.message}`);
+      toast({
+        title: 'Webhook Sync Failed',
+        description: `Failed to trigger webhook sync: ${error.message}`,
+        variant: 'destructive',
+      });
     } finally {
       setIsSyncing(false);
     }
   };
 
+  /**
+   * Handles updating a transaction
+   * @param {string|number} transactionId - The ID of the transaction to update
+   * @param {Object} updates - The updates to apply to the transaction
+   * @returns {Promise<void>}
+   */
   const handleUpdateTransaction = async (transactionId, updates) => {
     const payload = {
       transactionId: transactionId,
       categoryId: updates.category,
-      description: updates.description,  
+      description: updates.description,
       merchantName: updates.merchantName,
-    }
+    };
     await updateTransaction(payload);
-    
-    // Refresh the transaction table directly
+
     if (transactionListRef.current?.refresh) {
       transactionListRef.current.refresh();
     }
-    
+
     setSelectedTransaction(null);
   };
 
+  /**
+   * Exports transactions to CSV format
+   * @description Generates and downloads a CSV file containing filtered transactions
+   * @returns {void}
+   */
   const exportTransactions = () => {
-    const csvData = filteredTransactions.map(t => {
-      const account = accounts.find(a => a.id === t.account_id);
+    const csvData = filteredTransactions.map((t) => {
+      const account = accounts.find((a) => a.id === t.account_id);
       return {
         Date: format(new Date(t.date), 'yyyy-MM-dd'),
         Description: t.custom_description || t.description,
         Amount: t.amount,
         Category: t.category,
         Account: account?.account_name || 'Unknown',
-        Merchant: t.merchant || ''
+        Merchant: t.merchant || '',
       };
     });
 
     const headers = Object.keys(csvData[0]);
     const csvContent = [
       headers.join(','),
-      ...csvData.map(row => headers.map(header => JSON.stringify(row[header])).join(','))
+      ...csvData.map((row) =>
+        headers.map((header) => JSON.stringify(row[header])).join(',')
+      ),
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -243,7 +306,7 @@ export default function Transactions() {
   useEffect(() => {
     updateFilters(filterPayload);
   }, [filterPayload, updateFilters]);
-  
+
   // Transactions are filtered by the API
   const filteredTransactions = transactions;
 
@@ -257,10 +320,10 @@ export default function Transactions() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-           <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500">
             Last sync: {format(lastSync, 'MMM d, h:mm a')}
           </div>
-          
+
           <Select value={syncMethod} onValueChange={setSyncMethod}>
             <SelectTrigger className="w-32">
               <SelectValue />
@@ -270,17 +333,23 @@ export default function Transactions() {
               <SelectItem value="ngrok">Via Ngrok</SelectItem>
             </SelectContent>
           </Select>
-          
+
           <Button
             variant="outline"
             onClick={handleSyncTransactions}
             disabled={isSyncing || isLoading}
             className="gap-2"
           >
-            <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Syncing...' : (syncMethod === 'ngrok' ? 'Sync via Ngrok' : 'Sync')}
+            <RefreshCw
+              className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`}
+            />
+            {isSyncing
+              ? 'Syncing...'
+              : syncMethod === 'ngrok'
+                ? 'Sync via Ngrok'
+                : 'Sync'}
           </Button>
-          
+
           {/* <Button
             variant="outline"
             onClick={handleWebhookTrigger}
@@ -290,7 +359,7 @@ export default function Transactions() {
             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
             Trigger Webhook
           </Button> */}
-          
+
           <Button
             variant="outline"
             onClick={exportTransactions}
@@ -303,8 +372,8 @@ export default function Transactions() {
 
           <Link to={createPageUrl('Import')}>
             <Button variant="outline" className="gap-2">
-                <Upload className="w-4 h-4" />
-                Import
+              <Upload className="w-4 h-4" />
+              Import
             </Button>
           </Link>
         </div>

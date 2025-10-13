@@ -1,27 +1,57 @@
-
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Check, ChevronsUpDown, ArrowRight, Trash2, PlusCircle, Link2, GitMerge } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useAccounts } from "@/hooks/api";
-import { useEntities } from "@/hooks/api";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Check,
+  ChevronsUpDown,
+  ArrowRight,
+  Trash2,
+  PlusCircle,
+  Link2,
+  GitMerge,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAccounts } from '@/hooks/api';
+import { useEntities } from '@/hooks/api';
 
 export default function ManageEntityRulesModal({ isOpen, onClose }) {
   const [rules, setRules] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Form state for new rule
-  const [newRuleName, setNewRuleName] = useState("");
+  const [newRuleName, setNewRuleName] = useState('');
   const [selectedAccounts, setSelectedAccounts] = useState([]);
-  const [targetEntity, setTargetEntity] = useState("");
+  const [targetEntity, setTargetEntity] = useState('');
   const [openAccountSelector, setOpenAccountSelector] = useState(false);
 
   // Use the new hooks
@@ -39,19 +69,21 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
     if (!newRuleName || selectedAccounts.length === 0 || !targetEntity) return;
 
     // This would need to be implemented in the API
-    
+
     // Reset form
-    setNewRuleName("");
+    setNewRuleName('');
     setSelectedAccounts([]);
-    setTargetEntity("");
+    setTargetEntity('');
   };
-  
+
   const handleDeleteRule = async (ruleId) => {
     // This would need to be implemented in the API
   };
 
-  const getAccountName = (accountId) => accounts.find(a => a.id === accountId)?.account_name || 'Unknown Account';
-  const getEntityName = (entityId) => entities.find(e => e.id === entityId)?.name || 'Unknown Entity';
+  const getAccountName = (accountId) =>
+    accounts.find((a) => a.id === accountId)?.account_name || 'Unknown Account';
+  const getEntityName = (entityId) =>
+    entities.find((e) => e.id === entityId)?.name || 'Unknown Entity';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -66,7 +98,10 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
           {/* Create Rule Form */}
           <Card>
             <CardContent className="pt-6 space-y-4">
-              <h3 className="font-semibold text-lg flex items-center gap-2"><PlusCircle className="w-5 h-5 text-emerald-600" /> Create a New Rule</h3>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <PlusCircle className="w-5 h-5 text-emerald-600" /> Create a New
+                Rule
+              </h3>
               <div className="space-y-2">
                 <Label htmlFor="rule-name">Rule Name</Label>
                 <Input
@@ -79,10 +114,20 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                 <div className="space-y-2">
                   <Label>If transaction is from...</Label>
-                  <Popover open={openAccountSelector} onOpenChange={setOpenAccountSelector}>
+                  <Popover
+                    open={openAccountSelector}
+                    onOpenChange={setOpenAccountSelector}
+                  >
                     <PopoverTrigger asChild>
-                      <Button variant="outline" role="combobox" aria-expanded={openAccountSelector} className="w-full justify-between">
-                        {selectedAccounts.length > 0 ? `${selectedAccounts.length} account(s) selected` : "Select accounts..."}
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openAccountSelector}
+                        className="w-full justify-between"
+                      >
+                        {selectedAccounts.length > 0
+                          ? `${selectedAccounts.length} account(s) selected`
+                          : 'Select accounts...'}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
@@ -96,14 +141,23 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
                               <CommandItem
                                 key={account.id}
                                 onSelect={() => {
-                                  setSelectedAccounts(prev => 
-                                    prev.find(a => a.id === account.id)
-                                      ? prev.filter(a => a.id !== account.id)
+                                  setSelectedAccounts((prev) =>
+                                    prev.find((a) => a.id === account.id)
+                                      ? prev.filter((a) => a.id !== account.id)
                                       : [...prev, account]
                                   );
                                 }}
                               >
-                                <Check className={cn("mr-2 h-4 w-4", selectedAccounts.find(a => a.id === account.id) ? "opacity-100" : "opacity-0")} />
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    selectedAccounts.find(
+                                      (a) => a.id === account.id
+                                    )
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
                                 {account.account_name}
                               </CommandItem>
                             ))}
@@ -121,14 +175,24 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
                     </SelectTrigger>
                     <SelectContent>
                       {entities.map((entity) => (
-                        <SelectItem key={entity.id} value={entity.id}>{entity.name}</SelectItem>
+                        <SelectItem key={entity.id} value={entity.id}>
+                          {entity.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="flex justify-end">
-                <Button onClick={handleCreateRule} disabled={!newRuleName || selectedAccounts.length === 0 || !targetEntity} className="bg-emerald-600 hover:bg-emerald-700">
+                <Button
+                  onClick={handleCreateRule}
+                  disabled={
+                    !newRuleName ||
+                    selectedAccounts.length === 0 ||
+                    !targetEntity
+                  }
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
                   Add Rule
                 </Button>
               </div>
@@ -141,28 +205,44 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
             {isLoading ? (
               <p>Loading rules...</p>
             ) : rules.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center py-4">No rules created yet.</p>
+              <p className="text-sm text-gray-500 text-center py-4">
+                No rules created yet.
+              </p>
             ) : (
-              rules.map(rule => (
+              rules.map((rule) => (
                 <Card key={rule.id} className="bg-gray-50">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div>
                       <p className="font-semibold">{rule.name}</p>
                       <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">
                         <div className="flex flex-col items-start">
-                          <span className="text-xs text-gray-400">FROM ACCOUNTS</span>
+                          <span className="text-xs text-gray-400">
+                            FROM ACCOUNTS
+                          </span>
                           <div className="flex gap-1 flex-wrap">
-                            {rule.source_account_ids.map(id => <Badge key={id} variant="secondary">{getAccountName(id)}</Badge>)}
+                            {rule.source_account_ids.map((id) => (
+                              <Badge key={id} variant="secondary">
+                                {getAccountName(id)}
+                              </Badge>
+                            ))}
                           </div>
                         </div>
                         <ArrowRight className="w-4 h-4 text-gray-400 shrink-0" />
                         <div className="flex flex-col items-start">
-                           <span className="text-xs text-gray-400">TO ENTITY</span>
-                           <Badge variant="outline" className="bg-white">{getEntityName(rule.target_entity_id)}</Badge>
+                          <span className="text-xs text-gray-400">
+                            TO ENTITY
+                          </span>
+                          <Badge variant="outline" className="bg-white">
+                            {getEntityName(rule.target_entity_id)}
+                          </Badge>
                         </div>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteRule(rule.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteRule(rule.id)}
+                    >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </Button>
                   </CardContent>

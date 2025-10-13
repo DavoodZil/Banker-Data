@@ -25,4 +25,4 @@ const LogoutButton = () => {
   );
 };
 
-export default LogoutButton; 
+export default LogoutButton;

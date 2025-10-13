@@ -102,7 +102,9 @@ export default function TransactionTotalsCards({ filters }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={`text-2xl font-bold ${totalAmount >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+          <div
+            className={`text-2xl font-bold ${totalAmount >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+          >
             {totalAmount >= 0 ? '+' : ''}${totalAmount.toLocaleString()}
           </div>
         </CardContent>

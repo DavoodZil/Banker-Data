@@ -94,7 +94,7 @@ export const payloadMapper = (condition, allCategories = []) => {
   let allConditions = [];
   let merchantGroups = [];
   let merchantType = null;
-  
+
   Object.entries(condition)
     .filter(([key, value]) => value.enabled)
     .forEach(([key, value]) => {
@@ -103,31 +103,42 @@ export const payloadMapper = (condition, allCategories = []) => {
         merchantGroups = value.matchers;
         merchantType = value.type || 'merchant_name';
       } else if (key === 'amount') {
-        const mapped = matcherMapper({
-          match_type: value.operator,
-          value1: value.value1,
-          value2: value.value2
-        }, 'amount');
+        const mapped = matcherMapper(
+          {
+            match_type: value.operator,
+            value1: value.value1,
+            value2: value.value2,
+          },
+          'amount'
+        );
         if (mapped) allConditions.push([IF_AMOUNT, ...mapped]);
       } else if (key === 'categories') {
         // Categories now come as enc_ids directly
-        (value.values || []).forEach(categoryId => {
+        (value.values || []).forEach((categoryId) => {
           allConditions.push([IF_CATEGORY, categoryId]);
         });
       } else if (key === 'accounts') {
-        (value.values || []).forEach(val => allConditions.push([IF_ACCOUNT, MERCHANT_MATCH_TYPE_EXACT, val]));
+        (value.values || []).forEach((val) =>
+          allConditions.push([IF_ACCOUNT, MERCHANT_MATCH_TYPE_EXACT, val])
+        );
       } else if (key === 'description') {
-        const mapped = matcherMapper({
-          match_type: value.match_type,
-          value: value.value
-        }, 'description');
+        const mapped = matcherMapper(
+          {
+            match_type: value.match_type,
+            value: value.value,
+          },
+          'description'
+        );
         if (mapped) allConditions.push([IF_DESCRIPTION, ...mapped]);
       } else if (key === 'date') {
-        const mapped = matcherMapper({
-          match_type: value.match_type,
-          value1: value.value1,
-          value2: value.value2
-        }, 'date');
+        const mapped = matcherMapper(
+          {
+            match_type: value.match_type,
+            value1: value.value1,
+            value2: value.value2,
+          },
+          'date'
+        );
         if (mapped) allConditions.push([IF_DATE, ...mapped]);
       }
     });
@@ -139,23 +150,26 @@ export const payloadMapper = (condition, allCategories = []) => {
 
   // Build nested structure for OR groups with AND conditions
   const result = [];
-  
-  merchantGroups.forEach(group => {
+
+  merchantGroups.forEach((group) => {
     const groupConditions = [];
-    
+
     // Add merchant conditions for this group
-    group.forEach(matcher => {
+    group.forEach((matcher) => {
       const mapped = matcherMapper(matcher, 'merchants');
       if (mapped) {
         // Use IF_ORIGINAL_DESCRIPTION (1) for original_description, IF_MERCHANT (5) for merchant_name
-        const conditionType = merchantType === 'original_description' ? IF_ORIGINAL_DESCRIPTION : IF_MERCHANT;
+        const conditionType =
+          merchantType === 'original_description'
+            ? IF_ORIGINAL_DESCRIPTION
+            : IF_MERCHANT;
         groupConditions.push([conditionType, ...mapped]);
       }
     });
-    
+
     // Add all other conditions to each group
     groupConditions.push(...allConditions);
-    
+
     // Only add the group if it has conditions
     if (groupConditions.length > 0) {
       result.push(groupConditions);
@@ -168,10 +182,12 @@ export const payloadMapper = (condition, allCategories = []) => {
 // Helper function to convert tag names to IDs
 const convertTagNamesToIds = (tagNames, allTags) => {
   if (!Array.isArray(tagNames) || !Array.isArray(allTags)) return [];
-  return tagNames.map(tagName => {
-    const tag = allTags.find(t => t.name === tagName);
-    return tag ? tag.id : null;
-  }).filter(Boolean);
+  return tagNames
+    .map((tagName) => {
+      const tag = allTags.find((t) => t.name === tagName);
+      return tag ? tag.id : null;
+    })
+    .filter(Boolean);
 };
 
 // Helper function to convert tag IDs to names
@@ -179,20 +195,24 @@ const convertTagIdsToNames = (tagIds, allTags) => {
   if (!Array.isArray(tagIds) && typeof tagIds !== 'number') return [];
   const ids = Array.isArray(tagIds) ? tagIds : [tagIds];
   if (!Array.isArray(allTags)) return [];
-  return ids.map(tagId => {
-    const tag = allTags.find(t => t.id === tagId);
-    return tag ? tag.name : null;
-  }).filter(Boolean);
+  return ids
+    .map((tagId) => {
+      const tag = allTags.find((t) => t.id === tagId);
+      return tag ? tag.name : null;
+    })
+    .filter(Boolean);
 };
 
 // Helper function to convert category names to IDs
 const convertCategoryNamesToIds = (categoryNames, allCategories) => {
   if (!Array.isArray(categoryNames)) return [];
   if (!Array.isArray(allCategories)) return [];
-  return categoryNames.map(categoryName => {
-    const category = allCategories.find(c => c.name === categoryName);
-    return category ? category.id : null;
-  }).filter(Boolean);
+  return categoryNames
+    .map((categoryName) => {
+      const category = allCategories.find((c) => c.name === categoryName);
+      return category ? category.id : null;
+    })
+    .filter(Boolean);
 };
 
 // Helper function to convert category IDs to names
@@ -200,13 +220,19 @@ const convertCategoryIdsToNames = (categoryIds, allCategories) => {
   if (!Array.isArray(categoryIds) && typeof categoryIds !== 'number') return [];
   const ids = Array.isArray(categoryIds) ? categoryIds : [categoryIds];
   if (!Array.isArray(allCategories)) return [];
-  return ids.map(categoryId => {
-    const category = allCategories.find(c => c.id === categoryId);
-    return category ? category.name : null;
-  }).filter(Boolean);
+  return ids
+    .map((categoryId) => {
+      const category = allCategories.find((c) => c.id === categoryId);
+      return category ? category.name : null;
+    })
+    .filter(Boolean);
 };
 
-export const payloadActionMapper = (action, allTags = [], allCategories = []) => {
+export const payloadActionMapper = (
+  action,
+  allTags = [],
+  allCategories = []
+) => {
   const enabledFields = Object.entries(action)
     .filter(([key, value]) => value.enabled)
     .map(([key, value]) => {
@@ -231,23 +257,42 @@ export const payloadActionMapper = (action, allTags = [], allCategories = []) =>
   return enabledFields.filter(Boolean);
 };
 
-export const payloadSplitMapper = (splitData, allTags = [], allCategories = []) => {
-  if (!splitData.enabled || !splitData.splits || splitData.splits.length === 0) {
+export const payloadSplitMapper = (
+  splitData,
+  allTags = [],
+  allCategories = []
+) => {
+  if (
+    !splitData.enabled ||
+    !splitData.splits ||
+    splitData.splits.length === 0
+  ) {
     return null;
   }
-  
-  return splitData.splits.map(split => {
+
+  return splitData.splits.map((split) => {
     // Category is already an enc_id
     return {
       merchant: split.merchant || '',
       category_id: split.category,
-      amount: splitData.splitType === 'amount' ? parseFloat(split.amount) || 0 : parseFloat(split.percentage) || 0,
-      percentage: splitData.splitType === 'percentage' ? parseFloat(split.percentage) || 0 : null,
+      amount:
+        splitData.splitType === 'amount'
+          ? parseFloat(split.amount) || 0
+          : parseFloat(split.percentage) || 0,
+      percentage:
+        splitData.splitType === 'percentage'
+          ? parseFloat(split.percentage) || 0
+          : null,
       split_type: splitData.splitType,
       tags: convertTagNamesToIds(split.tags || [], allTags),
-      review_status: split.review_status === 'needs_review' ? 1 : (split.review_status === 'reviewed' ? 2 : 0),
+      review_status:
+        split.review_status === 'needs_review'
+          ? 1
+          : split.review_status === 'reviewed'
+            ? 2
+            : 0,
       reviewer: split.reviewer || null,
-      hide_original: splitData.hideOriginal || false
+      hide_original: splitData.hideOriginal || false,
     };
   });
 };
@@ -261,8 +306,18 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
   // Default form state structure
   const formState = {
     conditions: {
-      merchants: { enabled: false, type: 'merchant_name', matchers: [[{ match_type: 'exactly_matches', value: '' }]] },
-      amount: { enabled: false, transaction_type: 'expense', operator: 'greater_than', value1: '', value2: null },
+      merchants: {
+        enabled: false,
+        type: 'merchant_name',
+        matchers: [[{ match_type: 'exactly_matches', value: '' }]],
+      },
+      amount: {
+        enabled: false,
+        transaction_type: 'expense',
+        operator: 'greater_than',
+        value1: '',
+        value2: null,
+      },
       categories: { enabled: false, values: [] },
       accounts: { enabled: false, values: [] },
       description: { enabled: false, match_type: 'contains', value: '' },
@@ -273,26 +328,35 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
       update_category: { enabled: false, new_category: '' },
       add_tags: { enabled: false, tags: [] },
       hide_transaction: { enabled: false },
-      mark_for_review: { enabled: false, review_status: 'needs_review', reviewer: '' },
+      mark_for_review: {
+        enabled: false,
+        review_status: 'needs_review',
+        reviewer: '',
+      },
       link_to_goal: { enabled: false, goal_id: '' },
-      split_transaction: { enabled: false, splitType: 'amount', splits: [], hideOriginal: false }
-    }
+      split_transaction: {
+        enabled: false,
+        splitType: 'amount',
+        splits: [],
+        hideOriginal: false,
+      },
+    },
   };
 
   // --- Decode IFs (conditions) ---
   if (Array.isArray(ruleData.ifs) && ruleData.ifs.length > 0) {
     // Check if ifs is a nested array structure (OR groups)
     const isNestedStructure = Array.isArray(ruleData.ifs[0]);
-    
+
     if (isNestedStructure) {
       // Handle nested structure: [[...], [...], [...]]
       let merchantGroups = [];
       let hasOriginalDescription = false;
-      
+
       ruleData.ifs.forEach((orGroup, groupIndex) => {
         let merchantMatchers = [];
-        
-        orGroup.forEach(cond => {
+
+        orGroup.forEach((cond) => {
           const [type, ...rest] = cond;
           switch (type) {
             case IF_MERCHANT:
@@ -304,10 +368,14 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
               }
               const [matchType, value] = rest;
               let match_type = 'contains';
-              if (matchType === MERCHANT_MATCH_TYPE_CONTAINS) match_type = 'contains';
-              else if (matchType === MERCHANT_MATCH_TYPE_EXACT) match_type = 'exactly_matches';
-              else if (matchType === MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT) match_type = 'starts_with';
-              else if (matchType === MERCHANT_MATCH_TYPE_MERCHANT_NAME) match_type = 'ends_with';
+              if (matchType === MERCHANT_MATCH_TYPE_CONTAINS)
+                match_type = 'contains';
+              else if (matchType === MERCHANT_MATCH_TYPE_EXACT)
+                match_type = 'exactly_matches';
+              else if (matchType === MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT)
+                match_type = 'starts_with';
+              else if (matchType === MERCHANT_MATCH_TYPE_MERCHANT_NAME)
+                match_type = 'ends_with';
               merchantMatchers.push({ match_type, value });
               break;
             }
@@ -340,7 +408,9 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
               formState.conditions.categories.enabled = true;
               const [categoryId] = rest;
               // Categories are stored as enc_ids now
-              if (!formState.conditions.categories.values.includes(categoryId)) {
+              if (
+                !formState.conditions.categories.values.includes(categoryId)
+              ) {
                 formState.conditions.categories.values.push(categoryId);
               }
               break;
@@ -357,8 +427,10 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
               formState.conditions.description.enabled = true;
               const [matchType, value] = rest;
               let match_type = 'contains';
-              if (matchType === DESCRIPTION_MATCH_TYPE_CONTAINS) match_type = 'contains';
-              else if (matchType === DESCRIPTION_MATCH_TYPE_EXACT) match_type = 'exact';
+              if (matchType === DESCRIPTION_MATCH_TYPE_CONTAINS)
+                match_type = 'contains';
+              else if (matchType === DESCRIPTION_MATCH_TYPE_EXACT)
+                match_type = 'exact';
               formState.conditions.description.match_type = match_type;
               formState.conditions.description.value = value;
               break;
@@ -386,19 +458,19 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
               break;
           }
         });
-        
+
         if (merchantMatchers.length > 0) {
           merchantGroups.push(merchantMatchers);
         }
       });
-      
+
       if (merchantGroups.length > 0) {
         formState.conditions.merchants.matchers = merchantGroups;
       }
     } else {
       // Handle flat structure (backward compatibility)
       let merchantMatchers = [];
-      ruleData.ifs.forEach(cond => {
+      ruleData.ifs.forEach((cond) => {
         const [type, ...rest] = cond;
         switch (type) {
           case IF_MERCHANT:
@@ -409,10 +481,14 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
             }
             const [matchType, value] = rest;
             let match_type = 'contains';
-            if (matchType === MERCHANT_MATCH_TYPE_CONTAINS) match_type = 'contains';
-            else if (matchType === MERCHANT_MATCH_TYPE_EXACT) match_type = 'exactly_matches';
-            else if (matchType === MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT) match_type = 'starts_with';
-            else if (matchType === MERCHANT_MATCH_TYPE_MERCHANT_NAME) match_type = 'ends_with';
+            if (matchType === MERCHANT_MATCH_TYPE_CONTAINS)
+              match_type = 'contains';
+            else if (matchType === MERCHANT_MATCH_TYPE_EXACT)
+              match_type = 'exactly_matches';
+            else if (matchType === MERCHANT_MATCH_TYPE_ORIGINAL_STATEMENT)
+              match_type = 'starts_with';
+            else if (matchType === MERCHANT_MATCH_TYPE_MERCHANT_NAME)
+              match_type = 'ends_with';
             merchantMatchers.push({ match_type, value });
             break;
           }
@@ -427,7 +503,7 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
 
   // --- Decode THENs (actions) ---
   if (Array.isArray(ruleData.thens)) {
-    ruleData.thens.forEach(action => {
+    ruleData.thens.forEach((action) => {
       const [type, value] = action;
       switch (type) {
         case THEN_ACTION_RENAME_MERCHANT:
@@ -442,7 +518,10 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
         case THEN_ACTION_ADD_TAG:
           formState.actions.add_tags.enabled = true;
           // Convert tag IDs back to names for display
-          formState.actions.add_tags.tags = convertTagIdsToNames(value, allTags);
+          formState.actions.add_tags.tags = convertTagIdsToNames(
+            value,
+            allTags
+          );
           break;
         case THEN_ACTION_HIDE_TRANSACTION:
           formState.actions.hide_transaction.enabled = true;
@@ -460,27 +539,49 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
   // --- Decode SPLITS (for rule_type 2) ---
   if (Array.isArray(ruleData.splits) && ruleData.splits.length > 0) {
     formState.actions.split_transaction.enabled = true;
-    
+
     // Determine split type from the data
-    const splitType = ruleData.splits[0]?.split_type || 
-                     (ruleData.splits[0]?.percentage !== undefined && ruleData.splits[0]?.percentage !== null ? 'percentage' : 'amount');
-    
+    const splitType =
+      ruleData.splits[0]?.split_type ||
+      (ruleData.splits[0]?.percentage !== undefined &&
+      ruleData.splits[0]?.percentage !== null
+        ? 'percentage'
+        : 'amount');
+
     formState.actions.split_transaction.splitType = splitType;
-    formState.actions.split_transaction.splits = ruleData.splits.map((split, index) => ({
-      id: index + 1,
-      merchant: split.merchant || '',
-      category: split.category_id || split.category || '',
-      amount: splitType === 'amount' ? (split.amount || '') : '',
-      percentage: splitType === 'percentage' ? (split.percentage || split.amount || '') : '',
-      tags: convertTagIdsToNames(Array.isArray(split.tags) ? split.tags : (split.tags ? [split.tags] : []), allTags),
-      review_status: split.review_status === 1 ? 'needs_review' : (split.review_status === 2 ? 'reviewed' : 'none'),
-      reviewer: split.reviewer || ''
-    }));
-    
+    formState.actions.split_transaction.splits = ruleData.splits.map(
+      (split, index) => ({
+        id: index + 1,
+        merchant: split.merchant || '',
+        category: split.category_id || split.category || '',
+        amount: splitType === 'amount' ? split.amount || '' : '',
+        percentage:
+          splitType === 'percentage'
+            ? split.percentage || split.amount || ''
+            : '',
+        tags: convertTagIdsToNames(
+          Array.isArray(split.tags)
+            ? split.tags
+            : split.tags
+              ? [split.tags]
+              : [],
+          allTags
+        ),
+        review_status:
+          split.review_status === 1
+            ? 'needs_review'
+            : split.review_status === 2
+              ? 'reviewed'
+              : 'none',
+        reviewer: split.reviewer || '',
+      })
+    );
+
     // Check for hide_original - could be in the first split or as a separate field
-    const hideOriginal = ruleData.splits[0]?.hide_original || ruleData.hide_original || false;
+    const hideOriginal =
+      ruleData.splits[0]?.hide_original || ruleData.hide_original || false;
     formState.actions.split_transaction.hideOriginal = hideOriginal;
   }
 
   return formState;
-} 
+}

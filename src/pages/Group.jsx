@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 import { Users } from 'lucide-react';
 
 export default function GroupPage() {
@@ -8,7 +8,9 @@ export default function GroupPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Groups</h1>
-          <p className="text-gray-500 mt-1">Group accounts together for a consolidated view.</p>
+          <p className="text-gray-500 mt-1">
+            Group accounts together for a consolidated view.
+          </p>
         </div>
       </div>
       <Card className="card-shadow border-0 text-center py-24">
@@ -21,7 +23,9 @@ export default function GroupPage() {
               Feature Coming Soon!
             </h3>
             <p className="text-gray-500 max-w-md mx-auto">
-              This section is under construction. Soon you'll be able to create custom account groups, like "Personal" or "Business", for easier analysis.
+              This section is under construction. Soon you'll be able to create
+              custom account groups, like "Personal" or "Business", for easier
+              analysis.
             </p>
           </div>
         </CardContent>

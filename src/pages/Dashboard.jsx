@@ -1,9 +1,8 @@
-
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   TrendingUp,
   DollarSign,
@@ -13,46 +12,73 @@ import {
   ArrowDownRight,
   Plus,
   RefreshCw,
-  Target
-} from "lucide-react";
-import { format } from "date-fns";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import { useBankData } from "@/hooks/useBankData";
-import AccountOverview from "../components/dashboard/AccountOverview";
+  Target,
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { useBankData } from '@/hooks/useBankData';
+import AccountOverview from '../components/dashboard/AccountOverview';
+import { useCallback } from 'react';
 
 export default function Dashboard() {
-  const { bankData, isLoading, error, refetch, dashboardSummary, fetchDashboardSummary } = useBankData();
+  const {
+    bankData,
+    isLoading,
+    error,
+    refetch,
+    dashboardSummary,
+    fetchDashboardSummary,
+  } = useBankData();
   const [isSyncing, setIsSyncing] = React.useState(false);
   const [lastSync, setLastSync] = React.useState(new Date());
 
-  // Extract data safely with the correct structure
-  const accounts = bankData?.data?.accounts ? Object.values(bankData.data.accounts) : [];
+  /**
+   * Handles data synchronization
+   * @description Refreshes bank data and dashboard summary, updates last sync time
+   * @returns {Promise<void>}
+   */
+  const handleSync = useCallback(async () => {
+    setIsSyncing(true);
+    try {
+      await refetch();
+      if (fetchDashboardSummary) {
+        await fetchDashboardSummary();
+      }
+    } finally {
+      setIsSyncing(false);
+      setLastSync(new Date());
+    }
+  }, [refetch, fetchDashboardSummary]);
 
-  // Use dashboard summary data from API
+  const accounts = bankData?.data?.accounts
+    ? Object.values(bankData.data.accounts)
+    : [];
+
   const summary = dashboardSummary || {};
-  
-  // Extract values from API response with fallbacks
+
   const netWorth = summary.net_worth?.amount || 0;
   const netWorthFormatted = summary.net_worth?.formatted_amount || '$0';
   const netWorthChangeText = summary.net_worth?.change_text || '0% this month';
   const netWorthTrend = summary.net_worth?.trend || 'neutral';
-  
+
   const monthlyIncome = summary.monthly_income?.amount || '0.00';
-  const monthlyIncomeFormatted = summary.monthly_income?.formatted_amount || '$0';
+  const monthlyIncomeFormatted =
+    summary.monthly_income?.formatted_amount || '$0';
   const monthlyIncomeStatus = summary.monthly_income?.status || 'On track';
   const monthlyIncomeTrend = summary.monthly_income?.trend || 'neutral';
-  
+
   const monthlySpending = summary.monthly_spending?.amount || '0.00';
-  const monthlySpendingFormatted = summary.monthly_spending?.formatted_amount || '$0';
-  const monthlySpendingChangeText = summary.monthly_spending?.change_text || '0% vs last month';
+  const monthlySpendingFormatted =
+    summary.monthly_spending?.formatted_amount || '$0';
+  const monthlySpendingChangeText =
+    summary.monthly_spending?.change_text || '0% vs last month';
   const monthlySpendingTrend = summary.monthly_spending?.trend || 'neutral';
-  
+
   const totalAccounts = summary.total_accounts?.count || 0;
   const activeAccounts = summary.total_accounts?.active_count || 0;
   const accountsStatusText = summary.total_accounts?.status_text || '0 active';
 
-  // Skeleton component for summary cards
   const SummaryCardSkeleton = () => (
     <Card className="card-shadow-lg border-0 bg-gradient-to-br from-gray-50 to-slate-50">
       <CardHeader className="pb-3">
@@ -71,18 +97,17 @@ export default function Dashboard() {
     </Card>
   );
 
-  // Transform accounts to match expected format for AccountOverview
-  const transformedAccounts = accounts.map(account => ({
+  const transformedAccounts = accounts.map((account) => ({
     id: account.id,
     account_name: account.nick_name || account.name,
-    account_type: 'checking', 
+    account_type: 'checking',
     balance: parseFloat(account.current_balance) || 0,
-    currency: 'USD', 
-    institution_name: account.company_id, 
+    currency: 'USD',
+    institution_name: account.company_id,
     account_number_last_four: account.id.slice(-4),
     available_balance: parseFloat(account.available_balance_amount) || 0,
     lastSync: account.last_updated,
-    is_active: account.status === 1 
+    is_active: account.status === 1,
   }));
 
   return (
@@ -101,25 +126,16 @@ export default function Dashboard() {
           <Button
             variant="outline"
             size="sm"
-            onClick={async () => {
-              setIsSyncing(true);
-              try {
-                await refetch();
-                if (fetchDashboardSummary) {
-                  await fetchDashboardSummary();
-                }
-              } finally {
-                setIsSyncing(false);
-                setLastSync(new Date());
-              }
-            }}
+            onClick={handleSync}
             disabled={isSyncing || isLoading}
             className="gap-2"
           >
-            <RefreshCw className={`w-4 h-4 ${isSyncing || isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${isSyncing || isLoading ? 'animate-spin' : ''}`}
+            />
             {isSyncing || isLoading ? 'Syncing...' : 'Sync'}
           </Button>
-          <Link to={createPageUrl("Accounts")}> 
+          <Link to={createPageUrl('Accounts')}>
             <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2">
               <Plus className="w-4 h-4" />
               Add Account
@@ -131,10 +147,10 @@ export default function Dashboard() {
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
         {isLoading ? (
-          // Show skeleton loaders when loading
-          Array(5).fill(0).map((_, i) => <SummaryCardSkeleton key={i} />)
+          Array(5)
+            .fill(0)
+            .map((_, i) => <SummaryCardSkeleton key={i} />)
         ) : (
-          // Show actual cards when data is loaded
           <>
             <Card className="card-shadow-lg border-0 bg-gradient-to-br from-emerald-50 to-teal-50">
               <CardHeader className="pb-3">
@@ -159,7 +175,9 @@ export default function Dashboard() {
                   ) : (
                     <span className="w-4 h-4 text-gray-400">—</span>
                   )}
-                  <span className={`text-sm font-medium ${netWorthTrend === 'up' ? 'text-emerald-600' : netWorthTrend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
+                  <span
+                    className={`text-sm font-medium ${netWorthTrend === 'up' ? 'text-emerald-600' : netWorthTrend === 'down' ? 'text-red-600' : 'text-gray-600'}`}
+                  >
                     {netWorthChangeText}
                   </span>
                 </div>
@@ -189,7 +207,9 @@ export default function Dashboard() {
                   ) : (
                     <span className="w-4 h-4 text-gray-400">—</span>
                   )}
-                  <span className={`text-sm font-medium ${monthlyIncomeTrend === 'up' ? 'text-blue-600' : monthlyIncomeTrend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
+                  <span
+                    className={`text-sm font-medium ${monthlyIncomeTrend === 'up' ? 'text-blue-600' : monthlyIncomeTrend === 'down' ? 'text-red-600' : 'text-gray-600'}`}
+                  >
                     {monthlyIncomeStatus}
                   </span>
                 </div>
@@ -219,7 +239,9 @@ export default function Dashboard() {
                   ) : (
                     <span className="w-4 h-4 text-gray-400">—</span>
                   )}
-                  <span className={`text-sm font-medium ${monthlySpendingTrend === 'up' ? 'text-red-600' : monthlySpendingTrend === 'down' ? 'text-orange-600' : 'text-gray-600'}`}>
+                  <span
+                    className={`text-sm font-medium ${monthlySpendingTrend === 'up' ? 'text-red-600' : monthlySpendingTrend === 'down' ? 'text-orange-600' : 'text-gray-600'}`}
+                  >
                     {monthlySpendingChangeText}
                   </span>
                 </div>
@@ -238,9 +260,7 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
-                  —
-                </div>
+                <div className="text-2xl font-bold text-gray-900">—</div>
                 <div className="flex items-center gap-1 mt-1">
                   <Target className="w-4 h-4 text-purple-500" />
                   <span className="text-sm font-medium text-purple-600">
@@ -282,7 +302,9 @@ export default function Dashboard() {
       {/* Coming Soon Section */}
       <div className="flex flex-col items-center justify-center py-24">
         <div className="text-3xl font-bold text-gray-400 mb-2">Coming Soon</div>
-        <div className="text-lg text-gray-500">Detailed analytics and charts will be available here soon.</div>
+        <div className="text-lg text-gray-500">
+          Detailed analytics and charts will be available here soon.
+        </div>
       </div>
     </div>
   );
