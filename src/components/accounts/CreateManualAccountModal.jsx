@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,7 @@ export default function CreateManualAccountModal({
   // Use the new hook
   const { createAccount } = useAccounts();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setIsSaving(true);
     try {
@@ -63,60 +63,60 @@ export default function CreateManualAccountModal({
           <DialogTitle>Create Manual Account</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
+          <div className='space-y-4 py-4'>
             <div>
-              <Label htmlFor="account-name">Account Name</Label>
+              <Label htmlFor='account-name'>Account Name</Label>
               <Input
-                id="account-name"
+                id='account-name'
                 value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-                placeholder="e.g., My Wallet, Vacation Savings"
+                onChange={e => setAccountName(e.target.value)}
+                placeholder='e.g., My Wallet, Vacation Savings'
                 required
               />
             </div>
             <div>
-              <Label htmlFor="account-type">Account Type</Label>
+              <Label htmlFor='account-type'>Account Type</Label>
               <Select onValueChange={setAccountType} required>
-                <SelectTrigger id="account-type">
-                  <SelectValue placeholder="Select an account type" />
+                <SelectTrigger id='account-type'>
+                  <SelectValue placeholder='Select an account type' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="checking">Checking</SelectItem>
-                  <SelectItem value="savings">Savings</SelectItem>
-                  <SelectItem value="credit">Credit Card</SelectItem>
-                  <SelectItem value="investment">Investment</SelectItem>
-                  <SelectItem value="loan">Loan</SelectItem>
+                  <SelectItem value='cash'>Cash</SelectItem>
+                  <SelectItem value='checking'>Checking</SelectItem>
+                  <SelectItem value='savings'>Savings</SelectItem>
+                  <SelectItem value='credit'>Credit Card</SelectItem>
+                  <SelectItem value='investment'>Investment</SelectItem>
+                  <SelectItem value='loan'>Loan</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="balance">Current Balance</Label>
+              <Label htmlFor='balance'>Current Balance</Label>
               <Input
-                id="balance"
-                type="number"
-                step="0.01"
+                id='balance'
+                type='number'
+                step='0.01'
                 value={balance}
-                onChange={(e) => setBalance(e.target.value)}
-                placeholder="0.00"
+                onChange={e => setBalance(e.target.value)}
+                placeholder='0.00'
                 required
               />
             </div>
             <div>
-              <Label htmlFor="institution-name">Institution (Optional)</Label>
+              <Label htmlFor='institution-name'>Institution (Optional)</Label>
               <Input
-                id="institution-name"
+                id='institution-name'
                 value={institutionName}
-                onChange={(e) => setInstitutionName(e.target.value)}
-                placeholder="e.g., Bank of Sock Drawer"
+                onChange={e => setInstitutionName(e.target.value)}
+                placeholder='e.g., Bank of Sock Drawer'
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type='button' variant='outline' onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSaving}>
+            <Button type='submit' disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Create Account'}
             </Button>
           </DialogFooter>
@@ -125,11 +125,3 @@ export default function CreateManualAccountModal({
     </Dialog>
   );
 }
-
-
-
-
-
-
-
-

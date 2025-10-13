@@ -11,7 +11,7 @@ export const useTransactionTotals = (filters = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchTotals = async (filterPayload) => {
+  const fetchTotals = async filterPayload => {
     setLoading(true);
     setError(null);
 

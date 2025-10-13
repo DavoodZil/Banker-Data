@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
+// Force reload to clear cache
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Popover,
   PopoverContent,
@@ -18,12 +18,12 @@ import {
   CommandList,
 } from '@/components/ui/command';
 
-const TagSelector = React.memo(
+const TagSelector = memo(
   ({ allTags, selectedTags, onTagsChange, onCreateNew }) => {
     const [open, setOpen] = useState(false);
 
     const selectedTagObjects = useMemo(() => {
-      return allTags.filter((tag) => selectedTags.includes(tag.name));
+      return allTags.filter(tag => selectedTags.includes(tag.name));
     }, [allTags, selectedTags]);
 
     /**
@@ -31,9 +31,9 @@ const TagSelector = React.memo(
      * @param {string} tagName - The name of the tag to toggle
      * @returns {void}
      */
-    const handleTagToggle = (tagName) => {
+    const handleTagToggle = tagName => {
       const newSelectedTags = selectedTags.includes(tagName)
-        ? selectedTags.filter((t) => t !== tagName)
+        ? selectedTags.filter(t => t !== tagName)
         : [...selectedTags, tagName];
       onTagsChange(newSelectedTags);
     };
@@ -43,33 +43,33 @@ const TagSelector = React.memo(
      * @param {string} tagName - The name of the tag to remove
      * @returns {void}
      */
-    const handleRemoveTag = (tagName) => {
-      const newSelectedTags = selectedTags.filter((t) => t !== tagName);
+    const handleRemoveTag = tagName => {
+      const newSelectedTags = selectedTags.filter(t => t !== tagName);
       onTagsChange(newSelectedTags);
     };
 
     return (
-      <div className="space-y-3">
+      <div className='space-y-3'>
         {/* Selected Tags Display */}
         {selectedTagObjects.length > 0 && (
-          <div className="flex flex-wrap gap-2 p-3 bg-common-gray-light rounded-lg border border-common-gray-light">
-            {selectedTagObjects.map((tag) => (
+          <div className='flex flex-wrap gap-2 p-3 bg-common-gray-light rounded-lg border border-common-gray-light'>
+            {selectedTagObjects.map(tag => (
               <div
                 key={tag.name}
-                className="flex items-center gap-2 px-3 py-1.5 bg-common-gray-light text-common-gray-dark text-sm font-medium shadow-sm"
+                className='flex items-center gap-2 px-3 py-1.5 bg-common-gray-light text-common-gray-dark text-sm font-medium shadow-sm'
                 style={{ borderRadius: '20px' }}
               >
                 <div
-                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  className='w-3 h-3 rounded-full flex-shrink-0'
                   style={{ backgroundColor: tag.color }}
                 />
                 <span>{tag.name}</span>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => handleRemoveTag(tag.name)}
-                  className="hover:bg-common-gray-light rounded-full p-0.5 transition-colors ml-1"
+                  className='hover:bg-common-gray-light rounded-full p-0.5 transition-colors ml-1'
                 >
-                  <X className="w-3 h-3 text-common-gray-dark" />
+                  <X className='w-3 h-3 text-common-gray-dark' />
                 </button>
               </div>
             ))}
@@ -80,53 +80,53 @@ const TagSelector = React.memo(
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant="outline"
-              role="combobox"
+              variant='outline'
+              role='combobox'
               aria-expanded={open}
-              className="w-full justify-between h-10 bg-white hover:bg-common-gray-light border-common-gray-light shadow-sm"
+              className='w-full justify-between h-10 bg-white hover:bg-common-gray-light border-common-gray-light shadow-sm'
             >
-              <div className="flex items-center gap-2">
-                <Plus className="w-4 h-4 text-common-gray-dark" />
-                <span className="text-common-gray-dark">
+              <div className='flex items-center gap-2'>
+                <Plus className='w-4 h-4 text-common-gray-dark' />
+                <span className='text-common-gray-dark'>
                   {selectedTagObjects.length === 0
                     ? 'Add tags...'
                     : `Add more tags (${selectedTagObjects.length} selected)`}
                 </span>
               </div>
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[--radix-popover-trigger-width] p-0 shadow-lg border-common-gray-light">
+          <PopoverContent className='w-[--radix-popover-trigger-width] p-0 shadow-lg border-common-gray-light'>
             <Command>
               <CommandInput
-                placeholder="Search tags..."
-                className="border-none focus:ring-0 text-sm"
+                placeholder='Search tags...'
+                className='border-none focus:ring-0 text-sm'
               />
-              <CommandList className="max-h-48">
-                <CommandEmpty className="py-6 text-center text-sm text-common-gray-dark">
+              <CommandList className='max-h-48'>
+                <CommandEmpty className='py-6 text-center text-sm text-common-gray-dark'>
                   No tags found.
                 </CommandEmpty>
                 <CommandGroup>
-                  {allTags.map((tag) => {
+                  {allTags.map(tag => {
                     const isSelected = selectedTags.includes(tag.name);
                     return (
                       <CommandItem
                         key={tag.name}
                         onSelect={() => handleTagToggle(tag.name)}
-                        className="flex items-center space-x-3 py-2 px-3 cursor-pointer hover:bg-common-gray-light transition-colors"
+                        className='flex items-center space-x-3 py-2 px-3 cursor-pointer hover:bg-common-gray-light transition-colors'
                       >
                         <Checkbox
                           id={`tag-${tag.name}`}
                           checked={isSelected}
                           onCheckedChange={() => handleTagToggle(tag.name)}
-                          className="h-4 w-4 rounded border border-common-gray-light data-[state=checked]:bg-common-gray-light data-[state=checked]:border-common-gray-light data-[state=checked]:text-white transition-colors focus-visible:ring-1 focus-visible:ring-gray-400"
+                          className='h-4 w-4 rounded border border-common-gray-light data-[state=checked]:bg-common-gray-light data-[state=checked]:border-common-gray-light data-[state=checked]:text-white transition-colors focus-visible:ring-1 focus-visible:ring-gray-400'
                         />
-                        <div className="flex items-center gap-2 flex-1">
+                        <div className='flex items-center gap-2 flex-1'>
                           <div
-                            className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
+                            className='w-3 h-3 rounded-full flex-shrink-0 shadow-sm'
                             style={{ backgroundColor: tag.color }}
                           />
-                          <span className="text-sm font-medium text-common-gray-dark">
+                          <span className='text-sm font-medium text-common-gray-dark'>
                             {tag.name}
                           </span>
                         </div>
@@ -136,17 +136,17 @@ const TagSelector = React.memo(
                 </CommandGroup>
               </CommandList>
             </Command>
-            <Separator className="bg-common-gray-light" />
-            <div className="p-2">
+            <Separator className='bg-common-gray-light' />
+            <div className='p-2'>
               <Button
-                variant="ghost"
-                className="w-full justify-start gap-2 h-9 text-common-gray-dark hover:bg-common-gray-light hover:text-common-gray-dark transition-colors"
+                variant='ghost'
+                className='w-full justify-start gap-2 h-9 text-common-gray-dark hover:bg-common-gray-light hover:text-common-gray-dark transition-colors'
                 onClick={() => {
                   onCreateNew();
                   setOpen(false);
                 }}
               >
-                <Plus className="w-4 h-4" />
+                <Plus className='w-4 h-4' />
                 Create new tag
               </Button>
             </div>
@@ -160,11 +160,3 @@ const TagSelector = React.memo(
 TagSelector.displayName = 'TagSelector';
 
 export default TagSelector;
-
-
-
-
-
-
-
-

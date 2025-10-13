@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,7 +38,7 @@ export default function CreateEntityModal({ isOpen, onClose, onSave, entity }) {
     }
   }, [entity, isOpen]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     if (!formData.name || !formData.type) return;
     onSave(formData);
@@ -46,66 +46,62 @@ export default function CreateEntityModal({ isOpen, onClose, onSave, entity }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Briefcase className="w-5 h-5" />
+          <DialogTitle className='flex items-center gap-2'>
+            <Briefcase className='w-5 h-5' />
             {entity ? 'Edit Financial Entity' : 'Create Financial Entity'}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-          <div className="space-y-2">
-            <Label htmlFor="entity-name">Entity Name</Label>
+        <form onSubmit={handleSubmit} className='space-y-6 pt-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='entity-name'>Entity Name</Label>
             <Input
-              id="entity-name"
+              id='entity-name'
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              placeholder="e.g., My Rental Property, Side Business LLC"
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              placeholder='e.g., My Rental Property, Side Business LLC'
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="entity-type">Entity Type</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='entity-type'>Entity Type</Label>
             <Select
               value={formData.type}
-              onValueChange={(value) =>
-                setFormData({ ...formData, type: value })
-              }
+              onValueChange={value => setFormData({ ...formData, type: value })}
               required
             >
-              <SelectTrigger id="entity-type">
-                <SelectValue placeholder="Select a type" />
+              <SelectTrigger id='entity-type'>
+                <SelectValue placeholder='Select a type' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Business">Business</SelectItem>
-                <SelectItem value="Rental">Rental Property</SelectItem>
-                <SelectItem value="Personal Project">
+                <SelectItem value='Business'>Business</SelectItem>
+                <SelectItem value='Rental'>Rental Property</SelectItem>
+                <SelectItem value='Personal Project'>
                   Personal Project
                 </SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value='Other'>Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="entity-description">Description (Optional)</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='entity-description'>Description (Optional)</Label>
             <Textarea
-              id="entity-description"
+              id='entity-description'
               value={formData.description}
-              onChange={(e) =>
+              onChange={e =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              placeholder="Add a short description for this entity."
+              placeholder='Add a short description for this entity.'
             />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type='button' variant='outline' onClick={onClose}>
               Cancel
             </Button>
             <Button
-              type="submit"
-              className="bg-common-green hover:bg-common-green-dark"
+              type='submit'
+              className='bg-common-green hover:bg-common-green-dark'
             >
               {entity ? 'Save Changes' : 'Create Entity'}
             </Button>
@@ -115,11 +111,3 @@ export default function CreateEntityModal({ isOpen, onClose, onSave, entity }) {
     </Dialog>
   );
 }
-
-
-
-
-
-
-
-

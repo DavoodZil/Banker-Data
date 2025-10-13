@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,15 +70,15 @@ import {
  * @returns {JSX.Element} The rendered criteria block
  */
 const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
-  <div className="bg-white rounded-lg border border-common-gray-light">
-    <div className="flex items-center justify-between p-4">
-      <h3 className="font-semibold text-common-gray-dark">{title}</h3>
+  <div className='bg-white rounded-lg border border-common-gray-light'>
+    <div className='flex items-center justify-between p-4'>
+      <h3 className='font-semibold text-common-gray-dark'>{title}</h3>
       <Switch checked={isEnabled} onCheckedChange={onToggle} />
     </div>
     {isEnabled && (
       <>
         <Separator />
-        <div className="p-4 space-y-4">{children}</div>
+        <div className='p-4 space-y-4'>{children}</div>
       </>
     )}
   </div>
@@ -94,15 +94,15 @@ const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
  * @returns {JSX.Element} The rendered action row
  */
 const ActionRow = ({ label, icon: Icon, isEnabled, onToggle, children }) => (
-  <div className="space-y-3">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Icon className="w-5 h-5 text-common-gray-dark" />
-        <Label className="font-medium text-common-gray-dark">{label}</Label>
+  <div className='space-y-3'>
+    <div className='flex items-center justify-between'>
+      <div className='flex items-center gap-3'>
+        <Icon className='w-5 h-5 text-common-gray-dark' />
+        <Label className='font-medium text-common-gray-dark'>{label}</Label>
       </div>
       <Switch checked={isEnabled} onCheckedChange={onToggle} />
     </div>
-    {isEnabled && <div className="pl-8">{children}</div>}
+    {isEnabled && <div className='pl-8'>{children}</div>}
   </div>
 );
 
@@ -134,8 +134,8 @@ export default function RulesPage() {
       },
       categories: { enabled: false, values: [] },
       accounts: { enabled: false, values: [] },
-      description: { enabled: false, match_type: 'contains', value: '' }, // <-- Add description condition
-      date: { enabled: false, match_type: 'after', value1: '', value2: '' }, // <-- Add date condition
+      description: { enabled: false, match_type: 'contains', value: '' },
+      date: { enabled: false, match_type: 'after', value1: '', value2: '' },
     },
     actions: {
       rename_merchant: { enabled: false, new_name: '' },
@@ -164,13 +164,13 @@ export default function RulesPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedActionCategory, setSelectedActionCategory] = useState('');
 
-  const getCategoryNameById = (categoryId) => {
+  const getCategoryNameById = categoryId => {
     if (!categoryId) return '';
     for (const parent of categoryHierarchy) {
-      const child = parent.children?.find((c) => c.enc_id === categoryId);
+      const child = parent.children?.find(c => c.enc_id === categoryId);
       if (child) return formatCategoryName(child.name);
     }
-    return categoryId; // Fallback to ID if not found
+    return categoryId;
   };
   const [customCategories, setCustomCategories] = useState([]);
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
@@ -180,7 +180,7 @@ export default function RulesPage() {
   const { goals: allGoals } = useGoals();
   const { categoryHierarchy, createCategory } = useCategories();
 
-  const formatCategoryName = (name) => {
+  const formatCategoryName = name => {
     return name
       ? name
           .replace(/_/g, ' ')
@@ -196,7 +196,7 @@ export default function RulesPage() {
         const decoded = decodeRuleData(
           ruleData,
           allTags,
-          categoryHierarchy.flatMap((p) => p.children || [])
+          categoryHierarchy.flatMap(p => p.children || [])
         );
         setRule({
           name: existingRule.name || 'Rule',
@@ -223,7 +223,7 @@ export default function RulesPage() {
   }, [isEditing, existingRule, ruleLoading, allTags, categoryHierarchy]);
 
   const handleToggle = (type, key) => {
-    setRule((prev) => {
+    setRule(prev => {
       if (
         type === 'actions' &&
         key === 'split_transaction' &&
@@ -297,7 +297,7 @@ export default function RulesPage() {
     let rule_data;
     if (isSplitRule) {
       // For split rules (rule_type 2)
-      const allCategories = categoryHierarchy.flatMap((p) => p.children || []);
+      const allCategories = categoryHierarchy.flatMap(p => p.children || []);
       const splits = payloadSplitMapper(
         rule.actions.split_transaction,
         allTags,
@@ -309,7 +309,7 @@ export default function RulesPage() {
       };
     } else {
       // For regular rules (rule_type 1)
-      const allCategories = categoryHierarchy.flatMap((p) => p.children || []);
+      const allCategories = categoryHierarchy.flatMap(p => p.children || []);
       rule_data = {
         ifs: payloadMapper(rule.conditions, allCategories),
         thens: payloadActionMapper(rule.actions, allTags, allCategories),
@@ -347,7 +347,7 @@ export default function RulesPage() {
   };
 
   const handleMatcherChange = (groupIndex, matcherIndex, field, value) => {
-    setRule((prev) => {
+    setRule(prev => {
       const newMatchers = JSON.parse(
         JSON.stringify(prev.conditions.merchants.matchers)
       );
@@ -363,7 +363,7 @@ export default function RulesPage() {
   };
 
   const handleMerchantChange = (field, value) => {
-    setRule((prev) => {
+    setRule(prev => {
       const newMerchantState = { ...prev.conditions.merchants, [field]: value };
       return {
         ...prev,
@@ -373,7 +373,7 @@ export default function RulesPage() {
   };
 
   const handleAmountChange = (field, value) => {
-    setRule((prev) => {
+    setRule(prev => {
       const newAmountState = { ...prev.conditions.amount, [field]: value };
       if (field === 'operator' && value !== 'between') {
         newAmountState.value2 = null;
@@ -389,7 +389,7 @@ export default function RulesPage() {
   };
 
   const addOrGroup = () => {
-    setRule((prev) => ({
+    setRule(prev => ({
       ...prev,
       conditions: {
         ...prev.conditions,
@@ -404,8 +404,8 @@ export default function RulesPage() {
     }));
   };
 
-  const addAndMatcher = (groupIndex) => {
-    setRule((prev) => {
+  const addAndMatcher = groupIndex => {
+    setRule(prev => {
       const newMatchers = JSON.parse(
         JSON.stringify(prev.conditions.merchants.matchers)
       );
@@ -421,13 +421,13 @@ export default function RulesPage() {
   };
 
   const removeMatcher = (groupIndex, matcherIndex) => {
-    setRule((prev) => {
+    setRule(prev => {
       let newMatchers = JSON.parse(
         JSON.stringify(prev.conditions.merchants.matchers)
       );
       newMatchers[groupIndex].splice(matcherIndex, 1);
 
-      newMatchers = newMatchers.filter((group) => group.length > 0);
+      newMatchers = newMatchers.filter(group => group.length > 0);
 
       if (newMatchers.length === 0) {
         newMatchers.push([{ match_type: 'exactly_matches', value: '' }]);
@@ -442,7 +442,7 @@ export default function RulesPage() {
     });
   };
 
-  const handleCreateCategory = async (categoryData) => {
+  const handleCreateCategory = async categoryData => {
     try {
       const newCategory = await createCategory({
         name: categoryData.name,
@@ -455,7 +455,7 @@ export default function RulesPage() {
       setSelectedCategory(newCategoryId);
       setSelectedActionCategory(newCategoryId);
 
-      setRule((prevRule) => {
+      setRule(prevRule => {
         const newRule = { ...prevRule };
         if (newRule.conditions.categories.enabled) {
           newRule.conditions.categories = {
@@ -479,11 +479,11 @@ export default function RulesPage() {
     }
   };
 
-  const handleCreateTag = async (tagData) => {
+  const handleCreateTag = async tagData => {
     try {
       const newTag = await createTag(tagData);
 
-      setRule((prev) => ({
+      setRule(prev => ({
         ...prev,
         actions: {
           ...prev.actions,
@@ -501,7 +501,7 @@ export default function RulesPage() {
   };
 
   const handleReviewStatusChange = (field, value) => {
-    setRule((prev) => {
+    setRule(prev => {
       const newMarkForReview = {
         ...prev.actions.mark_for_review,
         [field]: value,
@@ -521,8 +521,8 @@ export default function RulesPage() {
     });
   };
 
-  const handleSplitSave = (splitData) => {
-    setRule((prev) => ({
+  const handleSplitSave = splitData => {
+    setRule(prev => ({
       ...prev,
       actions: {
         ...prev.actions,
@@ -539,7 +539,7 @@ export default function RulesPage() {
 
   // Add handler for Description condition
   const handleDescriptionChange = (field, value) => {
-    setRule((prev) => ({
+    setRule(prev => ({
       ...prev,
       conditions: {
         ...prev.conditions,
@@ -553,7 +553,7 @@ export default function RulesPage() {
 
   // Add handler for Date condition
   const handleDateChange = (field, value) => {
-    setRule((prev) => ({
+    setRule(prev => ({
       ...prev,
       conditions: {
         ...prev.conditions,
@@ -570,8 +570,8 @@ export default function RulesPage() {
     const groupName = formatCategoryName(parent.name);
 
     // Get all user categories from all children of this parent
-    const userCategories = (parent.children || []).flatMap((child) =>
-      (child.user_categories || child.user_category || []).map((userCat) => ({
+    const userCategories = (parent.children || []).flatMap(child =>
+      (child.user_categories || child.user_category || []).map(userCat => ({
         name: userCat.name,
         enc_id: userCat.id,
         original_name: userCat.name,
@@ -581,7 +581,7 @@ export default function RulesPage() {
     );
 
     // Also include system categories (selectable)
-    const systemCategories = (parent.children || []).map((child) => ({
+    const systemCategories = (parent.children || []).map(child => ({
       name: formatCategoryName(child.name),
       enc_id: child.enc_id,
       original_name: child.name,
@@ -608,11 +608,11 @@ export default function RulesPage() {
   // Show loading state when editing and rule is loading
   if (isEditing && ruleLoading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-common-green mx-auto mb-4"></div>
-            <p className="text-common-gray-dark">Loading rule...</p>
+      <div className='p-6 max-w-7xl mx-auto'>
+        <div className='flex items-center justify-center h-64'>
+          <div className='text-center'>
+            <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-common-green mx-auto mb-4'></div>
+            <p className='text-common-gray-dark'>Loading rule...</p>
           </div>
         </div>
       </div>
@@ -628,7 +628,7 @@ export default function RulesPage() {
 
       const lowerCaseSearch = categorySearch.toLowerCase();
       const categoryMatches = category.toLowerCase().includes(lowerCaseSearch);
-      const matchingSubcategories = subcategories.filter((sub) =>
+      const matchingSubcategories = subcategories.filter(sub =>
         sub.name.toLowerCase().includes(lowerCaseSearch)
       );
 
@@ -648,7 +648,7 @@ export default function RulesPage() {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50">
+    <div className='p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50'>
       <style>{`
           .switch-orange[data-state='checked'] { background-color: #f97316; }
           .category-header { font-weight: 600; color: #374151; padding: 8px 12px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; }
@@ -660,71 +660,71 @@ export default function RulesPage() {
           .data-[state=checked] { background-color: var(--color-primary) !important; border-color: var(--color-primary) !important; color: white; }
         `}</style>
       <div>
-        <h1 className="text-2xl font-bold text-common-gray-dark">
+        <h1 className='text-2xl font-bold text-common-gray-dark'>
           {isEditing ? 'Edit Rule' : 'Create Rule'}
         </h1>
       </div>
 
-      <div className="bg-white p-6 rounded-lg border border-common-gray-light space-y-4">
+      <div className='bg-white p-6 rounded-lg border border-common-gray-light space-y-4'>
         <Input
-          className="text-lg font-semibold border-common-gray-light"
-          placeholder="Enter Rule Name"
+          className='text-lg font-semibold border-common-gray-light'
+          placeholder='Enter Rule Name'
           value={rule.name}
-          onChange={(e) => setRule({ ...rule, name: e.target.value })}
+          onChange={e => setRule({ ...rule, name: e.target.value })}
         />
         <Textarea
-          placeholder="Description (optional)"
+          placeholder='Description (optional)'
           value={rule.description}
-          onChange={(e) => setRule({ ...rule, description: e.target.value })}
+          onChange={e => setRule({ ...rule, description: e.target.value })}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h2 className="font-semibold text-lg text-common-gray-dark">
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+        <div className='space-y-4'>
+          <h2 className='font-semibold text-lg text-common-gray-dark'>
             If a transaction matches...
           </h2>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <CriteriaBlock
-              title="Merchants"
+              title='Merchants'
               isEnabled={rule.conditions.merchants.enabled}
               onToggle={() => handleToggle('conditions', 'merchants')}
             >
               <Select
                 value={rule.conditions.merchants.type}
-                onValueChange={(value) => handleMerchantChange('type', value)}
+                onValueChange={value => handleMerchantChange('type', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="merchant_name">Merchant Name</SelectItem>
-                  <SelectItem value="original_description">
+                  <SelectItem value='merchant_name'>Merchant Name</SelectItem>
+                  <SelectItem value='original_description'>
                     Original Description
                   </SelectItem>
                 </SelectContent>
               </Select>
 
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 {rule.conditions.merchants.matchers.map((group, groupIndex) => (
-                  <React.Fragment key={groupIndex}>
+                  <Fragment key={groupIndex}>
                     {groupIndex > 0 && (
-                      <p className="text-sm font-semibold text-common-gray-dark text-center py-2">
+                      <p className='text-sm font-semibold text-common-gray-dark text-center py-2'>
                         OR
                       </p>
                     )}
-                    <div className="p-4 border rounded-md bg-common-gray-light space-y-3">
+                    <div className='p-4 border rounded-md bg-common-gray-light space-y-3'>
                       {group.map((matcher, matcherIndex) => (
-                        <div key={matcherIndex} className="space-y-2">
+                        <div key={matcherIndex} className='space-y-2'>
                           {matcherIndex > 0 && (
-                            <p className="text-xs font-semibold text-common-gray-dark pl-1">
+                            <p className='text-xs font-semibold text-common-gray-dark pl-1'>
                               AND
                             </p>
                           )}
-                          <div className="flex items-center gap-2">
+                          <div className='flex items-center gap-2'>
                             <Select
                               value={matcher.match_type}
-                              onValueChange={(value) =>
+                              onValueChange={value =>
                                 handleMatcherChange(
                                   groupIndex,
                                   matcherIndex,
@@ -733,29 +733,29 @@ export default function RulesPage() {
                                 )
                               }
                             >
-                              <SelectTrigger className="w-[180px] flex-shrink-0">
+                              <SelectTrigger className='w-[180px] flex-shrink-0'>
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="exactly_matches">
+                                <SelectItem value='exactly_matches'>
                                   Exactly matches
                                 </SelectItem>
-                                <SelectItem value="contains">
+                                <SelectItem value='contains'>
                                   Contains
                                 </SelectItem>
-                                <SelectItem value="starts_with">
+                                <SelectItem value='starts_with'>
                                   Starts with
                                 </SelectItem>
-                                <SelectItem value="ends_with">
+                                <SelectItem value='ends_with'>
                                   Ends with
                                 </SelectItem>
                               </SelectContent>
                             </Select>
-                            <div className="flex-grow relative">
+                            <div className='flex-grow relative'>
                               <Input
-                                placeholder="Name"
+                                placeholder='Name'
                                 value={matcher.value}
-                                onChange={(e) =>
+                                onChange={e =>
                                   handleMatcherChange(
                                     groupIndex,
                                     matcherIndex,
@@ -778,53 +778,53 @@ export default function RulesPage() {
                                 onClick={() =>
                                   removeMatcher(groupIndex, matcherIndex)
                                 }
-                                title="Remove condition"
+                                title='Remove condition'
                               >
-                                <MinusCircle className="w-5 h-5 text-common-gray-dark hover:text-common-red" />
+                                <MinusCircle className='w-5 h-5 text-common-gray-dark hover:text-common-red' />
                               </button>
                             ) : (
-                              <div className="w-5 h-5" />
+                              <div className='w-5 h-5' />
                             )}
                           </div>
                         </div>
                       ))}
 
-                      <div className="flex items-center justify-start gap-4 pt-2 border-t border-common-gray-light">
+                      <div className='flex items-center justify-start gap-4 pt-2 border-t border-common-gray-light'>
                         <button
                           onClick={() => addAndMatcher(groupIndex)}
-                          className="flex items-center gap-1.5 bg-common-green-secondary text-common-green-dark font-medium hover:bg-common-green-secondary px-3 py-1 rounded-md transition-colors text-sm"
-                          title="Add AND condition"
+                          className='flex items-center gap-1.5 bg-common-green-secondary text-common-green-dark font-medium hover:bg-common-green-secondary px-3 py-1 rounded-md transition-colors text-sm'
+                          title='Add AND condition'
                         >
-                          <Plus className="w-4 h-4" />
+                          <Plus className='w-4 h-4' />
                           <span>AND</span>
                         </button>
                         {groupIndex ===
                           rule.conditions.merchants.matchers.length - 1 && (
                           <button
                             onClick={addOrGroup}
-                            className="flex items-center gap-1.5 bg-common-blue-secondary text-common-blue-dark font-medium hover:bg-common-blue-secondary px-3 py-1 rounded-md transition-colors text-sm"
-                            title="Add OR condition"
+                            className='flex items-center gap-1.5 bg-common-blue-secondary text-common-blue-dark font-medium hover:bg-common-blue-secondary px-3 py-1 rounded-md transition-colors text-sm'
+                            title='Add OR condition'
                           >
-                            <PlusCircle className="w-4 h-4" />
+                            <PlusCircle className='w-4 h-4' />
                             <span>OR</span>
                           </button>
                         )}
                       </div>
                     </div>
-                  </React.Fragment>
+                  </Fragment>
                 ))}
               </div>
             </CriteriaBlock>
 
             <CriteriaBlock
-              title="Amount"
+              title='Amount'
               isEnabled={rule.conditions.amount.enabled}
               onToggle={() => handleToggle('conditions', 'amount')}
             >
-              <div className="grid grid-cols-2 gap-4">
+              <div className='grid grid-cols-2 gap-4'>
                 <Select
                   value={rule.conditions.amount.transaction_type}
-                  onValueChange={(value) =>
+                  onValueChange={value =>
                     handleAmountChange('transaction_type', value)
                   }
                 >
@@ -832,88 +832,84 @@ export default function RulesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="expense">Expense</SelectItem>
-                    <SelectItem value="income">Income</SelectItem>
+                    <SelectItem value='expense'>Expense</SelectItem>
+                    <SelectItem value='income'>Income</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select
                   value={rule.conditions.amount.operator}
-                  onValueChange={(value) =>
-                    handleAmountChange('operator', value)
-                  }
+                  onValueChange={value => handleAmountChange('operator', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="greater_than">Greater than</SelectItem>
-                    <SelectItem value="less_than">Less than</SelectItem>
-                    <SelectItem value="equal_to">Equal to</SelectItem>
-                    <SelectItem value="between">Between</SelectItem>
+                    <SelectItem value='greater_than'>Greater than</SelectItem>
+                    <SelectItem value='less_than'>Less than</SelectItem>
+                    <SelectItem value='equal_to'>Equal to</SelectItem>
+                    <SelectItem value='between'>Between</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {rule.conditions.amount.operator === 'between' ? (
-                <div className="flex items-center gap-3">
-                  <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark">
+                <div className='flex items-center gap-3'>
+                  <div className='relative flex-1'>
+                    <span className='absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark'>
                       $
                     </span>
                     <Input
-                      type="number"
-                      placeholder="Min"
+                      type='number'
+                      placeholder='Min'
                       value={rule.conditions.amount.value1 || ''}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleAmountChange('value1', e.target.value)
                       }
-                      className="pl-6"
+                      className='pl-6'
                     />
                   </div>
-                  <ArrowRight className="w-5 h-5 text-common-gray-dark flex-shrink-0" />
-                  <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark">
+                  <ArrowRight className='w-5 h-5 text-common-gray-dark flex-shrink-0' />
+                  <div className='relative flex-1'>
+                    <span className='absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark'>
                       $
                     </span>
                     <Input
-                      type="number"
-                      placeholder="Max"
+                      type='number'
+                      placeholder='Max'
                       value={rule.conditions.amount.value2 || ''}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleAmountChange('value2', e.target.value)
                       }
-                      className="pl-6"
+                      className='pl-6'
                     />
                   </div>
                 </div>
               ) : (
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark">
+                <div className='relative'>
+                  <span className='absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark'>
                     $
                   </span>
                   <Input
-                    type="number"
-                    placeholder="123"
+                    type='number'
+                    placeholder='123'
                     value={rule.conditions.amount.value1 || ''}
-                    onChange={(e) =>
-                      handleAmountChange('value1', e.target.value)
-                    }
-                    className="pl-6"
+                    onChange={e => handleAmountChange('value1', e.target.value)}
+                    className='pl-6'
                   />
                 </div>
               )}
             </CriteriaBlock>
 
             <CriteriaBlock
-              title="Categories"
+              title='Categories'
               isEnabled={rule.conditions.categories.enabled}
               onToggle={() => handleToggle('conditions', 'categories')}
             >
               <Select
                 value={selectedCategory}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   setSelectedCategory(value);
-                  setRule((prev) => ({
+                  setRule(prev => ({
                     ...prev,
                     conditions: {
                       ...prev.conditions,
@@ -926,52 +922,52 @@ export default function RulesPage() {
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Category equals..." />
+                  <SelectValue placeholder='Category equals...' />
                 </SelectTrigger>
-                <SelectContent className="max-h-80">
-                  <div className="category-search">
-                    <div className="relative">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
+                <SelectContent className='max-h-80'>
+                  <div className='category-search'>
+                    <div className='relative'>
+                      <Search className='w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark' />
                       <Input
-                        placeholder="Search categories..."
+                        placeholder='Search categories...'
                         value={categorySearch}
-                        onChange={(e) => setCategorySearch(e.target.value)}
-                        className="pl-9 h-8"
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onFocus={(e) => e.stopPropagation()}
+                        onChange={e => setCategorySearch(e.target.value)}
+                        className='pl-9 h-8'
+                        onMouseDown={e => e.stopPropagation()}
+                        onFocus={e => e.stopPropagation()}
                       />
                     </div>
                   </div>
 
-                  <div className="max-h-48 overflow-y-auto">
+                  <div className='max-h-48 overflow-y-auto'>
                     {Object.entries(filteredCategories).map(
                       ([
                         category,
                         { icon: CategoryIcon, emoji, subcategories },
                       ]) => (
                         <SelectGroup key={category}>
-                          <SelectLabel className="category-header flex items-center gap-2">
+                          <SelectLabel className='category-header flex items-center gap-2'>
                             {emoji ? (
-                              <span className="text-xl leading-none">
+                              <span className='text-xl leading-none'>
                                 {emoji}
                               </span>
                             ) : (
                               CategoryIcon && (
-                                <CategoryIcon className="w-4 h-4" />
+                                <CategoryIcon className='w-4 h-4' />
                               )
                             )}
                             {category}
                           </SelectLabel>
-                          {subcategories.map((subcategory) => (
+                          {subcategories.map(subcategory => (
                             <SelectItem
                               key={subcategory.enc_id}
                               value={subcategory.enc_id}
-                              className="subcategory-item"
+                              className='subcategory-item'
                             >
-                              <div className="flex items-center justify-between w-full">
+                              <div className='flex items-center justify-between w-full'>
                                 <span>{subcategory.name}</span>
                                 {subcategory.isUserCategory && (
-                                  <span className="text-xs text-common-gray-dark ml-2">
+                                  <span className='text-xs text-common-gray-dark ml-2'>
                                     (custom)
                                   </span>
                                 )}
@@ -983,20 +979,20 @@ export default function RulesPage() {
                     )}
 
                     {Object.keys(filteredCategories).length === 0 && (
-                      <div className="text-center py-4 text-common-gray-dark text-sm">
+                      <div className='text-center py-4 text-common-gray-dark text-sm'>
                         No categories found
                       </div>
                     )}
                   </div>
 
-                  <div className="add-category-button">
+                  <div className='add-category-button'>
                     <Button
-                      variant="outline"
-                      className="w-full h-8 text-sm gap-2"
+                      variant='outline'
+                      className='w-full h-8 text-sm gap-2'
                       onClick={() => setShowCreateCategoryModal(true)}
-                      onMouseDown={(e) => e.stopPropagation()}
+                      onMouseDown={e => e.stopPropagation()}
                     >
-                      <Plus className="w-3 h-3" />
+                      <Plus className='w-3 h-3' />
                       Add New Category
                     </Button>
                   </div>
@@ -1005,16 +1001,16 @@ export default function RulesPage() {
             </CriteriaBlock>
 
             <CriteriaBlock
-              title="Accounts"
+              title='Accounts'
               isEnabled={rule.conditions.accounts.enabled}
               onToggle={() => handleToggle('conditions', 'accounts')}
             >
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Account equals..." />
+                  <SelectValue placeholder='Account equals...' />
                 </SelectTrigger>
                 <SelectContent>
-                  {accounts.map((a) => (
+                  {accounts.map(a => (
                     <SelectItem key={a} value={a}>
                       {a}
                     </SelectItem>
@@ -1044,53 +1040,47 @@ export default function RulesPage() {
             </CriteriaBlock> */}
 
             <CriteriaBlock
-              title="Date"
+              title='Date'
               isEnabled={rule.conditions.date.enabled}
               onToggle={() => handleToggle('conditions', 'date')}
             >
-              <div className="flex gap-3 items-center">
+              <div className='flex gap-3 items-center'>
                 <Select
                   value={rule.conditions.date.match_type}
-                  onValueChange={(value) =>
-                    handleDateChange('match_type', value)
-                  }
+                  onValueChange={value => handleDateChange('match_type', value)}
                 >
-                  <SelectTrigger className="w-[140px]">
+                  <SelectTrigger className='w-[140px]'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="after">After</SelectItem>
-                    <SelectItem value="before">Before</SelectItem>
-                    <SelectItem value="on">On</SelectItem>
-                    <SelectItem value="between">Between</SelectItem>
+                    <SelectItem value='after'>After</SelectItem>
+                    <SelectItem value='before'>Before</SelectItem>
+                    <SelectItem value='on'>On</SelectItem>
+                    <SelectItem value='between'>Between</SelectItem>
                   </SelectContent>
                 </Select>
                 {rule.conditions.date.match_type === 'between' ? (
                   <>
                     <Input
-                      type="date"
+                      type='date'
                       value={rule.conditions.date.value1}
-                      onChange={(e) =>
-                        handleDateChange('value1', e.target.value)
-                      }
-                      className="w-[140px]"
+                      onChange={e => handleDateChange('value1', e.target.value)}
+                      className='w-[140px]'
                     />
-                    <span className="mx-1">to</span>
+                    <span className='mx-1'>to</span>
                     <Input
-                      type="date"
+                      type='date'
                       value={rule.conditions.date.value2}
-                      onChange={(e) =>
-                        handleDateChange('value2', e.target.value)
-                      }
-                      className="w-[140px]"
+                      onChange={e => handleDateChange('value2', e.target.value)}
+                      className='w-[140px]'
                     />
                   </>
                 ) : (
                   <Input
-                    type="date"
+                    type='date'
                     value={rule.conditions.date.value1}
-                    onChange={(e) => handleDateChange('value1', e.target.value)}
-                    className="w-[140px]"
+                    onChange={e => handleDateChange('value1', e.target.value)}
+                    className='w-[140px]'
                   />
                 )}
               </div>
@@ -1098,26 +1088,26 @@ export default function RulesPage() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h2 className="font-semibold text-lg text-common-gray-dark">
+        <div className='space-y-4'>
+          <h2 className='font-semibold text-lg text-common-gray-dark'>
             {rule.actions.split_transaction.enabled
               ? 'Then split the transaction...'
               : 'Then apply these updates...'}
           </h2>
-          <div className="bg-white rounded-lg border border-common-gray-light p-4 space-y-4">
+          <div className='bg-white rounded-lg border border-common-gray-light p-4 space-y-4'>
             {!rule.actions.split_transaction.enabled && (
               <>
                 <ActionRow
-                  label="Rename merchant"
+                  label='Rename merchant'
                   icon={Pencil}
                   isEnabled={rule.actions.rename_merchant.enabled}
                   onToggle={() => handleToggle('actions', 'rename_merchant')}
                 >
                   <Input
-                    placeholder="New merchant name"
+                    placeholder='New merchant name'
                     value={rule.actions.rename_merchant.new_name}
-                    onChange={(e) =>
-                      setRule((prev) => ({
+                    onChange={e =>
+                      setRule(prev => ({
                         ...prev,
                         actions: {
                           ...prev.actions,
@@ -1132,16 +1122,16 @@ export default function RulesPage() {
                 </ActionRow>
                 <Separator />
                 <ActionRow
-                  label="Update category"
+                  label='Update category'
                   icon={List}
                   isEnabled={rule.actions.update_category.enabled}
                   onToggle={() => handleToggle('actions', 'update_category')}
                 >
                   <Select
                     value={selectedActionCategory}
-                    onValueChange={(value) => {
+                    onValueChange={value => {
                       setSelectedActionCategory(value);
-                      setRule((prev) => ({
+                      setRule(prev => ({
                         ...prev,
                         actions: {
                           ...prev.actions,
@@ -1154,52 +1144,52 @@ export default function RulesPage() {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder='Select a category' />
                     </SelectTrigger>
-                    <SelectContent className="max-h-80">
-                      <div className="category-search">
-                        <div className="relative">
-                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
+                    <SelectContent className='max-h-80'>
+                      <div className='category-search'>
+                        <div className='relative'>
+                          <Search className='w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark' />
                           <Input
-                            placeholder="Search categories..."
+                            placeholder='Search categories...'
                             value={categorySearch}
-                            onChange={(e) => setCategorySearch(e.target.value)}
-                            className="pl-9 h-8"
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onFocus={(e) => e.stopPropagation()}
+                            onChange={e => setCategorySearch(e.target.value)}
+                            className='pl-9 h-8'
+                            onMouseDown={e => e.stopPropagation()}
+                            onFocus={e => e.stopPropagation()}
                           />
                         </div>
                       </div>
 
-                      <div className="max-h-48 overflow-y-auto">
+                      <div className='max-h-48 overflow-y-auto'>
                         {Object.entries(filteredCategories).map(
                           ([
                             category,
                             { icon: CategoryIcon, emoji, subcategories },
                           ]) => (
                             <SelectGroup key={category}>
-                              <SelectLabel className="category-header flex items-center gap-2">
+                              <SelectLabel className='category-header flex items-center gap-2'>
                                 {emoji ? (
-                                  <span className="text-xl leading-none">
+                                  <span className='text-xl leading-none'>
                                     {emoji}
                                   </span>
                                 ) : (
                                   CategoryIcon && (
-                                    <CategoryIcon className="w-4 h-4" />
+                                    <CategoryIcon className='w-4 h-4' />
                                   )
                                 )}
                                 {category}
                               </SelectLabel>
-                              {subcategories.map((subcategory) => (
+                              {subcategories.map(subcategory => (
                                 <SelectItem
                                   key={subcategory.enc_id}
                                   value={subcategory.enc_id}
-                                  className="subcategory-item"
+                                  className='subcategory-item'
                                 >
-                                  <div className="flex items-center justify-between w-full">
+                                  <div className='flex items-center justify-between w-full'>
                                     <span>{subcategory.name}</span>
                                     {subcategory.isUserCategory && (
-                                      <span className="text-xs text-common-gray-dark ml-2">
+                                      <span className='text-xs text-common-gray-dark ml-2'>
                                         (custom)
                                       </span>
                                     )}
@@ -1211,20 +1201,20 @@ export default function RulesPage() {
                         )}
 
                         {Object.keys(filteredCategories).length === 0 && (
-                          <div className="text-center py-4 text-common-gray-dark text-sm">
+                          <div className='text-center py-4 text-common-gray-dark text-sm'>
                             No categories found
                           </div>
                         )}
                       </div>
 
-                      <div className="add-category-button">
+                      <div className='add-category-button'>
                         <Button
-                          variant="outline"
-                          className="w-full h-8 text-sm gap-2"
+                          variant='outline'
+                          className='w-full h-8 text-sm gap-2'
                           onClick={() => setShowCreateCategoryModal(true)}
-                          onMouseDown={(e) => e.stopPropagation()}
+                          onMouseDown={e => e.stopPropagation()}
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className='w-3 h-3' />
                           Add New Category
                         </Button>
                       </div>
@@ -1233,7 +1223,7 @@ export default function RulesPage() {
                 </ActionRow>
                 <Separator />
                 <ActionRow
-                  label="Add tags"
+                  label='Add tags'
                   icon={Tag}
                   isEnabled={rule.actions.add_tags.enabled}
                   onToggle={() => handleToggle('actions', 'add_tags')}
@@ -1241,8 +1231,8 @@ export default function RulesPage() {
                   <TagSelector
                     allTags={allTags}
                     selectedTags={rule.actions.add_tags.tags}
-                    onTagsChange={(newTags) => {
-                      setRule((prev) => ({
+                    onTagsChange={newTags => {
+                      setRule(prev => ({
                         ...prev,
                         actions: {
                           ...prev.actions,
@@ -1255,53 +1245,53 @@ export default function RulesPage() {
                 </ActionRow>
                 <Separator />
                 <ActionRow
-                  label="Hide transaction"
+                  label='Hide transaction'
                   icon={EyeOff}
                   isEnabled={rule.actions.hide_transaction.enabled}
                   onToggle={() => handleToggle('actions', 'hide_transaction')}
                 />
                 <Separator />
                 <ActionRow
-                  label="Review status"
+                  label='Review status'
                   icon={ClipboardCheck}
                   isEnabled={rule.actions.mark_for_review.enabled}
                   onToggle={() => handleToggle('actions', 'mark_for_review')}
                 >
-                  <div className="space-y-3">
+                  <div className='space-y-3'>
                     <Select
                       value={rule.actions.mark_for_review.review_status}
-                      onValueChange={(value) =>
+                      onValueChange={value =>
                         handleReviewStatusChange('review_status', value)
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
+                        <SelectValue placeholder='Select a status' />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="needs_review">
+                        <SelectItem value='needs_review'>
                           Needs review
                         </SelectItem>
-                        <SelectItem value="reviewed">Reviewed</SelectItem>
+                        <SelectItem value='reviewed'>Reviewed</SelectItem>
                       </SelectContent>
                     </Select>
 
                     {rule.actions.mark_for_review.review_status ===
                       'needs_review' && (
                       <div>
-                        <Label className="text-sm font-medium text-common-gray-dark mb-2 block">
+                        <Label className='text-sm font-medium text-common-gray-dark mb-2 block'>
                           Assign To
                         </Label>
                         <Select
                           value={rule.actions.mark_for_review.reviewer}
-                          onValueChange={(value) =>
+                          onValueChange={value =>
                             handleReviewStatusChange('reviewer', value)
                           }
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select reviewer" />
+                            <SelectValue placeholder='Select reviewer' />
                           </SelectTrigger>
                           <SelectContent>
-                            {reviewers.map((reviewer) => (
+                            {reviewers.map(reviewer => (
                               <SelectItem key={reviewer} value={reviewer}>
                                 {reviewer}
                               </SelectItem>
@@ -1314,15 +1304,15 @@ export default function RulesPage() {
                 </ActionRow>
                 <Separator />
                 <ActionRow
-                  label="Link to goal"
+                  label='Link to goal'
                   icon={Target}
                   isEnabled={rule.actions.link_to_goal.enabled}
                   onToggle={() => handleToggle('actions', 'link_to_goal')}
                 >
                   <Select
                     value={rule.actions.link_to_goal.goal_id}
-                    onValueChange={(value) =>
-                      setRule((prev) => ({
+                    onValueChange={value =>
+                      setRule(prev => ({
                         ...prev,
                         actions: {
                           ...prev.actions,
@@ -1335,17 +1325,17 @@ export default function RulesPage() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a goal" />
+                      <SelectValue placeholder='Select a goal' />
                     </SelectTrigger>
                     <SelectContent>
                       {allGoals && allGoals.length > 0 ? (
-                        allGoals.map((goal) => (
+                        allGoals.map(goal => (
                           <SelectItem key={goal.id} value={goal.id}>
                             {goal.name}
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="p-2 text-sm text-common-gray-dark text-center">
+                        <div className='p-2 text-sm text-common-gray-dark text-center'>
                           No goals available
                         </div>
                       )}
@@ -1356,59 +1346,59 @@ export default function RulesPage() {
               </>
             )}
           </div>
-          <div className="flex items-center my-6">
-            <div className="flex-grow border-t border-common-gray-light" />
-            <span className="mx-4 text-common-gray-dark font-semibold">OR</span>
-            <div className="flex-grow border-t border-common-gray-light" />
+          <div className='flex items-center my-6'>
+            <div className='flex-grow border-t border-common-gray-light' />
+            <span className='mx-4 text-common-gray-dark font-semibold'>OR</span>
+            <div className='flex-grow border-t border-common-gray-light' />
           </div>
 
           {/* OR separator and Split transaction option in a separate card */}
-          <div className="mt-8" />
-          <div className="bg-white rounded-lg border border-common-gray-light p-4">
+          <div className='mt-8' />
+          <div className='bg-white rounded-lg border border-common-gray-light p-4'>
             <ActionRow
-              label="Split transaction"
+              label='Split transaction'
               icon={GitCommitHorizontal}
               isEnabled={rule.actions.split_transaction.enabled}
               onToggle={() => handleToggle('actions', 'split_transaction')}
             >
-              <div className="space-y-3">
-                <div className="p-3 bg-common-gray-light rounded-lg border border-common-gray-light">
+              <div className='space-y-3'>
+                <div className='p-3 bg-common-gray-light rounded-lg border border-common-gray-light'>
                   {rule.actions.split_transaction.splits.length > 0 ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">
+                    <div className='space-y-2'>
+                      <div className='flex items-center justify-between text-sm'>
+                        <span className='font-medium'>
                           Split Configuration:
                         </span>
-                        <Badge variant="outline">
+                        <Badge variant='outline'>
                           {rule.actions.split_transaction.splits.length} split
                           {rule.actions.split_transaction.splits.length !== 1
                             ? 's'
                             : ''}
                         </Badge>
                       </div>
-                      <div className="text-xs text-common-gray-dark">
+                      <div className='text-xs text-common-gray-dark'>
                         Type:{' '}
-                        <span className="capitalize">
+                        <span className='capitalize'>
                           {rule.actions.split_transaction.splitType}
                         </span>
                         {rule.actions.split_transaction.hideOriginal && (
-                          <span className="ml-2">• Hide original</span>
+                          <span className='ml-2'>• Hide original</span>
                         )}
                       </div>
                     </div>
                   ) : (
-                    <div className="text-sm text-common-gray-dark">
+                    <div className='text-sm text-common-gray-dark'>
                       No split configuration set
                     </div>
                   )}
                 </div>
                 <Button
-                  type="button"
-                  variant="outline"
+                  type='button'
+                  variant='outline'
                   onClick={() => setShowSplitModal(true)}
-                  className="w-full gap-2"
+                  className='w-full gap-2'
                 >
-                  <GitCommitHorizontal className="w-4 h-4" />
+                  <GitCommitHorizontal className='w-4 h-4' />
                   {rule.actions.split_transaction.splits.length > 0
                     ? 'Edit Split Configuration'
                     : 'Configure Split'}
@@ -1419,12 +1409,12 @@ export default function RulesPage() {
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
-        <Button variant="outline" onClick={() => navigate('/rules')}>
+      <div className='flex justify-end gap-3 pt-4'>
+        <Button variant='outline' onClick={() => navigate('/rules')}>
           Cancel
         </Button>
         <Button
-          className="bg-common-green hover:bg-common-green-dark"
+          className='bg-common-green hover:bg-common-green-dark'
           onClick={handleSaveRule}
         >
           {isEditing ? 'Update Rule' : 'Save Rule'}
@@ -1467,11 +1457,3 @@ export default function RulesPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-

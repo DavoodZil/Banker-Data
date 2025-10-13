@@ -8,11 +8,11 @@ export const useFileUpload = () => {
   const { execute, isLoading, error } = useApiCall();
 
   const uploadFile = useCallback(
-    async (file) => {
+    async file => {
       setUploadProgress(0);
       setUploadedFile(null);
 
-      const onUploadProgress = (progressEvent) => {
+      const onUploadProgress = progressEvent => {
         const progress = Math.round(
           (progressEvent.loaded * 100) / progressEvent.total
         );
@@ -45,7 +45,7 @@ export const useFileUpload = () => {
   );
 
   const getFileStatus = useCallback(
-    async (fileId) => {
+    async fileId => {
       try {
         const response = await execute(() => fileApi.getStatus(fileId));
         return response.data;
@@ -57,7 +57,7 @@ export const useFileUpload = () => {
   );
 
   const downloadFile = useCallback(
-    async (fileId) => {
+    async fileId => {
       try {
         const response = await execute(() => fileApi.download(fileId));
         return response.data;
@@ -69,7 +69,7 @@ export const useFileUpload = () => {
   );
 
   const deleteFile = useCallback(
-    async (fileId) => {
+    async fileId => {
       try {
         await execute(() => fileApi.delete(fileId));
       } catch (err) {
@@ -96,7 +96,7 @@ export const useFileImport = () => {
   const { execute, isLoading, error } = useApiCall();
 
   const extractData = useCallback(
-    async (fileId) => {
+    async fileId => {
       try {
         const response = await execute(() => fileApi.extractData(fileId));
         return response.data;

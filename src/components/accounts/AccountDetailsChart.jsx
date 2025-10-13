@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,7 +18,7 @@ const calculateBalanceHistory = (currentBalance, transactions, days) => {
   const dateInterval = eachDayOfInterval({ start: startDate, end: endDate });
 
   const balanceData = new Map(
-    dateInterval.map((date) => [
+    dateInterval.map(date => [
       format(date, 'yyyy-MM-dd'),
       { date: format(date, 'MMM dd'), balance: null },
     ])
@@ -79,14 +79,14 @@ export default function AccountDetailsChart({ currentBalance, transactions }) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row justify-between items-center">
+      <CardHeader className='flex flex-row justify-between items-center'>
         <CardTitle>Balance History</CardTitle>
-        <div className="flex gap-1">
+        <div className='flex gap-1'>
           {timeRanges.map(({ label, days }) => (
             <Button
               key={days}
               variant={timeRange === days ? 'default' : 'outline'}
-              size="sm"
+              size='sm'
               onClick={() => setTimeRange(days)}
             >
               {label}
@@ -94,24 +94,24 @@ export default function AccountDetailsChart({ currentBalance, transactions }) {
           ))}
         </div>
       </CardHeader>
-      <CardContent className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
+      <CardContent className='h-80'>
+        <ResponsiveContainer width='100%' height='100%'>
           <AreaChart data={chartData}>
             <defs>
-              <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+              <linearGradient id='balanceGradient' x1='0' y1='0' x2='0' y2='1'>
+                <stop offset='5%' stopColor='#10b981' stopOpacity={0.3} />
+                <stop offset='95%' stopColor='#10b981' stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="date" stroke="#6b7280" fontSize={12} />
+            <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+            <XAxis dataKey='date' stroke='#6b7280' fontSize={12} />
             <YAxis
-              stroke="#6b7280"
+              stroke='#6b7280'
               fontSize={12}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+              tickFormatter={value => `$${(value / 1000).toFixed(0)}k`}
             />
             <Tooltip
-              formatter={(value) => [
+              formatter={value => [
                 `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
                 'Balance',
               ]}
@@ -123,11 +123,11 @@ export default function AccountDetailsChart({ currentBalance, transactions }) {
               }}
             />
             <Area
-              type="monotone"
-              dataKey="balance"
-              stroke="#10b981"
+              type='monotone'
+              dataKey='balance'
+              stroke='#10b981'
               strokeWidth={2}
-              fill="url(#balanceGradient)"
+              fill='url(#balanceGradient)'
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -135,11 +135,3 @@ export default function AccountDetailsChart({ currentBalance, transactions }) {
     </Card>
   );
 }
-
-
-
-
-
-
-
-

@@ -23,10 +23,10 @@ export const useTags = () => {
     }
   }, []);
 
-  const createTag = useCallback(async (tagData) => {
+  const createTag = useCallback(async tagData => {
     try {
       const response = await tagApi.create(tagData);
-      setTags((prev) => [...prev, response.data]);
+      setTags(prev => [...prev, response.data]);
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -38,9 +38,7 @@ export const useTags = () => {
     try {
       // API expects data with id included
       const response = await tagApi.update({ ...tagData, id });
-      setTags((prev) =>
-        prev.map((tag) => (tag.id === id ? response.data : tag))
-      );
+      setTags(prev => prev.map(tag => (tag.id === id ? response.data : tag)));
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -48,11 +46,11 @@ export const useTags = () => {
     }
   }, []);
 
-  const deleteTag = useCallback(async (id) => {
+  const deleteTag = useCallback(async id => {
     try {
       // API expects data with id included
       await tagApi.delete({ id });
-      setTags((prev) => prev.filter((tag) => tag.id !== id));
+      setTags(prev => prev.filter(tag => tag.id !== id));
     } catch (err) {
       setError(err.message);
       throw err;
@@ -89,7 +87,7 @@ export const useTagSuggestions = () => {
   const { execute, isLoading, error } = useApiCall();
 
   const getSuggestions = useCallback(
-    async (transactionData) => {
+    async transactionData => {
       return execute(() => tagApi.getSuggestions(transactionData));
     },
     [execute]

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -13,23 +12,23 @@ export default function BudgetTracking({
 }) {
   if (isLoading) {
     return (
-      <Card className="card-shadow border-0">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-common-green" />
+      <Card className='card-shadow border-0'>
+        <CardHeader className='pb-4'>
+          <CardTitle className='flex items-center gap-2'>
+            <Target className='w-5 h-5 text-common-green' />
             Budget Tracking
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className='space-y-4'>
           {Array(4)
             .fill(0)
             .map((_, i) => (
-              <div key={i} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-16" />
+              <div key={i} className='space-y-2'>
+                <div className='flex items-center justify-between'>
+                  <Skeleton className='h-4 w-24' />
+                  <Skeleton className='h-4 w-16' />
                 </div>
-                <Skeleton className="h-2 w-full" />
+                <Skeleton className='h-2 w-full' />
               </div>
             ))}
         </CardContent>
@@ -43,7 +42,7 @@ export default function BudgetTracking({
 
   const categorySpending = {};
   transactions
-    .filter((t) => {
+    .filter(t => {
       const transactionDate = new Date(t.date);
       return (
         transactionDate >= monthStart &&
@@ -51,7 +50,7 @@ export default function BudgetTracking({
         t.amount < 0
       );
     })
-    .forEach((t) => {
+    .forEach(t => {
       const category = t.category || 'uncategorized';
       categorySpending[category] =
         (categorySpending[category] || 0) + Math.abs(t.amount);
@@ -59,8 +58,8 @@ export default function BudgetTracking({
 
   // Get categories with budgets and their spending
   const budgetedCategories = categories
-    .filter((cat) => cat.budget_amount > 0)
-    .map((cat) => {
+    .filter(cat => cat.budget_amount > 0)
+    .map(cat => {
       const spent = categorySpending[cat.name] || 0;
       const budget = cat.budget_amount;
       const percentage = budget > 0 ? (spent / budget) * 100 : 0;
@@ -91,21 +90,21 @@ export default function BudgetTracking({
 
   if (budgetedCategories.length === 0) {
     return (
-      <Card className="card-shadow border-0">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-common-green" />
+      <Card className='card-shadow border-0'>
+        <CardHeader className='pb-4'>
+          <CardTitle className='flex items-center gap-2'>
+            <Target className='w-5 h-5 text-common-green' />
             Budget Tracking
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-center py-6">
-          <div className="w-12 h-12 bg-common-gray-light rounded-full flex items-center justify-center mx-auto mb-3">
-            <Target className="w-6 h-6 text-common-gray-dark" />
+        <CardContent className='text-center py-6'>
+          <div className='w-12 h-12 bg-common-gray-light rounded-full flex items-center justify-center mx-auto mb-3'>
+            <Target className='w-6 h-6 text-common-gray-dark' />
           </div>
-          <h3 className="text-lg font-semibold text-common-gray-dark mb-2">
+          <h3 className='text-lg font-semibold text-common-gray-dark mb-2'>
             No Budgets Set
           </h3>
-          <p className="text-sm text-common-gray-dark">
+          <p className='text-sm text-common-gray-dark'>
             Create category budgets to track your spending goals
           </p>
         </CardContent>
@@ -114,33 +113,33 @@ export default function BudgetTracking({
   }
 
   return (
-    <Card className="card-shadow border-0">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-common-green" />
+    <Card className='card-shadow border-0'>
+      <CardHeader className='pb-4'>
+        <div className='flex items-center justify-between'>
+          <CardTitle className='flex items-center gap-2'>
+            <Target className='w-5 h-5 text-common-green' />
             Budget Tracking
           </CardTitle>
           <Badge
             variant={overallPercentage > 90 ? 'destructive' : 'secondary'}
-            className="text-xs"
+            className='text-xs'
           >
             {overallPercentage.toFixed(0)}% Used
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className='space-y-4'>
         {/* Overall Budget Summary - Compact */}
-        <div className="p-3 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-lg border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-common-gray-dark">
+        <div className='p-3 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-lg border'>
+          <div className='flex items-center justify-between mb-2'>
+            <span className='text-sm font-medium text-common-gray-dark'>
               Total Budget
             </span>
-            <span className="text-sm font-bold text-common-gray-dark">
+            <span className='text-sm font-bold text-common-gray-dark'>
               ${totalSpent.toLocaleString()} / ${totalBudget.toLocaleString()}
             </span>
           </div>
-          <div className="w-full bg-common-gray-light rounded-full h-2 mb-2">
+          <div className='w-full bg-common-gray-light rounded-full h-2 mb-2'>
             <div
               className={`h-2 rounded-full transition-all duration-500 ${
                 overallPercentage > 100
@@ -152,8 +151,8 @@ export default function BudgetTracking({
               style={{ width: `${Math.min(100, overallPercentage)}%` }}
             />
           </div>
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-common-gray-dark">
+          <div className='flex items-center justify-between text-xs'>
+            <span className='text-common-gray-dark'>
               ${Math.max(0, totalBudget - totalSpent).toLocaleString()}{' '}
               remaining
             </span>
@@ -174,34 +173,34 @@ export default function BudgetTracking({
         </div>
 
         {/* Individual Category Budgets - More Compact */}
-        <div className="space-y-3 max-h-64 overflow-y-auto">
-          {budgetedCategories.slice(0, 6).map((category) => (
-            <div key={category.name} className="space-y-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+        <div className='space-y-3 max-h-64 overflow-y-auto'>
+          {budgetedCategories.slice(0, 6).map(category => (
+            <div key={category.name} className='space-y-1'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
                   <div
-                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    className='w-2 h-2 rounded-full flex-shrink-0'
                     style={{ backgroundColor: category.color || '#6b7280' }}
                   />
-                  <span className="text-sm font-medium capitalize text-common-gray-dark truncate">
+                  <span className='text-sm font-medium capitalize text-common-gray-dark truncate'>
                     {category.name}
                   </span>
                   {category.isOverBudget && (
-                    <AlertTriangle className="w-3 h-3 text-common-red flex-shrink-0" />
+                    <AlertTriangle className='w-3 h-3 text-common-red flex-shrink-0' />
                   )}
                 </div>
-                <div className="text-right ml-2">
-                  <div className="text-xs font-semibold text-common-gray-dark">
+                <div className='text-right ml-2'>
+                  <div className='text-xs font-semibold text-common-gray-dark'>
                     ${category.spent.toLocaleString()}
                   </div>
-                  <div className="text-xs text-common-gray-dark">
+                  <div className='text-xs text-common-gray-dark'>
                     of ${category.budget.toLocaleString()}
                   </div>
                 </div>
               </div>
 
               {/* Horizontal Progress Bar */}
-              <div className="w-full bg-common-gray-light rounded-full h-1.5">
+              <div className='w-full bg-common-gray-light rounded-full h-1.5'>
                 <div
                   className={`h-1.5 rounded-full transition-all duration-500 ${
                     category.isOverBudget
@@ -219,7 +218,7 @@ export default function BudgetTracking({
           ))}
 
           {budgetedCategories.length > 6 && (
-            <div className="text-center text-xs text-common-gray-dark pt-2 border-t">
+            <div className='text-center text-xs text-common-gray-dark pt-2 border-t'>
               +{budgetedCategories.length - 6} more categories
             </div>
           )}
@@ -228,11 +227,3 @@ export default function BudgetTracking({
     </Card>
   );
 }
-
-
-
-
-
-
-
-

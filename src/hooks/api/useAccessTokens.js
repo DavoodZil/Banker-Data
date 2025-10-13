@@ -22,7 +22,7 @@ export const useAccessTokens = () => {
   }, []);
 
   const generateToken = useCallback(
-    async (name) => {
+    async name => {
       try {
         const response = await accessTokenApi.generate({ name });
         await fetchTokens(); // Refresh the list
@@ -36,7 +36,7 @@ export const useAccessTokens = () => {
   );
 
   const revokeToken = useCallback(
-    async (tokenId) => {
+    async tokenId => {
       try {
         await accessTokenApi.revoke(tokenId);
         await fetchTokens(); // Refresh the list

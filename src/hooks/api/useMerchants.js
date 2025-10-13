@@ -20,10 +20,10 @@ export const useMerchants = () => {
     }
   }, []);
 
-  const createMerchant = useCallback(async (merchantData) => {
+  const createMerchant = useCallback(async merchantData => {
     try {
       const response = await merchantApi.create(merchantData);
-      setMerchants((prev) => [...prev, response.data]);
+      setMerchants(prev => [...prev, response.data]);
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -34,8 +34,8 @@ export const useMerchants = () => {
   const updateMerchant = useCallback(async (id, merchantData) => {
     try {
       const response = await merchantApi.update(id, merchantData);
-      setMerchants((prev) =>
-        prev.map((merchant) => (merchant.id === id ? response.data : merchant))
+      setMerchants(prev =>
+        prev.map(merchant => (merchant.id === id ? response.data : merchant))
       );
       return response.data;
     } catch (err) {
@@ -44,17 +44,17 @@ export const useMerchants = () => {
     }
   }, []);
 
-  const deleteMerchant = useCallback(async (id) => {
+  const deleteMerchant = useCallback(async id => {
     try {
       await merchantApi.delete(id);
-      setMerchants((prev) => prev.filter((merchant) => merchant.id !== id));
+      setMerchants(prev => prev.filter(merchant => merchant.id !== id));
     } catch (err) {
       setError(err.message);
       throw err;
     }
   }, []);
 
-  const getTopBySpending = useCallback(async (params) => {
+  const getTopBySpending = useCallback(async params => {
     try {
       const response = await merchantApi.getTopBySpending(params);
       return response.data;
@@ -84,7 +84,7 @@ export const useMerchantSearch = () => {
   const { execute, isLoading, error } = useApiCall();
 
   const searchMerchants = useCallback(
-    async (query) => {
+    async query => {
       return execute(() => merchantApi.search(query));
     },
     [execute]

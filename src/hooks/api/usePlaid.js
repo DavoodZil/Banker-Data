@@ -22,7 +22,7 @@ export const usePlaidLink = () => {
     }
   }, []);
 
-  const exchangePublicToken = useCallback(async (publicToken) => {
+  const exchangePublicToken = useCallback(async publicToken => {
     try {
       const response = await plaidApi.exchangePublicToken(publicToken);
       return response.data;
@@ -57,7 +57,7 @@ export const usePlaidAccounts = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const syncTransactions = useCallback(async (itemId) => {
+  const syncTransactions = useCallback(async itemId => {
     setIsLoading(true);
     setError(null);
     try {
@@ -71,7 +71,7 @@ export const usePlaidAccounts = () => {
     }
   }, []);
 
-  const removeItem = useCallback(async (itemId) => {
+  const removeItem = useCallback(async itemId => {
     try {
       await plaidApi.removeItem(itemId);
     } catch (err) {

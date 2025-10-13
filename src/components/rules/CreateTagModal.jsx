@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,7 +16,7 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     if (!name.trim()) return;
     onSave({ name: name.trim(), description: description.trim() });
@@ -27,56 +27,56 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Tag className="w-5 h-5 text-common-green" />
+          <DialogTitle className='flex items-center gap-2'>
+            <Tag className='w-5 h-5 text-common-green' />
             Create New Tag
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-          <div className="space-y-2">
+        <form onSubmit={handleSubmit} className='space-y-6 pt-4'>
+          <div className='space-y-2'>
             <Label
-              htmlFor="tagName"
-              className="text-sm font-medium text-common-gray-dark"
+              htmlFor='tagName'
+              className='text-sm font-medium text-common-gray-dark'
             >
               Tag Name
             </Label>
             <Input
-              id="tagName"
+              id='tagName'
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter tag name..."
-              className="w-full"
+              onChange={e => setName(e.target.value)}
+              placeholder='Enter tag name...'
+              className='w-full'
               autoFocus
             />
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Label
-              htmlFor="tagDescription"
-              className="text-sm font-medium text-common-gray-dark"
+              htmlFor='tagDescription'
+              className='text-sm font-medium text-common-gray-dark'
             >
               Description (optional)
             </Label>
             <Textarea
-              id="tagDescription"
+              id='tagDescription'
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter tag description..."
+              onChange={e => setDescription(e.target.value)}
+              placeholder='Enter tag description...'
               rows={3}
-              className="resize-none"
+              className='resize-none'
             />
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type='button' variant='outline' onClick={onClose}>
               Cancel
             </Button>
             <Button
-              type="submit"
-              className="bg-common-green hover:bg-common-green-dark"
+              type='submit'
+              className='bg-common-green hover:bg-common-green-dark'
               disabled={!name.trim()}
             >
               Create Tag
@@ -87,11 +87,3 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
     </Dialog>
   );
 }
-
-
-
-
-
-
-
-

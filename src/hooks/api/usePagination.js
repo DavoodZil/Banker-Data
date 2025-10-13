@@ -8,7 +8,7 @@ export const usePagination = (initialPage = 1, initialPageSize = 10) => {
   const totalPages = Math.ceil(totalItems / pageSize);
 
   const goToPage = useCallback(
-    (page) => {
+    page => {
       const validPage = Math.max(1, Math.min(page, totalPages));
       setCurrentPage(validPage);
     },
@@ -35,12 +35,12 @@ export const usePagination = (initialPage = 1, initialPageSize = 10) => {
     setCurrentPage(totalPages);
   }, [totalPages]);
 
-  const changePageSize = useCallback((newPageSize) => {
+  const changePageSize = useCallback(newPageSize => {
     setPageSize(newPageSize);
     setCurrentPage(1); // Reset to first page when changing page size
   }, []);
 
-  const updateTotalItems = useCallback((total) => {
+  const updateTotalItems = useCallback(total => {
     setTotalItems(total);
   }, []);
 

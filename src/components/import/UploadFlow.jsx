@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccounts } from '@/hooks/api';
 import { useTransactions } from '@/hooks/api';
 import { useFileUpload, useFileImport } from '@/hooks/api';
@@ -51,10 +51,10 @@ export default function UploadFlow() {
 
   // Filter manual accounts
   const manualAccounts = allAccounts.filter(
-    (account) => account.source === 'manual'
+    account => account.source === 'manual'
   );
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
@@ -93,7 +93,7 @@ export default function UploadFlow() {
     setIsLoading(true);
     setError(null);
     try {
-      const transactionsToCreate = parsedTransactions.map((tx) => ({
+      const transactionsToCreate = parsedTransactions.map(tx => ({
         account_id: selectedAccountId,
         date: new Date(tx.Date).toISOString().split('T')[0],
         description: tx.Description,
@@ -113,7 +113,7 @@ export default function UploadFlow() {
         (sum, tx) => sum + tx.amount,
         0
       );
-      const account = manualAccounts.find((a) => a.id === selectedAccountId);
+      const account = manualAccounts.find(a => a.id === selectedAccountId);
       if (account) {
         await updateAccount(account.id, {
           balance: account.balance + totalImportedAmount,
@@ -132,16 +132,16 @@ export default function UploadFlow() {
     switch (step) {
       case STEPS.SELECT_ACCOUNT:
         return (
-          <CardContent className="space-y-4">
-            <p className="text-sm text-common-gray-dark">
+          <CardContent className='space-y-4'>
+            <p className='text-sm text-common-gray-dark'>
               Choose the manual account you want to import transactions into.
             </p>
             <Select onValueChange={setSelectedAccountId}>
               <SelectTrigger>
-                <SelectValue placeholder="Select an account..." />
+                <SelectValue placeholder='Select an account...' />
               </SelectTrigger>
               <SelectContent>
-                {manualAccounts.map((acc) => (
+                {manualAccounts.map(acc => (
                   <SelectItem key={acc.id} value={acc.id}>
                     {acc.account_name} ({acc.institution_name})
                   </SelectItem>
@@ -158,35 +158,35 @@ export default function UploadFlow() {
         );
       case STEPS.UPLOAD_FILE:
         return (
-          <CardContent className="space-y-4 text-center">
-            <div className="mx-auto w-fit">
-              <label htmlFor="csv-upload" className="cursor-pointer space-y-2">
-                <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center text-common-gray-dark hover:bg-common-gray-light hover:border-common-green">
-                  <FileUp className="w-8 h-8" />
+          <CardContent className='space-y-4 text-center'>
+            <div className='mx-auto w-fit'>
+              <label htmlFor='csv-upload' className='cursor-pointer space-y-2'>
+                <div className='w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center text-common-gray-dark hover:bg-common-gray-light hover:border-common-green'>
+                  <FileUp className='w-8 h-8' />
                 </div>
                 <Input
-                  id="csv-upload"
-                  type="file"
-                  accept=".csv"
-                  className="hidden"
+                  id='csv-upload'
+                  type='file'
+                  accept='.csv'
+                  className='hidden'
                   onChange={handleFileChange}
                 />
-                <p className="text-sm text-common-gray-dark">
+                <p className='text-sm text-common-gray-dark'>
                   {file ? file.name : 'Click to upload a CSV'}
                 </p>
               </label>
             </div>
-            {error && <p className="text-common-red text-sm">{error}</p>}
-            <div className="flex justify-between">
+            {error && <p className='text-common-red text-sm'>{error}</p>}
+            <div className='flex justify-between'>
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={() => setStep(STEPS.SELECT_ACCOUNT)}
               >
                 Back
               </Button>
               <Button onClick={handleProcessFile} disabled={!file || isLoading}>
                 {isLoading ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className='animate-spin' />
                 ) : (
                   'Process File'
                 )}
@@ -197,18 +197,18 @@ export default function UploadFlow() {
       case STEPS.REVIEW:
         return (
           <CardContent>
-            <p className="mb-4 text-sm text-common-gray-dark">
+            <p className='mb-4 text-sm text-common-gray-dark'>
               Review the {parsedTransactions.length} transactions found in your
               file.
             </p>
-            <div className="max-h-96 overflow-y-auto border rounded-lg">
+            <div className='max-h-96 overflow-y-auto border rounded-lg'>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Date</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className='text-right'>Amount</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -228,21 +228,21 @@ export default function UploadFlow() {
               </Table>
             </div>
             {parsedTransactions.length > 10 && (
-              <p className="text-center text-sm text-common-gray-dark mt-2">
+              <p className='text-center text-sm text-common-gray-dark mt-2'>
                 ...and {parsedTransactions.length - 10} more
               </p>
             )}
-            {error && <p className="text-common-red text-sm mt-4">{error}</p>}
-            <div className="flex justify-between mt-4">
+            {error && <p className='text-common-red text-sm mt-4'>{error}</p>}
+            <div className='flex justify-between mt-4'>
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={() => setStep(STEPS.UPLOAD_FILE)}
               >
                 Back
               </Button>
               <Button onClick={handleImport} disabled={isLoading}>
                 {isLoading ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className='animate-spin' />
                 ) : (
                   'Confirm & Import'
                 )}
@@ -252,9 +252,9 @@ export default function UploadFlow() {
         );
       case STEPS.COMPLETE:
         return (
-          <CardContent className="text-center space-y-4 py-8">
-            <CheckCircle className="w-16 h-16 text-common-green mx-auto" />
-            <h3 className="text-xl font-semibold">Import Complete!</h3>
+          <CardContent className='text-center space-y-4 py-8'>
+            <CheckCircle className='w-16 h-16 text-common-green mx-auto' />
+            <h3 className='text-xl font-semibold'>Import Complete!</h3>
             <p>
               {parsedTransactions.length} transactions have been successfully
               added.
@@ -279,11 +279,3 @@ export default function UploadFlow() {
     </Card>
   );
 }
-
-
-
-
-
-
-
-

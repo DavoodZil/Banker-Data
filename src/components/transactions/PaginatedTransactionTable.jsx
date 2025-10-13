@@ -1,4 +1,4 @@
-import React, {
+import {
   useMemo,
   useRef,
   useImperativeHandle,
@@ -52,28 +52,28 @@ function getCategoryColor(categoryName, parentName) {
  * @param {Array} accounts - Array of account objects
  * @returns {JSX.Element} Rendered description cell
  */
-const DescriptionCellRenderer = ({ data, accounts }) => {
+const DescriptionCellRenderer = ({ data }) => {
   const isPositive = data.amountAmount > 0;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className='flex items-center gap-2'>
       <div
         className={`p-1 rounded-full ${isPositive ? 'bg-common-green-secondary' : 'bg-common-red-secondary'}`}
       >
         {isPositive ? (
-          <ArrowUpRight className="w-3 h-3 text-common-green" />
+          <ArrowUpRight className='w-3 h-3 text-common-green' />
         ) : (
-          <ArrowDownRight className="w-3 h-3 text-common-red" />
+          <ArrowDownRight className='w-3 h-3 text-common-red' />
         )}
       </div>
       <div>
-        <div className="font-medium">
+        <div className='font-medium'>
           {data.description_custom ||
             data.original_description ||
             'No description'}
         </div>
         {data.merchant_name_custom || data.merchant_name ? (
-          <div className="text-sm text-common-gray-dark">
+          <div className='text-sm text-common-gray-dark'>
             {data.merchant_name_custom || data.merchant_name}
           </div>
         ) : null}
@@ -91,13 +91,13 @@ const DescriptionCellRenderer = ({ data, accounts }) => {
 const AccountCellRenderer = ({ data, accounts }) => {
   const accountName =
     data.bank_account?.account_name ||
-    accounts.find((a) => a.id === data.account_id)?.account_name ||
+    accounts.find(a => a.id === data.account_id)?.account_name ||
     'Unknown';
 
   return (
     <div>
-      <div className="text-sm">{accountName}</div>
-      <div className="text-xs text-common-gray-dark">
+      <div className='text-sm'>{accountName}</div>
+      <div className='text-xs text-common-gray-dark'>
         {data.bank_account?.institution_name || 'Bank Account'}
       </div>
     </div>
@@ -120,7 +120,7 @@ const CategoryCellRenderer = ({ data, categories }) => {
   const parentName = data.personal_finance_category?.name || '';
 
   const category = categories?.find(
-    (c) => c.name === categoryName || c.enc_id === data.category_id_custom
+    c => c.name === categoryName || c.enc_id === data.category_id_custom
   );
 
   const displayName = category
@@ -129,7 +129,7 @@ const CategoryCellRenderer = ({ data, categories }) => {
 
   return (
     <Badge
-      variant="outline"
+      variant='outline'
       className={`${getCategoryColor(categoryName, parentName)} text-xs`}
     >
       {displayName}
@@ -163,12 +163,12 @@ const AmountCellRenderer = ({ data }) => {
 const ActionsCellRenderer = ({ data, onEditTransaction }) => {
   return (
     <Button
-      variant="ghost"
-      size="sm"
+      variant='ghost'
+      size='sm'
       onClick={() => onEditTransaction && onEditTransaction(data)}
-      className="h-8 w-8 p-0"
+      className='h-8 w-8 p-0'
     >
-      <Edit className="w-4 h-4" />
+      <Edit className='w-4 h-4' />
     </Button>
   );
 };
@@ -179,7 +179,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
 ) {
   const gridApiRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  const [noData, setNoData] = useState(false);
+  const [noData] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
@@ -199,7 +199,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
    * @returns {void}
    */
   const handlePrevPage = useCallback(() => {
-    setCurrentPage((prev) => prev - 1);
+    setCurrentPage(prev => prev - 1);
   }, []);
 
   /**
@@ -207,7 +207,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
    * @returns {void}
    */
   const handleNextPage = useCallback(() => {
-    setCurrentPage((prev) => prev + 1);
+    setCurrentPage(prev => prev + 1);
   }, []);
 
   /**
@@ -240,7 +240,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         const response = await transactionApi.list(payload);
         const { data } = response;
 
-        const processedData = (data.rowData || []).map((transaction) => ({
+        const processedData = (data.rowData || []).map(transaction => ({
           ...transaction,
           amountAmount:
             parseFloat(transaction.amount || transaction.amountAmount) || 0,
@@ -249,7 +249,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         setRowData(processedData);
         setTotalRows(data.rowCount || 0);
         setNoData(processedData.length === 0);
-      } catch (error) {
+      } catch {
         setRowData([]);
         setTotalRows(0);
         setNoData(true);
@@ -274,7 +274,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         headerName: 'Date',
         field: 'date',
         width: 120,
-        cellRenderer: (params) => {
+        cellRenderer: params => {
           return params.value
             ? format(new Date(params.value), 'MMM d, yyyy')
             : '-';
@@ -286,7 +286,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         headerName: 'Description',
         field: 'description_custom',
         flex: 2,
-        cellRenderer: (params) => (
+        cellRenderer: params => (
           <DescriptionCellRenderer data={params.data} accounts={accounts} />
         ),
         sortable: true,
@@ -303,7 +303,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         headerName: 'Account',
         field: 'account_id',
         width: 150,
-        cellRenderer: (params) => (
+        cellRenderer: params => (
           <AccountCellRenderer data={params.data} accounts={accounts} />
         ),
         sortable: true,
@@ -313,7 +313,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         headerName: 'Category',
         field: 'personal_finance_category.name',
         width: 120,
-        cellRenderer: (params) => (
+        cellRenderer: params => (
           <CategoryCellRenderer
             data={params.data}
             categories={childCategories}
@@ -326,7 +326,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         headerName: 'Amount',
         field: 'amountAmount',
         width: 120,
-        cellRenderer: (params) => <AmountCellRenderer data={params.data} />,
+        cellRenderer: params => <AmountCellRenderer data={params.data} />,
         sortable: true,
         filter: false,
         type: 'numericColumn',
@@ -342,7 +342,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         headerName: 'Actions',
         field: 'actions',
         width: 80,
-        cellRenderer: (params) => (
+        cellRenderer: params => (
           <ActionsCellRenderer
             data={params.data}
             onEditTransaction={onEditTransaction}
@@ -364,53 +364,52 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
     []
   );
 
-  const pageSizes = [5, 10, 20, 50, 100];
 
   const SkeletonTable = () => (
-    <div className="w-full space-y-4">
+    <div className='w-full space-y-4'>
       {/* Header skeleton */}
-      <div className="grid grid-cols-7 gap-4 p-4 bg-common-gray-light rounded-t-lg">
+      <div className='grid grid-cols-7 gap-4 p-4 bg-common-gray-light rounded-t-lg'>
         {Array.from({ length: 7 }).map((_, i) => (
-          <Skeleton key={i} className="h-6 w-full" />
+          <Skeleton key={i} className='h-6 w-full' />
         ))}
       </div>
 
       {/* Rows skeleton */}
       {Array.from({ length: 10 }).map((_, rowIndex) => (
-        <div key={rowIndex} className="grid grid-cols-7 gap-4 p-4 border-b">
+        <div key={rowIndex} className='grid grid-cols-7 gap-4 p-4 border-b'>
           {Array.from({ length: 7 }).map((_, colIndex) => (
-            <div key={colIndex} className="space-y-2">
-              <Skeleton className="h-4 w-full" />
-              {colIndex === 1 && <Skeleton className="h-3 w-3/4" />}
+            <div key={colIndex} className='space-y-2'>
+              <Skeleton className='h-4 w-full' />
+              {colIndex === 1 && <Skeleton className='h-3 w-3/4' />}
             </div>
           ))}
         </div>
       ))}
 
       {/* Pagination skeleton */}
-      <div className="flex justify-between items-center p-4 bg-common-gray-light rounded-b-lg">
-        <Skeleton className="h-6 w-32" />
-        <div className="flex gap-2">
+      <div className='flex justify-between items-center p-4 bg-common-gray-light rounded-b-lg'>
+        <Skeleton className='h-6 w-32' />
+        <div className='flex gap-2'>
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-8" />
+            <Skeleton key={i} className='h-8 w-8' />
           ))}
         </div>
-        <Skeleton className="h-6 w-24" />
+        <Skeleton className='h-6 w-24' />
       </div>
     </div>
   );
 
   if (loading) {
     return (
-      <div className="w-full h-full">
+      <div className='w-full h-full'>
         <SkeletonTable />
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full">
-      <style jsx="true">{`
+    <div className='w-full h-full'>
+      <style>{`
         .enhanced-grid {
           border-radius: 8px;
           overflow: hidden;
@@ -548,13 +547,13 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         }
       `}</style>
 
-      <div className="w-full space-y-4">
-        <div className="h-[500px] enhanced-grid">
+      <div className='w-full space-y-4'>
+        <div className='h-[500px] enhanced-grid'>
           <AgGridReact
-            theme="ag-theme-alpine"
+            theme='ag-theme-alpine'
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
-            rowModelType="clientSide"
+            rowModelType='clientSide'
             rowData={rowData}
             pagination={false}
             rowHeight={60}
@@ -566,35 +565,35 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
             suppressMenuHide={true}
             suppressColumnMoveAnimation={true}
             suppressDragLeaveHidesColumns={true}
-            noRowsOverlayComponent="No transactions found matching your criteria"
+            noRowsOverlayComponent='No transactions found matching your criteria'
             suppressNoRowsOverlay={rowData.length === 0}
-            onGridReady={(params) => {
+            onGridReady={params => {
               gridApiRef.current = params.api;
               params.api.sizeColumnsToFit();
             }}
-            onFirstDataRendered={(params) => {
+            onFirstDataRendered={params => {
               params.api.sizeColumnsToFit();
             }}
           />
         </div>
 
         {/* Custom Pagination Controls */}
-        <div className="flex items-center justify-between p-4 bg-common-gray-light rounded-lg border">
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-common-gray-dark">
+        <div className='flex items-center justify-between p-4 bg-common-gray-light rounded-lg border'>
+          <div className='flex items-center gap-4'>
+            <span className='text-sm text-common-gray-dark'>
               Showing {currentPage * pageSize + 1} to{' '}
               {Math.min((currentPage + 1) * pageSize, totalRows)} of {totalRows}{' '}
               entries
             </span>
             <select
               value={pageSize}
-              onChange={(e) => {
+              onChange={e => {
                 setPageSize(Number(e.target.value));
                 setCurrentPage(0);
               }}
-              className="px-3 py-1 border border-common-gray-light rounded text-sm"
+              className='px-3 py-1 border border-common-gray-light rounded text-sm'
             >
-              {[10, 20, 50, 100].map((size) => (
+              {[10, 20, 50, 100].map(size => (
                 <option key={size} value={size}>
                   {size} per page
                 </option>
@@ -602,49 +601,49 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className='flex items-center gap-2'>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handleFirstPage}
               disabled={currentPage === 0 || loading}
-              className="h-8 w-8 p-0"
+              className='h-8 w-8 p-0'
             >
               ⟪
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handlePrevPage}
               disabled={currentPage === 0 || loading}
-              className="h-8 w-8 p-0"
+              className='h-8 w-8 p-0'
             >
               ‹
             </Button>
 
-            <span className="px-3 py-1 text-sm">
+            <span className='px-3 py-1 text-sm'>
               Page {currentPage + 1} of {Math.ceil(totalRows / pageSize) || 1}
             </span>
 
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handleNextPage}
               disabled={
                 currentPage >= Math.ceil(totalRows / pageSize) - 1 || loading
               }
-              className="h-8 w-8 p-0"
+              className='h-8 w-8 p-0'
             >
               ›
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handleLastPage}
               disabled={
                 currentPage >= Math.ceil(totalRows / pageSize) - 1 || loading
               }
-              className="h-8 w-8 p-0"
+              className='h-8 w-8 p-0'
             >
               ⟫
             </Button>
@@ -656,12 +655,3 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
 });
 
 export default PaginatedTransactionTable;
-
-
-
-
-
-
-
-
-

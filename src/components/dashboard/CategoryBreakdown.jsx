@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,20 +17,20 @@ const categoryColors = {
 export default function CategoryBreakdown({ transactions, isLoading }) {
   if (isLoading) {
     return (
-      <Card className="card-shadow border-0">
+      <Card className='card-shadow border-0'>
         <CardHeader>
           <CardTitle>Category Breakdown</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className='space-y-4'>
           {Array(5)
             .fill(0)
             .map((_, i) => (
-              <div key={i} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="w-4 h-4 rounded-full" />
-                  <Skeleton className="h-4 w-20" />
+              <div key={i} className='flex items-center justify-between'>
+                <div className='flex items-center gap-3'>
+                  <Skeleton className='w-4 h-4 rounded-full' />
+                  <Skeleton className='h-4 w-20' />
                 </div>
-                <Skeleton className="h-4 w-16" />
+                <Skeleton className='h-4 w-16' />
               </div>
             ))}
         </CardContent>
@@ -41,7 +40,7 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
 
   const getCategoryBreakdown = () => {
     const categories = {};
-    transactions.forEach((transaction) => {
+    transactions.forEach(transaction => {
       if (transaction.amount < 0) {
         const category = transaction.category || 'uncategorized';
         categories[category] =
@@ -61,38 +60,38 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
   );
 
   return (
-    <Card className="card-shadow border-0">
+    <Card className='card-shadow border-0'>
       <CardHeader>
         <CardTitle>Category Breakdown</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className='space-y-4'>
         {categoryData.map(([category, amount]) => {
           const percentage =
             totalSpending > 0 ? (amount / totalSpending) * 100 : 0;
 
           return (
-            <div key={category} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+            <div key={category} className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
                   <div
-                    className="w-3 h-3 rounded-full"
+                    className='w-3 h-3 rounded-full'
                     style={{
                       backgroundColor:
                         categoryColors[category] ||
                         categoryColors.uncategorized,
                     }}
                   />
-                  <span className="text-sm font-medium capitalize">
+                  <span className='text-sm font-medium capitalize'>
                     {category}
                   </span>
                 </div>
-                <span className="text-sm font-semibold">
+                <span className='text-sm font-semibold'>
                   ${amount.toLocaleString()}
                 </span>
               </div>
-              <div className="w-full bg-common-gray-light rounded-full h-2">
+              <div className='w-full bg-common-gray-light rounded-full h-2'>
                 <div
-                  className="h-2 rounded-full transition-all duration-300"
+                  className='h-2 rounded-full transition-all duration-300'
                   style={{
                     width: `${percentage}%`,
                     backgroundColor:
@@ -100,7 +99,7 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
                   }}
                 />
               </div>
-              <div className="text-xs text-common-gray-dark">
+              <div className='text-xs text-common-gray-dark'>
                 {percentage.toFixed(1)}% of total spending
               </div>
             </div>
@@ -108,7 +107,7 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
         })}
 
         {categoryData.length === 0 && (
-          <div className="text-center py-8 text-common-gray-dark">
+          <div className='text-center py-8 text-common-gray-dark'>
             No spending data available
           </div>
         )}
@@ -116,11 +115,3 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
     </Card>
   );
 }
-
-
-
-
-
-
-
-

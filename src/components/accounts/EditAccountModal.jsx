@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -36,17 +36,17 @@ export default function EditAccountModal({ isOpen, onClose, onSave, account }) {
             name at your financial institution.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          <Label htmlFor="account-name">Account Name</Label>
+        <div className='py-4'>
+          <Label htmlFor='account-name'>Account Name</Label>
           <Input
-            id="account-name"
+            id='account-name'
             value={accountName}
-            onChange={(e) => setAccountName(e.target.value)}
-            placeholder="Enter new account name"
+            onChange={e => setAccountName(e.target.value)}
+            placeholder='Enter new account name'
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant='outline' onClick={onClose}>
             Cancel
           </Button>
           <Button onClick={handleSave}>Save Changes</Button>
@@ -55,11 +55,3 @@ export default function EditAccountModal({ isOpen, onClose, onSave, account }) {
     </Dialog>
   );
 }
-
-
-
-
-
-
-
-

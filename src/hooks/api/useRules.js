@@ -24,10 +24,10 @@ export const useRules = () => {
     }
   }, []);
 
-  const createRule = useCallback(async (ruleData) => {
+  const createRule = useCallback(async ruleData => {
     try {
       const response = await ruleApi.create(ruleData);
-      setRules((prev) => [...prev, response.data]);
+      setRules(prev => [...prev, response.data]);
       return response.data;
     } catch (err) {
       setError(err.message);
@@ -38,8 +38,8 @@ export const useRules = () => {
   const updateRule = useCallback(async (id, ruleData) => {
     try {
       const response = await ruleApi.update(id, ruleData);
-      setRules((prev) =>
-        prev.map((rule) => (rule.id === id ? response.data : rule))
+      setRules(prev =>
+        prev.map(rule => (rule.id === id ? response.data : rule))
       );
       return response.data;
     } catch (err) {
@@ -48,17 +48,17 @@ export const useRules = () => {
     }
   }, []);
 
-  const deleteRule = useCallback(async (id) => {
+  const deleteRule = useCallback(async id => {
     try {
       await ruleApi.delete(id);
-      setRules((prev) => prev.filter((rule) => rule.id !== id));
+      setRules(prev => prev.filter(rule => rule.id !== id));
     } catch (err) {
       setError(err.message);
       throw err;
     }
   }, []);
 
-  const applyRule = useCallback(async (id) => {
+  const applyRule = useCallback(async id => {
     try {
       await ruleApi.apply(id);
     } catch (err) {
@@ -93,7 +93,7 @@ export const useRules = () => {
   };
 };
 
-export const useRule = (id) => {
+export const useRule = id => {
   const [rule, setRule] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);

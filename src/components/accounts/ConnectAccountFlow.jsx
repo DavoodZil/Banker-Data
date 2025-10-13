@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import { usePlaidLink } from '@/hooks/api';
 import { usePlaidLinkToken } from '@/hooks/usePlaidLinkToken';
 
 const StatusDisplay = ({ step, error, isReady }) => (
-  <div className="text-center space-y-4 py-8">
+  <div className='text-center space-y-4 py-8'>
     <div
       className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto transition-colors ${
         step === 'success' || (step === 'ready' && isReady)
@@ -29,24 +29,26 @@ const StatusDisplay = ({ step, error, isReady }) => (
       }`}
     >
       {step === 'loading' && (
-        <Loader2 className="w-8 h-8 text-common-gray-dark animate-spin" />
+        <Loader2 className='w-8 h-8 text-common-gray-dark animate-spin' />
       )}
       {step === 'ready' && isReady && (
-        <ShieldCheck className="w-8 h-8 text-common-green" />
+        <ShieldCheck className='w-8 h-8 text-common-green' />
       )}
       {step === 'success' && (
-        <CheckCircle className="w-8 h-8 text-common-green" />
+        <CheckCircle className='w-8 h-8 text-common-green' />
       )}
-      {step === 'error' && <AlertTriangle className="w-8 h-8 text-common-red" />}
+      {step === 'error' && (
+        <AlertTriangle className='w-8 h-8 text-common-red' />
+      )}
     </div>
-    <div className="space-y-1">
-      <h3 className="text-lg font-semibold text-common-gray-dark">
+    <div className='space-y-1'>
+      <h3 className='text-lg font-semibold text-common-gray-dark'>
         {step === 'loading' && 'Preparing secure connection...'}
         {step === 'ready' && 'Ready to Connect'}
         {step === 'success' && 'Connection Successful!'}
         {step === 'error' && 'Connection Failed'}
       </h3>
-      <p className="text-sm text-common-gray-dark">
+      <p className='text-sm text-common-gray-dark'>
         {step === 'loading' && 'Please wait a moment.'}
         {step === 'ready' && 'Click below to securely open the Plaid window.'}
         {step === 'success' && 'Your account is linked and will sync shortly.'}
@@ -223,11 +225,11 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
         !['loading', 'success'].includes(step) ? handleClose : () => {}
       }
     >
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="p-2 bg-common-green-secondary rounded-lg">
-              <Landmark className="w-6 h-6 text-common-green" />
+          <DialogTitle className='flex items-center gap-3 text-xl'>
+            <div className='p-2 bg-common-green-secondary rounded-lg'>
+              <Landmark className='w-6 h-6 text-common-green' />
             </div>
             Connect Bank Account
           </DialogTitle>
@@ -239,11 +241,11 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
 
         <StatusDisplay step={step} error={error} isReady={isReady} />
 
-        <div className="pt-4">
+        <div className='pt-4'>
           {step === 'success' ? (
             <Button
               onClick={handleClose}
-              className="w-full bg-common-green hover:bg-common-green-dark"
+              className='w-full bg-common-green hover:bg-common-green-dark'
             >
               Done
             </Button>
@@ -251,9 +253,9 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
             <Button
               onClick={handleOpenPlaid}
               disabled={!isReady}
-              className="w-full h-11 text-base bg-common-green hover:bg-common-green-dark"
+              className='w-full h-11 text-base bg-common-green hover:bg-common-green-dark'
             >
-              {step === 'loading' && <Loader2 className="animate-spin" />}
+              {step === 'loading' && <Loader2 className='animate-spin' />}
               {step !== 'loading' && 'Continue Securely'}
             </Button>
           )}
@@ -262,11 +264,3 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
     </Dialog>
   );
 }
-
-
-
-
-
-
-
-

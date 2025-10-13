@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,7 +38,7 @@ export default function TransactionEditModal({
   const { categoryHierarchy, loading: categoriesLoading } = useCategories();
 
   // Format category name by replacing underscores with spaces
-  const formatCategoryName = (name) => {
+  const formatCategoryName = name => {
     return name
       ? name
           .replace(/_/g, ' ')
@@ -64,7 +64,7 @@ export default function TransactionEditModal({
     }
   }, [transaction]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     onSave(transaction.id, formData);
   };
@@ -81,7 +81,7 @@ export default function TransactionEditModal({
       acc[groupName] = {
         icon: FileText,
         emoji: parent.emoji,
-        subcategories: children.map((child) => ({
+        subcategories: children.map(child => ({
           name: formatCategoryName(child.name),
           enc_id: child.enc_id,
           original_name: child.name,
@@ -102,7 +102,7 @@ export default function TransactionEditModal({
 
       const lowerCaseSearch = categorySearch.toLowerCase();
       const categoryMatches = category.toLowerCase().includes(lowerCaseSearch);
-      const matchingSubcategories = subcategories.filter((sub) =>
+      const matchingSubcategories = subcategories.filter(sub =>
         sub.name.toLowerCase().includes(lowerCaseSearch)
       );
 
@@ -156,24 +156,24 @@ export default function TransactionEditModal({
         }
       `}</style>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className='sm:max-w-lg'>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Edit className="w-5 h-5" />
+            <DialogTitle className='flex items-center gap-2'>
+              <Edit className='w-5 h-5' />
               Edit Transaction
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="p-4 bg-common-gray-light rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-4 h-4 text-common-gray-dark" />
-                <span className="font-medium">
+          <div className='space-y-4'>
+            <div className='p-4 bg-common-gray-light rounded-lg'>
+              <div className='flex items-center gap-2 mb-2'>
+                <Calendar className='w-4 h-4 text-common-gray-dark' />
+                <span className='font-medium'>
                   {format(new Date(transaction.date), 'MMMM d, yyyy')}
                 </span>
               </div>
-              <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="w-4 h-4 text-common-gray-dark" />
+              <div className='flex items-center gap-2 mb-2'>
+                <DollarSign className='w-4 h-4 text-common-gray-dark' />
                 <span
                   className={`font-semibold ${transaction.amountAmount > 0 ? 'text-common-green' : 'text-common-red'}`}
                 >
@@ -183,90 +183,90 @@ export default function TransactionEditModal({
                   ).toLocaleString()}
                 </span>
               </div>
-              <div className="text-sm text-common-gray-dark">
+              <div className='text-sm text-common-gray-dark'>
                 Original:{' '}
                 {transaction.original_description || transaction.description}
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className='space-y-4'>
               {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+              <div className='space-y-2'>
+                <Label htmlFor='description'>Description</Label>
                 <Input
-                  id="description"
+                  id='description'
                   value={formData.description}
-                  onChange={(e) =>
+                  onChange={e =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  placeholder="Enter description..."
+                  placeholder='Enter description...'
                   required
                 />
               </div>
 
               {/* Merchant Name */}
-              <div className="space-y-2">
-                <Label htmlFor="merchantName">Merchant Name</Label>
+              <div className='space-y-2'>
+                <Label htmlFor='merchantName'>Merchant Name</Label>
                 <Input
-                  id="merchantName"
+                  id='merchantName'
                   value={formData.merchantName}
-                  onChange={(e) =>
+                  onChange={e =>
                     setFormData({ ...formData, merchantName: e.target.value })
                   }
-                  placeholder="Enter merchant name..."
+                  placeholder='Enter merchant name...'
                 />
               </div>
 
               {/* Category */}
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+              <div className='space-y-2'>
+                <Label htmlFor='category'>Category</Label>
                 <Select
                   value={formData.category}
-                  onValueChange={(value) =>
+                  onValueChange={value =>
                     setFormData({ ...formData, category: value })
                   }
                   disabled={categoriesLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder='Select a category' />
                   </SelectTrigger>
-                  <SelectContent className="max-h-80">
-                    <div className="sticky top-0 z-10 bg-white p-2 border-b">
-                      <div className="relative">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
+                  <SelectContent className='max-h-80'>
+                    <div className='sticky top-0 z-10 bg-white p-2 border-b'>
+                      <div className='relative'>
+                        <Search className='w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark' />
                         <Input
-                          placeholder="Search categories..."
+                          placeholder='Search categories...'
                           value={categorySearch}
-                          onChange={(e) => setCategorySearch(e.target.value)}
-                          className="pl-9 h-8"
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onFocus={(e) => e.stopPropagation()}
+                          onChange={e => setCategorySearch(e.target.value)}
+                          className='pl-9 h-8'
+                          onMouseDown={e => e.stopPropagation()}
+                          onFocus={e => e.stopPropagation()}
                         />
                       </div>
                     </div>
 
-                    <div className="max-h-48 overflow-y-auto">
+                    <div className='max-h-48 overflow-y-auto'>
                       {Object.entries(filteredCategories).map(
                         ([
                           category,
                           { icon: CategoryIcon, emoji, subcategories },
                         ]) => (
                           <SelectGroup key={category}>
-                            <SelectLabel className="category-header flex items-center gap-2">
+                            <SelectLabel className='category-header flex items-center gap-2'>
                               {emoji ? (
-                                <span className="text-xl leading-none">
+                                <span className='text-xl leading-none'>
                                   {emoji}
                                 </span>
                               ) : (
-                                <CategoryIcon className="w-4 h-4" />
+                                <CategoryIcon className='w-4 h-4' />
                               )}
                               {category}
                             </SelectLabel>
-                            {subcategories.map((subcategory) => (
+                            {subcategories.map(subcategory => (
                               <SelectItem
                                 key={subcategory.enc_id}
                                 value={subcategory.enc_id}
-                                className="subcategory-item"
+                                className='subcategory-item'
                               >
                                 {subcategory.name}
                               </SelectItem>
@@ -277,7 +277,7 @@ export default function TransactionEditModal({
 
                       {Object.keys(filteredCategories).length === 0 &&
                         categorySearch && (
-                          <div className="text-center py-4 text-common-gray-dark text-sm">
+                          <div className='text-center py-4 text-common-gray-dark text-sm'>
                             No categories found
                           </div>
                         )}
@@ -287,37 +287,37 @@ export default function TransactionEditModal({
               </div>
 
               {/* Amount */}
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount</Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark text-sm">
+              <div className='space-y-2'>
+                <Label htmlFor='amount'>Amount</Label>
+                <div className='relative'>
+                  <span className='absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark text-sm'>
                     $
                   </span>
                   <Input
-                    id="amount"
-                    type="number"
-                    step="0.01"
+                    id='amount'
+                    type='number'
+                    step='0.01'
                     value={formData.amount}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({
                         ...formData,
                         amount: parseFloat(e.target.value) || 0,
                       })
                     }
-                    placeholder="0.00"
-                    className="pl-7"
+                    placeholder='0.00'
+                    className='pl-7'
                     required
                   />
                 </div>
               </div>
 
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={onClose}>
+                <Button type='button' variant='outline' onClick={onClose}>
                   Cancel
                 </Button>
                 <Button
-                  type="submit"
-                  className="bg-common-green hover:bg-common-green-dark"
+                  type='submit'
+                  className='bg-common-green hover:bg-common-green-dark'
                 >
                   Save Changes
                 </Button>
@@ -329,11 +329,3 @@ export default function TransactionEditModal({
     </>
   );
 }
-
-
-
-
-
-
-
-

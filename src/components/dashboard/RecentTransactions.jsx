@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -16,35 +15,36 @@ const categoryColors = {
   travel: 'bg-lime-50 text-lime-700 border-lime-200',
   income: 'bg-common-green-secondary text-common-green-dark ',
   investments: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  uncategorized: 'bg-common-gray-light text-common-gray-dark border-common-gray-light',
+  uncategorized:
+    'bg-common-gray-light text-common-gray-dark border-common-gray-light',
 };
 
 export default function RecentTransactions({ transactions, isLoading }) {
   if (isLoading) {
     return (
-      <Card className="card-shadow border-0">
-        <CardHeader className="pb-4">
+      <Card className='card-shadow border-0'>
+        <CardHeader className='pb-4'>
           <CardTitle>Recent Transactions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
+          <div className='space-y-3'>
             {Array(10)
               .fill(0)
               .map((_, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className='flex items-center justify-between p-3 border rounded-lg'
                 >
-                  <div className="flex items-center gap-3">
-                    <Skeleton className="w-8 h-8 rounded-full" />
+                  <div className='flex items-center gap-3'>
+                    <Skeleton className='w-8 h-8 rounded-full' />
                     <div>
-                      <Skeleton className="h-4 w-32 mb-1" />
-                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className='h-4 w-32 mb-1' />
+                      <Skeleton className='h-3 w-20' />
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Skeleton className="h-4 w-16 mb-1" />
-                    <Skeleton className="h-3 w-12" />
+                  <div className='text-right'>
+                    <Skeleton className='h-4 w-16 mb-1' />
+                    <Skeleton className='h-3 w-12' />
                   </div>
                 </div>
               ))}
@@ -57,37 +57,37 @@ export default function RecentTransactions({ transactions, isLoading }) {
   const recentTransactions = transactions.slice(0, 25);
 
   return (
-    <Card className="card-shadow border-0">
-      <CardHeader className="pb-4">
+    <Card className='card-shadow border-0'>
+      <CardHeader className='pb-4'>
         <CardTitle>Recent Transactions</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2 max-h-[600px] overflow-y-auto">
-          {recentTransactions.map((transaction) => (
+        <div className='space-y-2 max-h-[600px] overflow-y-auto'>
+          {recentTransactions.map(transaction => (
             <div
               key={transaction.id}
-              className="flex items-center justify-between p-3 hover:bg-common-gray-light rounded-lg transition-smooth"
+              className='flex items-center justify-between p-3 hover:bg-common-gray-light rounded-lg transition-smooth'
             >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className='flex items-center gap-3 min-w-0 flex-1'>
                 <div
                   className={`p-2 rounded-full flex-shrink-0 ${transaction.amount > 0 ? 'bg-common-green-secondary' : 'bg-common-red-secondary'}`}
                 >
                   {transaction.amount > 0 ? (
-                    <ArrowUpRight className="w-4 h-4 text-common-green" />
+                    <ArrowUpRight className='w-4 h-4 text-common-green' />
                   ) : (
-                    <ArrowDownRight className="w-4 h-4 text-common-red" />
+                    <ArrowDownRight className='w-4 h-4 text-common-red' />
                   )}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="font-medium text-common-gray-dark truncate">
+                <div className='min-w-0 flex-1'>
+                  <div className='font-medium text-common-gray-dark truncate'>
                     {transaction.custom_description || transaction.description}
                   </div>
-                  <div className="text-sm text-common-gray-dark">
+                  <div className='text-sm text-common-gray-dark'>
                     {format(new Date(transaction.date), 'MMM d, yyyy')}
                   </div>
                 </div>
               </div>
-              <div className="text-right ml-4 flex-shrink-0">
+              <div className='text-right ml-4 flex-shrink-0'>
                 <div
                   className={`font-semibold ${transaction.amount > 0 ? 'text-common-green' : 'text-common-red'}`}
                 >
@@ -95,7 +95,7 @@ export default function RecentTransactions({ transactions, isLoading }) {
                   {Math.abs(transaction.amount).toLocaleString()}
                 </div>
                 <Badge
-                  variant="outline"
+                  variant='outline'
                   className={`text-xs mt-1 ${categoryColors[transaction.category] || categoryColors.uncategorized}`}
                 >
                   {transaction.category}
@@ -106,9 +106,9 @@ export default function RecentTransactions({ transactions, isLoading }) {
         </div>
 
         {transactions.length === 0 && (
-          <div className="text-center py-8 text-common-gray-dark">
-            <div className="w-12 h-12 bg-common-gray-light rounded-full flex items-center justify-center mx-auto mb-3">
-              <ArrowUpRight className="w-6 h-6 text-common-gray-dark" />
+          <div className='text-center py-8 text-common-gray-dark'>
+            <div className='w-12 h-12 bg-common-gray-light rounded-full flex items-center justify-center mx-auto mb-3'>
+              <ArrowUpRight className='w-6 h-6 text-common-gray-dark' />
             </div>
             <p>No transactions yet</p>
           </div>
@@ -117,12 +117,3 @@ export default function RecentTransactions({ transactions, isLoading }) {
     </Card>
   );
 }
-
-
-
-
-
-
-
-
-

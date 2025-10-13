@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -42,7 +42,7 @@ export default function RecentTransactionsList({ transactions }) {
   const endIndex = startIndex + itemsPerPage;
   const paginatedTransactions = transactions.slice(startIndex, endIndex);
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = newPage => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
@@ -61,21 +61,21 @@ export default function RecentTransactionsList({ transactions }) {
                 <TableHead>Date</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className='text-right'>Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedTransactions.map((tx) => (
+              {paginatedTransactions.map(tx => (
                 <TableRow key={tx.id}>
                   <TableCell>
                     {format(new Date(tx.date), 'MMM dd, yyyy')}
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className='font-medium'>
                     {tx.custom_description || tx.description}
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant="outline"
+                      variant='outline'
                       className={`${categoryColors[tx.category] || categoryColors.uncategorized}`}
                     >
                       {tx.category}
@@ -95,31 +95,31 @@ export default function RecentTransactionsList({ transactions }) {
             </TableBody>
           </Table>
         ) : (
-          <p className="text-common-gray-dark text-center py-8">
+          <p className='text-common-gray-dark text-center py-8'>
             No recent transactions for this account.
           </p>
         )}
       </CardContent>
       {totalPages > 1 && (
-        <CardFooter className="flex items-center justify-between pt-4 border-t">
-          <div className="text-sm text-common-gray-dark">
+        <CardFooter className='flex items-center justify-between pt-4 border-t'>
+          <div className='text-sm text-common-gray-dark'>
             Showing {startIndex + 1} to{' '}
             {Math.min(endIndex, transactions.length)} of {transactions.length}{' '}
             transactions
           </div>
-          <div className="flex items-center gap-2">
+          <div className='flex items-center gap-2'>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
               Previous
             </Button>
-            <span className="text-sm font-medium">{`Page ${currentPage} of ${totalPages}`}</span>
+            <span className='text-sm font-medium'>{`Page ${currentPage} of ${totalPages}`}</span>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
@@ -131,11 +131,3 @@ export default function RecentTransactionsList({ transactions }) {
     </Card>
   );
 }
-
-
-
-
-
-
-
-

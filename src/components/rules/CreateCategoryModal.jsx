@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -93,7 +93,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
   const [emojiPopoverOpen, setEmojiPopoverOpen] = useState(false);
   const [emojiSearch, setEmojiSearch] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     onSave(formData);
     // Reset form
@@ -106,7 +106,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
     setEmojiSearch('');
   };
 
-  const handleEmojiSelect = (emoji) => {
+  const handleEmojiSelect = emoji => {
     setFormData({ ...formData, emoji: emoji });
     setEmojiPopoverOpen(false);
     setEmojiSearch('');
@@ -114,23 +114,23 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
 
   const filteredEmojis = useMemo(() => {
     const searchTerm = emojiSearch.toLowerCase().trim();
-    return availableEmojis.filter((item) =>
+    return availableEmojis.filter(item =>
       item.name.toLowerCase().includes(searchTerm)
     );
   }, [emojiSearch]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Create New Category</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className='space-y-6'>
           {/* Emoji & Name Row */}
-          <div className="flex items-start gap-3">
+          <div className='flex items-start gap-3'>
             {/* Emoji Selector */}
-            <div className="space-y-2">
+            <div className='space-y-2'>
               <Label>Emoji</Label>
               <Popover
                 open={emojiPopoverOpen}
@@ -138,32 +138,32 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
               >
                 <PopoverTrigger asChild>
                   <Button
-                    type="button"
-                    variant="outline"
-                    className="w-16 h-10 text-xl p-0 flex justify-center items-center"
+                    type='button'
+                    variant='outline'
+                    className='w-16 h-10 text-xl p-0 flex justify-center items-center'
                   >
                     {formData.emoji}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80 p-3" align="start">
-                  <div className="space-y-3">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-common-gray-dark" />
+                <PopoverContent className='w-80 p-3' align='start'>
+                  <div className='space-y-3'>
+                    <div className='relative'>
+                      <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-common-gray-dark' />
                       <Input
-                        placeholder="Search emoji..."
-                        className="pl-9"
+                        placeholder='Search emoji...'
+                        className='pl-9'
                         value={emojiSearch}
-                        onChange={(e) => setEmojiSearch(e.target.value)}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onFocus={(e) => e.stopPropagation()}
+                        onChange={e => setEmojiSearch(e.target.value)}
+                        onMouseDown={e => e.stopPropagation()}
+                        onFocus={e => e.stopPropagation()}
                       />
                     </div>
-                    <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto pr-2">
+                    <div className='grid grid-cols-8 gap-1 max-h-48 overflow-y-auto pr-2'>
                       {filteredEmojis.length > 0 ? (
-                        filteredEmojis.map((item) => (
+                        filteredEmojis.map(item => (
                           <button
                             key={item.emoji}
-                            type="button"
+                            type='button'
                             className={`p-2 rounded-md border-2 text-lg transition-colors hover:bg-common-gray-light ${
                               formData.emoji === item.emoji
                                 ? 'border-common-green bg-common-green-secondary'
@@ -176,7 +176,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
                           </button>
                         ))
                       ) : (
-                        <div className="col-span-8 text-center py-4 text-sm text-common-gray-dark">
+                        <div className='col-span-8 text-center py-4 text-sm text-common-gray-dark'>
                           {`No emojis found for "${emojiSearch}"`}
                         </div>
                       )}
@@ -187,45 +187,47 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
             </div>
 
             {/* Category Name */}
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="categoryName">Category Name</Label>
+            <div className='flex-1 space-y-2'>
+              <Label htmlFor='categoryName'>Category Name</Label>
               <Input
-                id="categoryName"
+                id='categoryName'
                 value={formData.name}
-                onChange={(e) =>
+                onChange={e =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="e.g., Coffee Shops"
+                placeholder='e.g., Coffee Shops'
                 required
               />
             </div>
           </div>
 
           {/* Category Preview */}
-          <div className="p-3 bg-common-gray-light rounded-lg border-2 border-dashed border-common-gray-light">
-            <Label className="text-sm text-common-gray-dark mb-2 block">Preview</Label>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{formData.emoji}</span>
-              <span className="font-medium text-common-gray-dark text-lg">
+          <div className='p-3 bg-common-gray-light rounded-lg border-2 border-dashed border-common-gray-light'>
+            <Label className='text-sm text-common-gray-dark mb-2 block'>
+              Preview
+            </Label>
+            <div className='flex items-center gap-3'>
+              <span className='text-2xl'>{formData.emoji}</span>
+              <span className='font-medium text-common-gray-dark text-lg'>
                 {formData.name || 'Category Name'}
               </span>
             </div>
           </div>
 
           {/* Group Section */}
-          <div className="space-y-3">
+          <div className='space-y-3'>
             <Label>Group</Label>
             <Select
               value={formData.group}
-              onValueChange={(value) =>
+              onValueChange={value =>
                 setFormData({ ...formData, group: value })
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a group" />
+                <SelectValue placeholder='Select a group' />
               </SelectTrigger>
               <SelectContent>
-                {categoryGroups.map((group) => (
+                {categoryGroups.map(group => (
                   <SelectItem key={group} value={group}>
                     {group}
                   </SelectItem>
@@ -235,21 +237,21 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
           </div>
 
           {/* Budget Exclusion Option */}
-          <div className="space-y-3">
+          <div className='space-y-3'>
             <Label>Budget Settings</Label>
-            <div className="flex items-center justify-between p-3 bg-common-gray-light rounded-lg">
+            <div className='flex items-center justify-between p-3 bg-common-gray-light rounded-lg'>
               <div>
-                <Label htmlFor="excludeBudget" className="font-medium">
+                <Label htmlFor='excludeBudget' className='font-medium'>
                   Exclude from budget
                 </Label>
-                <p className="text-sm text-common-gray-dark mt-1">
+                <p className='text-sm text-common-gray-dark mt-1'>
                   This category won't be included in budget calculations
                 </p>
               </div>
               <Switch
-                id="excludeBudget"
+                id='excludeBudget'
                 checked={formData.excludeFromBudget}
-                onCheckedChange={(checked) =>
+                onCheckedChange={checked =>
                   setFormData({ ...formData, excludeFromBudget: checked })
                 }
               />
@@ -257,12 +259,12 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type='button' variant='outline' onClick={onClose}>
               Cancel
             </Button>
             <Button
-              type="submit"
-              className="bg-common-green hover:bg-common-green-dark"
+              type='submit'
+              className='bg-common-green hover:bg-common-green-dark'
               disabled={!formData.name.trim() || !formData.group}
             >
               Save Category
@@ -273,11 +275,3 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
     </Dialog>
   );
 }
-
-
-
-
-
-
-
-

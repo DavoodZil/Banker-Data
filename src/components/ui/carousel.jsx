@@ -40,7 +40,7 @@ const Carousel = React.forwardRef(
     const [canScrollPrev, setCanScrollPrev] = React.useState(false);
     const [canScrollNext, setCanScrollNext] = React.useState(false);
 
-    const onSelect = React.useCallback((api) => {
+    const onSelect = React.useCallback(api => {
       if (!api) {
         return;
       }
@@ -58,7 +58,7 @@ const Carousel = React.forwardRef(
     }, [api]);
 
     const handleKeyDown = React.useCallback(
-      (event) => {
+      event => {
         if (event.key === 'ArrowLeft') {
           event.preventDefault();
           scrollPrev();
@@ -110,8 +110,8 @@ const Carousel = React.forwardRef(
           ref={ref}
           onKeyDownCapture={handleKeyDown}
           className={cn('relative', className)}
-          role="region"
-          aria-roledescription="carousel"
+          role='region'
+          aria-roledescription='carousel'
           {...props}
         >
           {children}
@@ -126,7 +126,7 @@ const CarouselContent = React.forwardRef(({ className, ...props }, ref) => {
   const { carouselRef, orientation } = useCarousel();
 
   return (
-    <div ref={carouselRef} className="overflow-hidden">
+    <div ref={carouselRef} className='overflow-hidden'>
       <div
         ref={ref}
         className={cn(
@@ -147,8 +147,8 @@ const CarouselItem = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <div
       ref={ref}
-      role="group"
-      aria-roledescription="slide"
+      role='group'
+      aria-roledescription='slide'
       className={cn(
         'min-w-0 shrink-0 grow-0 basis-full',
         orientation === 'horizontal' ? 'pl-4' : 'pt-4',
@@ -180,8 +180,8 @@ const CarouselPrevious = React.forwardRef(
         onClick={scrollPrev}
         {...props}
       >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="sr-only">Previous slide</span>
+        <ArrowLeft className='h-4 w-4' />
+        <span className='sr-only'>Previous slide</span>
       </Button>
     );
   }
@@ -208,8 +208,8 @@ const CarouselNext = React.forwardRef(
         onClick={scrollNext}
         {...props}
       >
-        <ArrowRight className="h-4 w-4" />
-        <span className="sr-only">Next slide</span>
+        <ArrowRight className='h-4 w-4' />
+        <span className='sr-only'>Next slide</span>
       </Button>
     );
   }
@@ -223,11 +223,3 @@ export {
   CarouselPrevious,
   CarouselNext,
 };
-
-
-
-
-
-
-
-

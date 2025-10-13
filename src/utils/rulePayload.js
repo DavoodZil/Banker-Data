@@ -114,11 +114,11 @@ export const payloadMapper = (condition, allCategories = []) => {
         if (mapped) allConditions.push([IF_AMOUNT, ...mapped]);
       } else if (key === 'categories') {
         // Categories now come as enc_ids directly
-        (value.values || []).forEach((categoryId) => {
+        (value.values || []).forEach(categoryId => {
           allConditions.push([IF_CATEGORY, categoryId]);
         });
       } else if (key === 'accounts') {
-        (value.values || []).forEach((val) =>
+        (value.values || []).forEach(val =>
           allConditions.push([IF_ACCOUNT, MERCHANT_MATCH_TYPE_EXACT, val])
         );
       } else if (key === 'description') {
@@ -151,11 +151,11 @@ export const payloadMapper = (condition, allCategories = []) => {
   // Build nested structure for OR groups with AND conditions
   const result = [];
 
-  merchantGroups.forEach((group) => {
+  merchantGroups.forEach(group => {
     const groupConditions = [];
 
     // Add merchant conditions for this group
-    group.forEach((matcher) => {
+    group.forEach(matcher => {
       const mapped = matcherMapper(matcher, 'merchants');
       if (mapped) {
         // Use IF_ORIGINAL_DESCRIPTION (1) for original_description, IF_MERCHANT (5) for merchant_name
@@ -183,8 +183,8 @@ export const payloadMapper = (condition, allCategories = []) => {
 const convertTagNamesToIds = (tagNames, allTags) => {
   if (!Array.isArray(tagNames) || !Array.isArray(allTags)) return [];
   return tagNames
-    .map((tagName) => {
-      const tag = allTags.find((t) => t.name === tagName);
+    .map(tagName => {
+      const tag = allTags.find(t => t.name === tagName);
       return tag ? tag.id : null;
     })
     .filter(Boolean);
@@ -196,8 +196,8 @@ const convertTagIdsToNames = (tagIds, allTags) => {
   const ids = Array.isArray(tagIds) ? tagIds : [tagIds];
   if (!Array.isArray(allTags)) return [];
   return ids
-    .map((tagId) => {
-      const tag = allTags.find((t) => t.id === tagId);
+    .map(tagId => {
+      const tag = allTags.find(t => t.id === tagId);
       return tag ? tag.name : null;
     })
     .filter(Boolean);
@@ -208,8 +208,8 @@ const convertCategoryNamesToIds = (categoryNames, allCategories) => {
   if (!Array.isArray(categoryNames)) return [];
   if (!Array.isArray(allCategories)) return [];
   return categoryNames
-    .map((categoryName) => {
-      const category = allCategories.find((c) => c.name === categoryName);
+    .map(categoryName => {
+      const category = allCategories.find(c => c.name === categoryName);
       return category ? category.id : null;
     })
     .filter(Boolean);
@@ -221,8 +221,8 @@ const convertCategoryIdsToNames = (categoryIds, allCategories) => {
   const ids = Array.isArray(categoryIds) ? categoryIds : [categoryIds];
   if (!Array.isArray(allCategories)) return [];
   return ids
-    .map((categoryId) => {
-      const category = allCategories.find((c) => c.id === categoryId);
+    .map(categoryId => {
+      const category = allCategories.find(c => c.id === categoryId);
       return category ? category.name : null;
     })
     .filter(Boolean);
@@ -270,7 +270,7 @@ export const payloadSplitMapper = (
     return null;
   }
 
-  return splitData.splits.map((split) => {
+  return splitData.splits.map(split => {
     // Category is already an enc_id
     return {
       merchant: split.merchant || '',
@@ -356,7 +356,7 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
       ruleData.ifs.forEach((orGroup, groupIndex) => {
         let merchantMatchers = [];
 
-        orGroup.forEach((cond) => {
+        orGroup.forEach(cond => {
           const [type, ...rest] = cond;
           switch (type) {
             case IF_MERCHANT:
@@ -470,7 +470,7 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
     } else {
       // Handle flat structure (backward compatibility)
       let merchantMatchers = [];
-      ruleData.ifs.forEach((cond) => {
+      ruleData.ifs.forEach(cond => {
         const [type, ...rest] = cond;
         switch (type) {
           case IF_MERCHANT:
@@ -503,7 +503,7 @@ export function decodeRuleData(ruleData, allTags = [], allCategories = []) {
 
   // --- Decode THENs (actions) ---
   if (Array.isArray(ruleData.thens)) {
-    ruleData.thens.forEach((action) => {
+    ruleData.thens.forEach(action => {
       const [type, value] = action;
       switch (type) {
         case THEN_ACTION_RENAME_MERCHANT:

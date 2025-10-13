@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/services/api';
 
-export const usePlaidLinkToken = (isOpen) => {
+export const usePlaidLinkToken = isOpen => {
   const [linkToken, setLinkToken] = useState(null);
   const [linkKey, setLinkKey] = useState(null);
   const [isLoading, setIsLoading] = useState(false);

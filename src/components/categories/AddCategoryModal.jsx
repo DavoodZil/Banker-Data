@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,7 +40,7 @@ export default function AddCategoryModal({
   const { categoryHierarchy, loading: loadingCategories } = useCategories();
 
   // Format category name by replacing underscores with spaces
-  const formatCategoryName = (name) => {
+  const formatCategoryName = name => {
     return name
       ? name
           .replace(/_/g, ' ')
@@ -68,7 +68,7 @@ export default function AddCategoryModal({
     }
   }, [category]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     // Send the parent category's enc_id as 'parent' to the backend
     onSave({
@@ -91,8 +91,8 @@ export default function AddCategoryModal({
         icon: FileText, // Default icon
         emoji: parent.emoji,
         subcategories: children
-          .filter((child) => !category || child.enc_id !== category.enc_id) // Skip current category if editing
-          .map((child) => ({
+          .filter(child => !category || child.enc_id !== category.enc_id) // Skip current category if editing
+          .map(child => ({
             name: formatCategoryName(child.name),
             enc_id: child.enc_id,
             original_name: child.name,
@@ -113,7 +113,7 @@ export default function AddCategoryModal({
 
       const lowerCaseSearch = categorySearch.toLowerCase();
       const categoryMatches = category.toLowerCase().includes(lowerCaseSearch);
-      const matchingSubcategories = subcategories.filter((sub) =>
+      const matchingSubcategories = subcategories.filter(sub =>
         sub.name.toLowerCase().includes(lowerCaseSearch)
       );
 
@@ -165,82 +165,82 @@ export default function AddCategoryModal({
         }
       `}</style>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className='sm:max-w-md'>
           <DialogHeader>
-            <DialogTitle className="text-lg">
+            <DialogTitle className='text-lg'>
               {category ? 'Edit Category' : 'Add New Category'}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className='space-y-4'>
             {/* Category Name */}
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium">
+            <div className='space-y-2'>
+              <Label htmlFor='name' className='text-sm font-medium'>
                 Category Name
               </Label>
               <Input
-                id="name"
+                id='name'
                 value={formatCategoryName(formData.name)}
-                onChange={(e) =>
+                onChange={e =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="e.g., Coffee & Snacks"
-                className="h-9"
+                placeholder='e.g., Coffee & Snacks'
+                className='h-9'
                 required
               />
             </div>
 
             {/* Parent Category Dropdown */}
-            <div className="space-y-2">
-              <Label htmlFor="parent_category" className="text-sm font-medium">
-                Parent Category <span className="text-common-red">*</span>
+            <div className='space-y-2'>
+              <Label htmlFor='parent_category' className='text-sm font-medium'>
+                Parent Category <span className='text-common-red'>*</span>
               </Label>
               <Select
                 value={formData.parent_category}
-                onValueChange={(value) =>
+                onValueChange={value =>
                   setFormData({ ...formData, parent_category: value })
                 }
                 disabled={loadingCategories}
               >
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select a parent category" />
+                <SelectTrigger className='h-9'>
+                  <SelectValue placeholder='Select a parent category' />
                 </SelectTrigger>
-                <SelectContent className="max-h-80">
-                  <div className="sticky top-0 z-10 bg-white p-2 border-b">
-                    <div className="relative">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
+                <SelectContent className='max-h-80'>
+                  <div className='sticky top-0 z-10 bg-white p-2 border-b'>
+                    <div className='relative'>
+                      <Search className='w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark' />
                       <Input
-                        placeholder="Search categories..."
+                        placeholder='Search categories...'
                         value={categorySearch}
-                        onChange={(e) => setCategorySearch(e.target.value)}
-                        className="pl-9 h-8"
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onFocus={(e) => e.stopPropagation()}
+                        onChange={e => setCategorySearch(e.target.value)}
+                        className='pl-9 h-8'
+                        onMouseDown={e => e.stopPropagation()}
+                        onFocus={e => e.stopPropagation()}
                       />
                     </div>
                   </div>
 
-                  <div className="max-h-48 overflow-y-auto">
+                  <div className='max-h-48 overflow-y-auto'>
                     {Object.entries(filteredCategories).map(
                       ([
                         category,
                         { icon: CategoryIcon, emoji, subcategories },
                       ]) => (
                         <SelectGroup key={category}>
-                          <SelectLabel className="category-header flex items-center gap-2">
+                          <SelectLabel className='category-header flex items-center gap-2'>
                             {emoji ? (
-                              <span className="text-xl leading-none">
+                              <span className='text-xl leading-none'>
                                 {emoji}
                               </span>
                             ) : (
-                              <CategoryIcon className="w-4 h-4" />
+                              <CategoryIcon className='w-4 h-4' />
                             )}
                             {category}
                           </SelectLabel>
-                          {subcategories.map((subcategory) => (
+                          {subcategories.map(subcategory => (
                             <SelectItem
                               key={subcategory.enc_id}
                               value={subcategory.enc_id}
-                              className="subcategory-item"
+                              className='subcategory-item'
                             >
                               {subcategory.name}
                             </SelectItem>
@@ -251,7 +251,7 @@ export default function AddCategoryModal({
 
                     {Object.keys(filteredCategories).length === 0 &&
                       categorySearch && (
-                        <div className="text-center py-4 text-common-gray-dark text-sm">
+                        <div className='text-center py-4 text-common-gray-dark text-sm'>
                           No categories found
                         </div>
                       )}
@@ -261,48 +261,48 @@ export default function AddCategoryModal({
             </div>
 
             {/* Monthly Budget */}
-            <div className="space-y-2">
-              <Label htmlFor="budget_amount" className="text-sm font-medium">
+            <div className='space-y-2'>
+              <Label htmlFor='budget_amount' className='text-sm font-medium'>
                 Monthly Budget (Optional)
               </Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark text-sm">
+              <div className='relative'>
+                <span className='absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark text-sm'>
                   $
                 </span>
                 <Input
-                  id="budget_amount"
-                  type="number"
-                  step="0.01"
+                  id='budget_amount'
+                  type='number'
+                  step='0.01'
                   value={formData.budget_amount}
-                  onChange={(e) =>
+                  onChange={e =>
                     setFormData({ ...formData, budget_amount: e.target.value })
                   }
-                  placeholder="0.00"
-                  className="pl-7 h-9"
+                  placeholder='0.00'
+                  className='pl-7 h-9'
                 />
               </div>
-              <p className="text-xs text-common-gray-dark">
+              <p className='text-xs text-common-gray-dark'>
                 Set a monthly spending limit for this category
               </p>
             </div>
 
-            <DialogFooter className="gap-2">
+            <DialogFooter className='gap-2'>
               <Button
-                type="button"
-                variant="outline"
+                type='button'
+                variant='outline'
                 onClick={onClose}
-                size="sm"
+                size='sm'
                 disabled={isSaving}
               >
                 Cancel
               </Button>
               <Button
-                type="submit"
-                className="bg-common-green hover:bg-common-green-dark"
-                size="sm"
+                type='submit'
+                className='bg-common-green hover:bg-common-green-dark'
+                size='sm'
                 disabled={isSaving || !formData.parent_category}
               >
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSaving && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
                 {category ? 'Update' : 'Create'} Category
               </Button>
             </DialogFooter>
@@ -312,11 +312,3 @@ export default function AddCategoryModal({
     </>
   );
 }
-
-
-
-
-
-
-
-

@@ -33,16 +33,16 @@ export function useCategories() {
         const parentData = response.data.data;
 
         // Extract parent categories (non-selectable)
-        const parentCategories = parentData.map((parent) => ({
+        const parentCategories = parentData.map(parent => ({
           ...parent,
           isParent: true,
           selectable: false,
         }));
 
         // Extract user categories (actual selectable categories) with parent reference
-        const childCategories = parentData.flatMap((parent) =>
-          parent.children.flatMap((child) =>
-            (child.user_category || []).map((userCat) => ({
+        const childCategories = parentData.flatMap(parent =>
+          parent.children.flatMap(child =>
+            (child.user_category || []).map(userCat => ({
               ...userCat,
               parent_id: parent.enc_id,
               parent_name: parent.name,
@@ -58,9 +58,9 @@ export function useCategories() {
         );
 
         // Create hierarchy structure for display with user categories
-        const hierarchy = parentData.map((parent) => ({
+        const hierarchy = parentData.map(parent => ({
           ...parent,
-          children: parent.children.map((child) => ({
+          children: parent.children.map(child => ({
             ...child,
             parent_id: parent.enc_id,
             parent_name: parent.name,
@@ -111,7 +111,7 @@ export function useCategories() {
 
   // Create category
   const createCategory = useCallback(
-    async (data) => {
+    async data => {
       setLoading(true);
       setError(null);
       try {
@@ -186,14 +186,14 @@ export function useCategories() {
 
   // Delete category
   const deleteCategory = useCallback(
-    async (id) => {
+    async id => {
       setLoading(true);
       setError(null);
       try {
         await categoryApi.delete(id);
 
         // Remove from local state
-        setCategories((prev) => prev.filter((cat) => cat.id !== id));
+        setCategories(prev => prev.filter(cat => cat.id !== id));
 
         toast({
           title: 'Success',
@@ -300,10 +300,9 @@ export function useCategories() {
 
     // Computed values
     categoryCount: categories.length,
-    getCategoryById: (id) =>
-      categories.find((cat) => cat.enc_id === id || cat.id === id),
-    getCategoriesByType: (type) =>
-      categories.filter((cat) => cat.type === type),
+    getCategoryById: id =>
+      categories.find(cat => cat.enc_id === id || cat.id === id),
+    getCategoriesByType: type => categories.filter(cat => cat.type === type),
     getSelectableCategories: () => childCategories,
     getNonSelectableCategories: () => parentCategories,
   };
@@ -322,7 +321,7 @@ export function useCategorySearch(categories = []) {
 
     const lowercaseSearch = searchTerm.toLowerCase();
     const filtered = categories.filter(
-      (category) =>
+      category =>
         category.name.toLowerCase().includes(lowercaseSearch) ||
         category.parent?.toLowerCase().includes(lowercaseSearch)
     );
@@ -371,7 +370,7 @@ export function useCategoryBudget(categoryId) {
   );
 
   const updateBudget = useCallback(
-    async (amount) => {
+    async amount => {
       if (!categoryId) return;
 
       try {

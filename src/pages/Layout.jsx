@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import {
@@ -8,18 +7,16 @@ import {
   PieChart,
   Wallet,
   Settings,
-  Bell, // Add Bell icon
-  KeyRound, // Add KeyRound icon
+  Bell,
+  KeyRound,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator, // Import separator
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import LogoutButton from '@/components/auth/LogoutButton';
 
 const menuItems = [
   {
@@ -76,7 +73,7 @@ const menuItems = [
   },
 ];
 
-export default function Layout({ children, currentPageName }) {
+export default function Layout({ children }) {
   const location = useLocation();
 
   return (
@@ -109,12 +106,12 @@ export default function Layout({ children, currentPageName }) {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
       `}</style>
-      <div className="min-h-screen flex flex-col w-full gradient-bg">
-        <header className="bg-white/90 backdrop-blur-sm border-b border-common-gray-light sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <nav className="hidden md:flex h-full items-center gap-1 overflow-x-auto">
-                {menuItems.map((item) => (
+      <div className='min-h-screen flex flex-col w-full gradient-bg'>
+        <header className='bg-white/90 backdrop-blur-sm border-b border-common-gray-light sticky top-0 z-50'>
+          <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+            <div className='flex items-center justify-between h-16'>
+              <nav className='hidden md:flex h-full items-center gap-1 overflow-x-auto'>
+                {menuItems.map(item => (
                   <Link
                     key={item.title}
                     to={item.url}
@@ -170,16 +167,8 @@ export default function Layout({ children, currentPageName }) {
           </div>
         </header>
 
-        <main className="flex-1">{children}</main>
+        <main className='flex-1'>{children}</main>
       </div>
     </>
   );
 }
-
-
-
-
-
-
-
-

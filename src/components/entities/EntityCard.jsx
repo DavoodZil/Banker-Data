@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Card,
   CardContent,
@@ -21,66 +20,60 @@ export default function EntityCard({ entity, accounts, onEdit }) {
   const Icon = entityTypeIcons[entity.type] || Briefcase;
 
   return (
-    <Card className="card-shadow-lg border-0 bg-white flex flex-col justify-between">
+    <Card className='card-shadow-lg border-0 bg-white flex flex-col justify-between'>
       <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-indigo-100 rounded-lg">
-              <Icon className="w-6 h-6 text-indigo-600" />
+        <div className='flex items-start justify-between'>
+          <div className='flex items-center gap-4'>
+            <div className='p-3 bg-indigo-100 rounded-lg'>
+              <Icon className='w-6 h-6 text-indigo-600' />
             </div>
             <div>
-              <CardTitle className="text-lg">{entity.name}</CardTitle>
-              <Badge variant="outline" className="mt-1">
+              <CardTitle className='text-lg'>{entity.name}</CardTitle>
+              <Badge variant='outline' className='mt-1'>
                 {entity.type}
               </Badge>
             </div>
           </div>
           <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-common-gray-dark"
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8 text-common-gray-dark'
             onClick={() => onEdit(entity)}
           >
-            <Edit className="w-4 h-4" />
+            <Edit className='w-4 h-4' />
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         {entity.description && (
-          <p className="text-sm text-common-gray-dark mb-4">{entity.description}</p>
+          <p className='text-sm text-common-gray-dark mb-4'>
+            {entity.description}
+          </p>
         )}
         <div>
-          <h4 className="text-sm font-semibold text-common-gray-dark mb-2 flex items-center gap-2">
-            <Link2 className="w-4 h-4" /> Linked Accounts
+          <h4 className='text-sm font-semibold text-common-gray-dark mb-2 flex items-center gap-2'>
+            <Link2 className='w-4 h-4' /> Linked Accounts
           </h4>
           {accounts.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {accounts.map((account) => (
-                <Badge key={account.id} variant="secondary">
+            <div className='flex flex-wrap gap-2'>
+              {accounts.map(account => (
+                <Badge key={account.id} variant='secondary'>
                   {account.account_name}
                 </Badge>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-common-gray-dark">
+            <p className='text-sm text-common-gray-dark'>
               No accounts linked. Go to "Manage Rules" to link accounts.
             </p>
           )}
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full">
+        <Button variant='outline' className='w-full'>
           View Transactions
         </Button>
       </CardFooter>
     </Card>
   );
 }
-
-
-
-
-
-
-
-

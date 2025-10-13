@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   LineChart,
@@ -18,15 +17,15 @@ import { CreditCard } from 'lucide-react';
 export default function SpendingChart({ transactions, isLoading }) {
   if (isLoading) {
     return (
-      <Card className="card-shadow border-0">
+      <Card className='card-shadow border-0'>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-common-orange" />
+          <CardTitle className='flex items-center gap-2'>
+            <CreditCard className='w-5 h-5 text-common-orange' />
             Daily Spending
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-64 w-full" />
+          <Skeleton className='h-64 w-full' />
         </CardContent>
       </Card>
     );
@@ -35,17 +34,17 @@ export default function SpendingChart({ transactions, isLoading }) {
   const generateChartData = () => {
     const days = Array.from({ length: 14 }, (_, i) => {
       const date = startOfDay(subDays(new Date(), 13 - i));
-      const dayTransactions = transactions.filter((t) => {
+      const dayTransactions = transactions.filter(t => {
         const transactionDate = startOfDay(new Date(t.date));
         return transactionDate.getTime() === date.getTime();
       });
 
       const spending = dayTransactions
-        .filter((t) => t.amount < 0)
+        .filter(t => t.amount < 0)
         .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
       const income = dayTransactions
-        .filter((t) => t.amount > 0)
+        .filter(t => t.amount > 0)
         .reduce((sum, t) => sum + t.amount, 0);
 
       return {
@@ -65,38 +64,38 @@ export default function SpendingChart({ transactions, isLoading }) {
   const avgDaily = totalSpending / chartData.length;
 
   return (
-    <Card className="card-shadow border-0">
+    <Card className='card-shadow border-0'>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-common-orange" />
+        <div className='flex items-center justify-between'>
+          <CardTitle className='flex items-center gap-2'>
+            <CreditCard className='w-5 h-5 text-common-orange' />
             Daily Spending
           </CardTitle>
-          <div className="text-right">
-            <div className="text-lg font-bold text-common-gray-dark">
+          <div className='text-right'>
+            <div className='text-lg font-bold text-common-gray-dark'>
               ${avgDaily.toFixed(0)}/day avg
             </div>
-            <div className="text-sm text-common-gray-dark">Last 14 days</div>
+            <div className='text-sm text-common-gray-dark'>Last 14 days</div>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width='100%' height={250}>
           <BarChart
             data={chartData}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            <CartesianGrid strokeDasharray='3 3' stroke='#f1f5f9' />
             <XAxis
-              dataKey="date"
-              stroke="#64748b"
+              dataKey='date'
+              stroke='#64748b'
               fontSize={12}
               tickLine={false}
             />
             <YAxis
-              stroke="#64748b"
+              stroke='#64748b'
               fontSize={12}
-              tickFormatter={(value) => `$${value}`}
+              tickFormatter={value => `$${value}`}
               tickLine={false}
             />
             <Tooltip
@@ -117,38 +116,40 @@ export default function SpendingChart({ transactions, isLoading }) {
               }}
             />
             <Bar
-              dataKey="spending"
-              fill="#f97316"
+              dataKey='spending'
+              fill='#f97316'
               radius={[4, 4, 0, 0]}
-              name="spending"
+              name='spending'
             />
             <Bar
-              dataKey="income"
-              fill="#10b981"
+              dataKey='income'
+              fill='#10b981'
               radius={[4, 4, 0, 0]}
-              name="income"
+              name='income'
             />
           </BarChart>
         </ResponsiveContainer>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-common-gray-light">
-          <div className="text-center">
-            <div className="text-sm text-common-gray-dark">Total Spent</div>
-            <div className="text-lg font-semibold text-common-orange">
+        <div className='grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-common-gray-light'>
+          <div className='text-center'>
+            <div className='text-sm text-common-gray-dark'>Total Spent</div>
+            <div className='text-lg font-semibold text-common-orange'>
               ${totalSpending.toLocaleString()}
             </div>
           </div>
-          <div className="text-center">
-            <div className="text-sm text-common-gray-dark">Highest Day</div>
-            <div className="text-lg font-semibold text-common-gray-dark">
-              ${Math.max(...chartData.map((d) => d.spending)).toLocaleString()}
+          <div className='text-center'>
+            <div className='text-sm text-common-gray-dark'>Highest Day</div>
+            <div className='text-lg font-semibold text-common-gray-dark'>
+              ${Math.max(...chartData.map(d => d.spending)).toLocaleString()}
             </div>
           </div>
-          <div className="text-center">
-            <div className="text-sm text-common-gray-dark">Days with Spending</div>
-            <div className="text-lg font-semibold text-common-gray-dark">
-              {chartData.filter((d) => d.spending > 0).length}/14
+          <div className='text-center'>
+            <div className='text-sm text-common-gray-dark'>
+              Days with Spending
+            </div>
+            <div className='text-lg font-semibold text-common-gray-dark'>
+              {chartData.filter(d => d.spending > 0).length}/14
             </div>
           </div>
         </div>
@@ -156,11 +157,3 @@ export default function SpendingChart({ transactions, isLoading }) {
     </Card>
   );
 }
-
-
-
-
-
-
-
-

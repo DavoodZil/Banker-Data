@@ -43,7 +43,7 @@ export function useAccounts() {
   );
 
   // Get single account
-  const getAccount = useCallback(async (id) => {
+  const getAccount = useCallback(async id => {
     setLoading(true);
     setError(null);
     try {
@@ -61,13 +61,13 @@ export function useAccounts() {
 
   // Create account
   const createAccount = useCallback(
-    async (data) => {
+    async data => {
       setLoading(true);
       setError(null);
       try {
         const response = await accountApi.create(data);
         const newAccount = response.data;
-        setAccounts((prev) => [...prev, newAccount]);
+        setAccounts(prev => [...prev, newAccount]);
         toast({
           title: 'Success',
           description: 'Account created successfully',
@@ -98,8 +98,8 @@ export function useAccounts() {
       try {
         const response = await accountApi.update(id, data);
         const updatedAccount = response.data;
-        setAccounts((prev) =>
-          prev.map((acc) => (acc.id === id ? updatedAccount : acc))
+        setAccounts(prev =>
+          prev.map(acc => (acc.id === id ? updatedAccount : acc))
         );
         toast({
           title: 'Success',
@@ -125,12 +125,12 @@ export function useAccounts() {
 
   // Delete account
   const deleteAccount = useCallback(
-    async (id) => {
+    async id => {
       setLoading(true);
       setError(null);
       try {
         await accountApi.delete(id);
-        setAccounts((prev) => prev.filter((acc) => acc.id !== id));
+        setAccounts(prev => prev.filter(acc => acc.id !== id));
         toast({
           title: 'Success',
           description: 'Account deleted successfully',
@@ -154,7 +154,7 @@ export function useAccounts() {
 
   // Sync account with bank
   const syncAccount = useCallback(
-    async (id) => {
+    async id => {
       setLoading(true);
       setError(null);
       try {
@@ -205,13 +205,13 @@ export function useAccounts() {
 
   // Connect Plaid account
   const connectPlaidAccount = useCallback(
-    async (plaidData) => {
+    async plaidData => {
       setLoading(true);
       setError(null);
       try {
         const response = await accountApi.connectPlaid(plaidData);
         const newAccount = response.data;
-        setAccounts((prev) => [...prev, newAccount]);
+        setAccounts(prev => [...prev, newAccount]);
         toast({
           title: 'Success',
           description: 'Bank account connected successfully',
@@ -298,7 +298,7 @@ export function useAccount(accountId) {
   }, [fetchAccount]);
 
   const updateAccount = useCallback(
-    async (data) => {
+    async data => {
       if (!accountId) return;
 
       try {

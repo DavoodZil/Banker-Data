@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,39 +30,41 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-common-gray-dark mb-1 flex items-center gap-2">
-              <Target className="w-4 h-4 text-common-gray-dark" />
+    <Card className='hover:shadow-md transition-shadow'>
+      <CardHeader className='pb-3'>
+        <div className='flex items-start justify-between'>
+          <div className='flex-1'>
+            <CardTitle className='text-lg font-semibold text-common-gray-dark mb-1 flex items-center gap-2'>
+              <Target className='w-4 h-4 text-common-gray-dark' />
               {goal.name}
             </CardTitle>
             {goal.description && (
-              <p className="text-sm text-common-gray-dark">{goal.description}</p>
+              <p className='text-sm text-common-gray-dark'>
+                {goal.description}
+              </p>
             )}
           </div>
-          <div className="flex items-center gap-2 ml-4">
+          <div className='flex items-center gap-2 ml-4'>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => onEdit(goal)}
-              className="h-8 px-2"
+              className='h-8 px-2'
             >
-              <Edit3 className="w-4 h-4" />
+              <Edit3 className='w-4 h-4' />
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => setShowDeleteDialog(true)}
-              className="h-8 px-2 text-common-red hover:text-common-red-dark"
+              className='h-8 px-2 text-common-red hover:text-common-red-dark'
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className='w-4 h-4' />
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className='pt-0'>
         {/* <div className="flex items-center gap-2 text-xs text-common-gray-dark">
           <Hash className="w-3 h-3" />
           <span>ID: {goal.id}</span>
@@ -85,7 +87,7 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
                 onDelete(goal.id);
                 setShowDeleteDialog(false);
               }}
-              className="bg-common-red hover:bg-common-red-dark"
+              className='bg-common-red hover:bg-common-red-dark'
             >
               Delete
             </AlertDialogAction>
@@ -104,7 +106,7 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (goal) {
       setFormData({
         name: goal.name || '',
@@ -119,7 +121,7 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
     setErrors({});
   }, [goal, isOpen]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     // Validation
@@ -146,7 +148,7 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className='sm:max-w-[425px]'>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>{goal ? 'Edit Goal' : 'Create New Goal'}</DialogTitle>
@@ -156,43 +158,43 @@ const GoalFormModal = ({ isOpen, onClose, goal = null, onSave }) => {
                 : 'Enter the details for the new goal.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+          <div className='grid gap-4 py-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='name'>Name</Label>
               <Input
-                id="name"
+                id='name'
                 value={formData.name}
-                onChange={(e) =>
+                onChange={e =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="Enter goal name"
+                placeholder='Enter goal name'
                 className={errors.name ? 'border-common-red' : ''}
               />
               {errors.name && (
-                <p className="text-xs text-common-red">{errors.name}</p>
+                <p className='text-xs text-common-red'>{errors.name}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description (optional)</Label>
+            <div className='space-y-2'>
+              <Label htmlFor='description'>Description (optional)</Label>
               <Textarea
-                id="description"
+                id='description'
                 value={formData.description}
-                onChange={(e) =>
+                onChange={e =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Enter goal description"
+                placeholder='Enter goal description'
                 rows={3}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type='button' variant='outline' onClick={onClose}>
               Cancel
             </Button>
             <Button
-              type="submit"
+              type='submit'
               disabled={isSubmitting}
-              className="bg-common-green hover:bg-common-green-dark"
+              className='bg-common-green hover:bg-common-green-dark'
             >
               {isSubmitting
                 ? 'Saving...'
@@ -223,14 +225,14 @@ export default function GoalsListPage() {
 
   const filteredGoals = Array.isArray(goals)
     ? goals.filter(
-        (goal) =>
+        goal =>
           goal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (goal?.description &&
             goal.description.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : [];
 
-  const handleCreateOrUpdate = async (formData) => {
+  const handleCreateOrUpdate = async formData => {
     if (editingGoal) {
       await updateGoal(editingGoal.id, formData);
     } else {
@@ -239,12 +241,12 @@ export default function GoalsListPage() {
     refetch();
   };
 
-  const handleEdit = (goal) => {
+  const handleEdit = goal => {
     setEditingGoal(goal);
     setShowFormModal(true);
   };
 
-  const handleDelete = async (goalId) => {
+  const handleDelete = async goalId => {
     try {
       await deleteGoal(goalId);
       refetch();
@@ -260,73 +262,75 @@ export default function GoalsListPage() {
 
   if (error) {
     return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="bg-common-red-secondary border border-common-red rounded-lg p-4">
-          <p className="text-common-red-dark">Error loading goals: {error}</p>
+      <div className='p-6 max-w-7xl mx-auto'>
+        <div className='bg-common-red-secondary border border-common-red rounded-lg p-4'>
+          <p className='text-common-red-dark'>Error loading goals: {error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50">
-      <div className="flex items-start justify-between">
+    <div className='p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50'>
+      <div className='flex items-start justify-between'>
         <div>
-          <h1 className="text-2xl font-bold text-common-gray-dark">Goals</h1>
-          <p className="text-common-gray-dark mt-1">Manage your financial goals</p>
+          <h1 className='text-2xl font-bold text-common-gray-dark'>Goals</h1>
+          <p className='text-common-gray-dark mt-1'>
+            Manage your financial goals
+          </p>
         </div>
         <Button
           onClick={handleCreate}
-          className="bg-common-green hover:bg-common-green-dark gap-2"
+          className='bg-common-green hover:bg-common-green-dark gap-2'
         >
-          <Plus className="w-4 h-4" />
+          <Plus className='w-4 h-4' />
           Create Goal
         </Button>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg border border-common-gray-light">
-        <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
+      <div className='bg-white p-4 rounded-lg border border-common-gray-light'>
+        <div className='flex items-center gap-4'>
+          <div className='relative flex-1 max-w-md'>
+            <Search className='w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark' />
             <Input
-              placeholder="Search goals..."
+              placeholder='Search goals...'
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              onChange={e => setSearchQuery(e.target.value)}
+              className='pl-9'
             />
           </div>
-          <div className="text-sm text-common-gray-dark">
+          <div className='text-sm text-common-gray-dark'>
             {filteredGoals.length} of {goals?.length || 0} goals
           </div>
         </div>
       </div>
 
       {/* Goals List */}
-      <div className="space-y-4">
+      <div className='space-y-4'>
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
             {[...Array(6)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
+              <Card key={i} className='animate-pulse'>
                 <CardHeader>
-                  <div className="h-4 bg-common-gray-light rounded w-3/4"></div>
+                  <div className='h-4 bg-common-gray-light rounded w-3/4'></div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    <div className="h-3 bg-common-gray-light rounded w-1/2"></div>
-                    <div className="h-3 bg-common-gray-light rounded w-2/3"></div>
+                  <div className='space-y-2'>
+                    <div className='h-3 bg-common-gray-light rounded w-1/2'></div>
+                    <div className='h-3 bg-common-gray-light rounded w-2/3'></div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : filteredGoals.length === 0 ? (
-          <div className="text-center py-12">
-            <Target className="w-12 h-12 text-common-gray-dark mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-common-gray-dark mb-2">
+          <div className='text-center py-12'>
+            <Target className='w-12 h-12 text-common-gray-dark mx-auto mb-4' />
+            <h3 className='text-lg font-medium text-common-gray-dark mb-2'>
               {searchQuery ? 'No goals found' : 'No goals created yet'}
             </h3>
-            <p className="text-common-gray-dark mb-4">
+            <p className='text-common-gray-dark mb-4'>
               {searchQuery
                 ? 'Try adjusting your search terms'
                 : 'Create your first goal to track your financial progress'}
@@ -334,16 +338,16 @@ export default function GoalsListPage() {
             {!searchQuery && (
               <Button
                 onClick={handleCreate}
-                className="bg-common-green hover:bg-common-green-dark gap-2"
+                className='bg-common-green hover:bg-common-green-dark gap-2'
               >
-                <Plus className="w-4 h-4" />
+                <Plus className='w-4 h-4' />
                 Create Your First Goal
               </Button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredGoals.map((goal) => (
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+            {filteredGoals.map(goal => (
               <GoalCard
                 key={goal.id}
                 goal={goal}
@@ -368,11 +372,3 @@ export default function GoalsListPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-

@@ -1,28 +1,27 @@
-import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Target } from 'lucide-react';
 
 export default function GoalsPage() {
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div className='p-6 max-w-7xl mx-auto'>
+      <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6'>
         <div>
-          <h1 className="text-3xl font-bold text-common-gray-dark">Goals</h1>
-          <p className="text-common-gray-dark mt-1">
+          <h1 className='text-3xl font-bold text-common-gray-dark'>Goals</h1>
+          <p className='text-common-gray-dark mt-1'>
             Set and track your financial goals.
           </p>
         </div>
       </div>
-      <Card className="card-shadow border-0 text-center py-24">
-        <CardContent className="space-y-4">
-          <div className="w-20 h-20 bg-common-red-secondary rounded-full flex items-center justify-center mx-auto">
-            <Target className="w-10 h-10 text-common-red" />
+      <Card className='card-shadow border-0 text-center py-24'>
+        <CardContent className='space-y-4'>
+          <div className='w-20 h-20 bg-common-red-secondary rounded-full flex items-center justify-center mx-auto'>
+            <Target className='w-10 h-10 text-common-red' />
           </div>
           <div>
-            <h3 className="text-2xl font-semibold text-common-gray-dark mb-2">
+            <h3 className='text-2xl font-semibold text-common-gray-dark mb-2'>
               Feature Coming Soon!
             </h3>
-            <p className="text-common-gray-dark max-w-md mx-auto">
+            <p className='text-common-gray-dark max-w-md mx-auto'>
               This section is under construction. Soon you'll be able to set
               savings goals and track your progress automatically.
             </p>
@@ -32,11 +31,3 @@ export default function GoalsPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-

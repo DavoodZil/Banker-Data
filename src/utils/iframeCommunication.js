@@ -41,8 +41,8 @@ export const sendToParent = (action, data = {}) => {
  * @param {function} callback - Callback function to handle messages
  * @returns {function} - Cleanup function to remove the listener
  */
-export const listenToParent = (callback) => {
-  const messageHandler = (event) => {
+export const listenToParent = callback => {
+  const messageHandler = event => {
     if (event.data.source === 'angular-parent') {
       callback(event.data);
     }
@@ -66,7 +66,7 @@ export const requestFromParent = (action, data = {}) => {
   return new Promise((resolve, reject) => {
     const requestId = Date.now().toString();
 
-    const messageHandler = (event) => {
+    const messageHandler = event => {
       if (
         event.data.source === 'angular-parent' &&
         event.data.requestId === requestId
@@ -117,7 +117,7 @@ export const notifyReady = () => {
  * Notify the parent about route changes
  * @param {string} route - The current route
  */
-export const notifyRouteChange = (route) => {
+export const notifyRouteChange = route => {
   sendToParent('route:change', { route });
 };
 

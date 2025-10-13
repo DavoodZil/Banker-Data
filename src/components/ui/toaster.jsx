@@ -23,7 +23,7 @@ export function Toaster() {
       }) {
         return (
           <Toast key={id} open={open} {...props}>
-            <div className="grid gap-1">
+            <div className='grid gap-1'>
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
@@ -38,11 +38,3 @@ export function Toaster() {
     </ToastProvider>
   );
 }
-
-
-
-
-
-
-
-

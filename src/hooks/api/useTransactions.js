@@ -77,9 +77,9 @@ export function useTransactions(initialParams = {}) {
   );
 
   // Update filters
-  const updateFilters = useCallback((newFilters) => {
+  const updateFilters = useCallback(newFilters => {
     setFilters(newFilters);
-    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
   }, []);
 
   // Clear filters
@@ -95,12 +95,12 @@ export function useTransactions(initialParams = {}) {
       filteredDate: '',
       filteredAmount: '',
     });
-    setPagination((prev) => ({ ...prev, page: 1 }));
+    setPagination(prev => ({ ...prev, page: 1 }));
   }, []);
 
   // Pagination helpers
   const goToPage = useCallback(
-    (page) => {
+    page => {
       if (page >= 1 && page <= pagination.totalPages) {
         fetchTransactions({ page });
       }
@@ -118,7 +118,7 @@ export function useTransactions(initialParams = {}) {
 
   // Create transaction
   const createTransaction = useCallback(
-    async (data) => {
+    async data => {
       try {
         const response = await transactionApi.create(data);
         const newTransaction = response.data;
@@ -153,8 +153,8 @@ export function useTransactions(initialParams = {}) {
         const response = await transactionApi.update(id, data);
         const updatedTransaction = response.data;
 
-        setTransactions((prev) =>
-          prev.map((t) => (t.id === id ? updatedTransaction : t))
+        setTransactions(prev =>
+          prev.map(t => (t.id === id ? updatedTransaction : t))
         );
 
         toast({
@@ -184,8 +184,8 @@ export function useTransactions(initialParams = {}) {
         const response = await transactionApi.categorize(id, categoryId);
         const updatedTransaction = response.data;
 
-        setTransactions((prev) =>
-          prev.map((t) => (t.id === id ? updatedTransaction : t))
+        setTransactions(prev =>
+          prev.map(t => (t.id === id ? updatedTransaction : t))
         );
 
         return updatedTransaction;
@@ -208,7 +208,7 @@ export function useTransactions(initialParams = {}) {
     async (transactionIds, categoryId) => {
       setLoading(true);
       try {
-        const categorizations = transactionIds.map((id) => ({
+        const categorizations = transactionIds.map(id => ({
           transactionId: id,
           categoryId,
         }));
@@ -244,11 +244,11 @@ export function useTransactions(initialParams = {}) {
 
   // Delete transaction
   const deleteTransaction = useCallback(
-    async (id) => {
+    async id => {
       try {
         await transactionApi.delete(id);
 
-        setTransactions((prev) => prev.filter((t) => t.id !== id));
+        setTransactions(prev => prev.filter(t => t.id !== id));
 
         toast({
           title: 'Success',
@@ -304,8 +304,8 @@ export function useTransactions(initialParams = {}) {
         const response = await transactionApi.addTags(id, tagIds);
         const updatedTransaction = response.data;
 
-        setTransactions((prev) =>
-          prev.map((t) => (t.id === id ? updatedTransaction : t))
+        setTransactions(prev =>
+          prev.map(t => (t.id === id ? updatedTransaction : t))
         );
 
         return updatedTransaction;
@@ -366,7 +366,7 @@ export function useTransactionSearch(debounceMs = 300) {
   const [searching, setSearching] = useState(false);
   const debounceTimerRef = useRef(null);
 
-  const search = useCallback(async (searchQuery) => {
+  const search = useCallback(async searchQuery => {
     if (!searchQuery.trim()) {
       setResults([]);
       return;
@@ -388,7 +388,7 @@ export function useTransactionSearch(debounceMs = 300) {
 
   // Debounced search
   const handleQueryChange = useCallback(
-    (newQuery) => {
+    newQuery => {
       setQuery(newQuery);
 
       // Clear existing timer

@@ -7,6 +7,7 @@ import { handleAuthParams, clearAuth } from '@/utils/auth';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Layout from '@/pages/Layout';
 
+// Import all pages
 import Dashboard from '@/pages/Dashboard';
 import Accounts from '@/pages/Accounts';
 import Transactions from '@/pages/Transactions';
@@ -28,6 +29,39 @@ import Tag from '@/pages/Tag';
 import TagsList from '@/pages/TagsList';
 import Group from '@/pages/Group';
 
+// Route configuration
+const routes = [
+  { path: '/', component: Dashboard },
+  { path: '/dashboard', component: Dashboard },
+  { path: '/accounts', component: Accounts },
+  { path: '/transactions', component: Transactions },
+  { path: '/categories', component: Categories },
+  { path: '/rules', component: RulesList },
+  { path: '/rules/create', component: Rules },
+  { path: '/rules/edit/:id', component: Rules },
+  { path: '/merchants', component: Merchants },
+  { path: '/reports', component: Reports },
+  { path: '/goals', component: GoalsList },
+  { path: '/cashflow', component: CashFlow },
+  { path: '/budget', component: Budget },
+  { path: '/tag', component: Tag },
+  { path: '/tags', component: TagsList },
+  { path: '/entity', component: Entity },
+  { path: '/group', component: Group },
+  { path: '/import', component: Import },
+  { path: '/api', component: API },
+  { path: '/auth-test', component: AuthTest },
+];
+
+// Helper component for protected routes
+const ProtectedRouteWrapper = ({ component: Component }) => (
+  <ProtectedRoute>
+    <Layout>
+      <Component />
+    </Layout>
+  </ProtectedRoute>
+);
+
 function App() {
   const location = useLocation();
 
@@ -36,7 +70,7 @@ function App() {
 
     notifyReady();
 
-    const cleanup = listenToParent((message) => {
+    const cleanup = listenToParent(message => {
       if (message.action === 'logout' || message.action === 'auth:logout') {
         clearAuth();
         window.location.href = '/unauthorized';
@@ -49,240 +83,20 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/unauthorized" element={<Unauthorized />} />
+        {/* Unauthorized route */}
+        <Route path='/unauthorized' element={<Unauthorized />} />
 
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Dashboard />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Protected routes */}
+        {routes.map(({ path, component }) => (
+          <Route
+            key={path}
+            path={path}
+            element={<ProtectedRouteWrapper component={component} />}
+          />
+        ))}
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Dashboard />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/accounts"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Accounts />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/transactions"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Transactions />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/categories"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Categories />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/rules"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <RulesList />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/rules/create"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Rules />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/rules/edit/:id"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Rules />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/merchants"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Merchants />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/reports"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Reports />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/goals"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <GoalsList />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/cashflow"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <CashFlow />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/budget"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Budget />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/tag"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Tag />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/tags"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <TagsList />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/entity"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Entity />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/group"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Group />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/import"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Import />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/api"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <API />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/reports"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Reports />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/auth-test"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <AuthTest />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Catch-all route */}
+        <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
       <Toaster />
     </>
@@ -290,11 +104,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-
-

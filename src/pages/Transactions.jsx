@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTransactions } from '@/hooks/api';
 import { useDebounceWithLoading } from '@/hooks/api/useDebounce';
 import { useBankData } from '@/hooks/useBankData';
@@ -13,13 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import {
   Search,
-  Filter,
   Download,
-  Calendar,
-  ArrowUpDown,
   RefreshCw,
   Upload,
   Loader2,
@@ -52,19 +48,19 @@ export default function Transactions() {
   const [filters, setFilters] = useState({
     account: 'all',
     category: 'all',
-    dateRange: 'all', // Changed default from 'this_month' to 'all'
+    dateRange: 'all',
     amountRange: 'all',
   });
 
   const filterPayload = useMemo(() => {
     const payload = {
-      filterModel: {}, // Keep filterModel empty as per virtual card platform
+      filterModel: {},
       filteredDescription: debouncedSearchQuery || '',
       filteredBankAccounts: filters.account !== 'all' ? [filters.account] : '',
       filteredCategory: filters.category !== 'all' ? filters.category : '',
-      categoriesList: '', // Will be populated if needed
+      categoriesList: '',
       filteredDate: '',
-      fromDate: '2015-07-29', // Default wide date range
+      fromDate: '2015-07-29',
       toDate: '2035-07-29',
     };
 
@@ -95,7 +91,7 @@ export default function Transactions() {
       if (dateFrom && dateTo) {
         payload.fromDate = format(dateFrom, 'yyyy-MM-dd');
         payload.toDate = format(dateTo, 'yyyy-MM-dd');
-        payload.filteredDate = filters.dateRange; // Store the filter type
+        payload.filteredDate = filters.dateRange;
       }
     }
 
@@ -111,28 +107,24 @@ export default function Transactions() {
           break;
         case 'over_200':
           payload.minimumAmount = '200.01';
-          payload.maximumAmount = '999999.99'; // Large number for "over" range
+          payload.maximumAmount = '999999.99';
           break;
       }
     }
 
     return payload;
   }, [debouncedSearchQuery, filters]);
-  const [syncMethod, setSyncMethod] = useState('direct'); // 'direct' or 'ngrok'
+  const [syncMethod, setSyncMethod] = useState('direct');
 
   const {
     transactions,
     loading: isLoading,
-    error,
     refetch: refetchTransactions,
     updateTransaction,
     updateFilters,
-    pagination,
   } = useTransactions();
   const {
     bankData,
-    isLoading: bankDataLoading,
-    error: bankDataError,
     refetch: refetchBankData,
   } = useBankData();
 
@@ -165,7 +157,8 @@ export default function Transactions() {
       let response;
 
       if (syncMethod === 'ngrok') {
-        response = await fetchFromNgrok();
+        // TODO: Implement fetchFromNgrok function
+        response = { data: { success: false, message: 'Not implemented' } };
         if (response.data && response.data.success) {
           await loadData();
         } else {
@@ -183,7 +176,8 @@ export default function Transactions() {
         }
       } else {
         // Direct sync
-        response = await syncTransactions();
+        // TODO: Implement syncTransactions function
+        response = { data: { success: false, message: 'Not implemented' } };
         if (response.data && response.data.success) {
           await loadData();
         } else {
@@ -222,7 +216,8 @@ export default function Transactions() {
   const handleWebhookTrigger = async () => {
     setIsSyncing(true);
     try {
-      const response = await triggerWebhookSync();
+      // TODO: Implement triggerWebhookSync function
+      const response = { data: { success: false, message: 'Not implemented' } };
       if (response.data && response.data.success) {
         setTimeout(async () => {
           await loadData();
@@ -273,8 +268,8 @@ export default function Transactions() {
    * @returns {void}
    */
   const exportTransactions = () => {
-    const csvData = filteredTransactions.map((t) => {
-      const account = accounts.find((a) => a.id === t.account_id);
+    const csvData = filteredTransactions.map(t => {
+      const account = accounts.find(a => a.id === t.account_id);
       return {
         Date: format(new Date(t.date), 'yyyy-MM-dd'),
         Description: t.custom_description || t.description,
@@ -288,8 +283,8 @@ export default function Transactions() {
     const headers = Object.keys(csvData[0]);
     const csvContent = [
       headers.join(','),
-      ...csvData.map((row) =>
-        headers.map((header) => JSON.stringify(row[header])).join(',')
+      ...csvData.map(row =>
+        headers.map(header => JSON.stringify(row[header])).join(',')
       ),
     ].join('\n');
 
@@ -311,34 +306,36 @@ export default function Transactions() {
   const filteredTransactions = transactions;
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className='p-6 space-y-6 max-w-7xl mx-auto'>
+      <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
         <div>
-          <h1 className="text-3xl font-bold text-common-gray-dark">Transactions</h1>
-          <p className="text-common-gray-dark mt-1">
+          <h1 className='text-3xl font-bold text-common-gray-dark'>
+            Transactions
+          </h1>
+          <p className='text-common-gray-dark mt-1'>
             Review and categorize your financial transactions
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-sm text-common-gray-dark">
+        <div className='flex items-center gap-3'>
+          <div className='text-sm text-common-gray-dark'>
             Last sync: {format(lastSync, 'MMM d, h:mm a')}
           </div>
 
           <Select value={syncMethod} onValueChange={setSyncMethod}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className='w-32'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="direct">Direct Sync</SelectItem>
-              <SelectItem value="ngrok">Via Ngrok</SelectItem>
+              <SelectItem value='direct'>Direct Sync</SelectItem>
+              <SelectItem value='ngrok'>Via Ngrok</SelectItem>
             </SelectContent>
           </Select>
 
           <Button
-            variant="outline"
+            variant='outline'
             onClick={handleSyncTransactions}
             disabled={isSyncing || isLoading}
-            className="gap-2"
+            className='gap-2'
           >
             <RefreshCw
               className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`}
@@ -361,18 +358,18 @@ export default function Transactions() {
           </Button> */}
 
           <Button
-            variant="outline"
+            variant='outline'
             onClick={exportTransactions}
             disabled={filteredTransactions.length === 0}
-            className="gap-2"
+            className='gap-2'
           >
-            <Download className="w-4 h-4" />
+            <Download className='w-4 h-4' />
             Export CSV
           </Button>
 
           <Link to={createPageUrl('Import')}>
-            <Button variant="outline" className="gap-2">
-              <Upload className="w-4 h-4" />
+            <Button variant='outline' className='gap-2'>
+              <Upload className='w-4 h-4' />
               Import
             </Button>
           </Link>
@@ -381,20 +378,20 @@ export default function Transactions() {
 
       <TransactionTotalsCards filters={filterPayload} />
 
-      <Card className="card-shadow border-0">
+      <Card className='card-shadow border-0'>
         <CardHeader>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-3 text-common-gray-dark" />
+          <div className='flex flex-col md:flex-row gap-4'>
+            <div className='flex-1'>
+              <div className='relative'>
+                <Search className='w-4 h-4 absolute left-3 top-3 text-common-gray-dark' />
                 <Input
-                  placeholder="Search transactions..."
+                  placeholder='Search transactions...'
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-10"
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className='pl-10 pr-10'
                 />
                 {isDebouncing && (
-                  <Loader2 className="w-4 h-4 absolute right-3 top-3 text-common-gray-dark animate-spin" />
+                  <Loader2 className='w-4 h-4 absolute right-3 top-3 text-common-gray-dark animate-spin' />
                 )}
               </div>
             </div>
@@ -405,7 +402,7 @@ export default function Transactions() {
             />
           </div>
         </CardHeader>
-        <CardContent className="p-6 ">
+        <CardContent className='p-6 '>
           <TransactionList
             ref={transactionListRef}
             transactions={filteredTransactions}
@@ -426,11 +423,3 @@ export default function Transactions() {
     </div>
   );
 }
-
-
-
-
-
-
-
-

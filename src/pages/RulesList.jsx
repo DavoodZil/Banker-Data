@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -49,7 +49,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
   const conditions = ruleData.ifs || [];
   const actions = ruleData.thens || [];
 
-  const getConditionIcon = (type) => {
+  const getConditionIcon = type => {
     const iconMap = {
       merchant: Store,
       amount: DollarSign,
@@ -61,7 +61,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
     return iconMap[type] || Settings;
   };
 
-  const getActionIcon = (type) => {
+  const getActionIcon = type => {
     const iconMap = {
       rename_merchant: Edit3,
       update_category: List,
@@ -94,42 +94,44 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-common-gray-dark mb-1">
+    <Card className='hover:shadow-md transition-shadow'>
+      <CardHeader className='pb-3'>
+        <div className='flex items-start justify-between'>
+          <div className='flex-1'>
+            <CardTitle className='text-lg font-semibold text-common-gray-dark mb-1'>
               {rule.name}
             </CardTitle>
             {rule.description && (
-              <p className="text-sm text-common-gray-dark">{rule.description}</p>
+              <p className='text-sm text-common-gray-dark'>
+                {rule.description}
+              </p>
             )}
           </div>
-          <div className="flex items-center gap-2 ml-4">
+          <div className='flex items-center gap-2 ml-4'>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => onEdit(rule)}
-              className="h-8 px-2"
+              className='h-8 px-2'
             >
-              <Edit3 className="w-4 h-4" />
+              <Edit3 className='w-4 h-4' />
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handleApply}
-              className="h-8 px-2 text-common-green hover:text-common-green-dark"
+              className='h-8 px-2 text-common-green hover:text-common-green-dark'
             >
-              <Play className="w-4 h-4" />
+              <Play className='w-4 h-4' />
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 px-2 text-common-red hover:text-common-red-dark"
+                  variant='outline'
+                  size='sm'
+                  className='h-8 px-2 text-common-red hover:text-common-red-dark'
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className='w-4 h-4' />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -144,7 +146,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
-                    className="bg-common-red hover:bg-common-red-dark"
+                    className='bg-common-red hover:bg-common-red-dark'
                     disabled={isDeleting}
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
@@ -155,8 +157,8 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-4">
+      <CardContent className='pt-0'>
+        <div className='space-y-4'>
           {/* Rule Type */}
           <div>
             <Badge variant={rule.rule_type === 1 ? 'default' : 'secondary'}>
@@ -170,7 +172,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
 
           {/* Basic Rule Info */}
           {(conditions.length > 0 || actions.length > 0) && (
-            <div className="text-sm text-common-gray-dark">
+            <div className='text-sm text-common-gray-dark'>
               {conditions.length > 0 && (
                 <span>
                   {conditions.length} condition
@@ -187,7 +189,9 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
           )}
 
           {conditions.length === 0 && actions.length === 0 && (
-            <p className="text-sm text-common-gray-dark">No rule configuration found</p>
+            <p className='text-sm text-common-gray-dark'>
+              No rule configuration found
+            </p>
           )}
         </div>
       </CardContent>
@@ -203,26 +207,25 @@ export default function RulesListPage() {
 
   const filteredRules = Array.isArray(rules)
     ? rules.filter(
-        (rule) =>
+        rule =>
           rule?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (rule?.description &&
             rule.description.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : [];
 
-  const handleEdit = (rule) => {
+  const handleEdit = rule => {
     // Navigate to edit page with rule data
     navigate(`/rules/edit/${rule.id}`, { state: { rule } });
   };
 
-  const handleDelete = async (ruleId) => {
+  const handleDelete = async ruleId => {
     await deleteRule(ruleId);
     refetch();
   };
 
-  const handleApply = async (ruleId) => {
+  const handleApply = async ruleId => {
     await applyRule(ruleId);
-    // Could show a toast notification here
   };
 
   const handleApplyAll = async () => {
@@ -232,79 +235,83 @@ export default function RulesListPage() {
 
   if (error) {
     return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="bg-common-red-secondary border border-common-red rounded-lg p-4">
-          <p className="text-common-red-dark">Error loading rules: {error.message}</p>
+      <div className='p-6 max-w-7xl mx-auto'>
+        <div className='bg-common-red-secondary border border-common-red rounded-lg p-4'>
+          <p className='text-common-red-dark'>
+            Error loading rules: {error.message}
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50">
-      <div className="flex items-start justify-between">
+    <div className='p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50'>
+      <div className='flex items-start justify-between'>
         <div>
-          <h1 className="text-2xl font-bold text-common-gray-dark">Rules</h1>
-          <p className="text-common-gray-dark mt-1">Manage your transaction rules</p>
+          <h1 className='text-2xl font-bold text-common-gray-dark'>Rules</h1>
+          <p className='text-common-gray-dark mt-1'>
+            Manage your transaction rules
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={handleApplyAll} className="gap-2">
-            <Play className="w-4 h-4" />
+        <div className='flex items-center gap-3'>
+          <Button variant='outline' onClick={handleApplyAll} className='gap-2'>
+            <Play className='w-4 h-4' />
             Apply All Rules
           </Button>
           <Button
             onClick={() => navigate('/rules/create')}
-            className="bg-common-green hover:bg-common-green-dark gap-2"
+            className='bg-common-green hover:bg-common-green-dark gap-2'
           >
-            <Plus className="w-4 h-4" />
+            <Plus className='w-4 h-4' />
             Create Rule
           </Button>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg border border-common-gray-light">
-        <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
+      <div className='bg-white p-4 rounded-lg border border-common-gray-light'>
+        <div className='flex items-center gap-4'>
+          <div className='relative flex-1 max-w-md'>
+            <Search className='w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark' />
             <Input
-              placeholder="Search rules..."
+              placeholder='Search rules...'
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              onChange={e => setSearchQuery(e.target.value)}
+              className='pl-9'
             />
           </div>
-          <div className="text-sm text-common-gray-dark">
+          <div className='text-sm text-common-gray-dark'>
             {filteredRules.length} of {rules?.length || 0} rules
           </div>
         </div>
       </div>
 
       {/* Rules List */}
-      <div className="space-y-4">
+      <div className='space-y-4'>
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
             {[...Array(6)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
+              <Card key={i} className='animate-pulse'>
                 <CardHeader>
-                  <div className="h-4 bg-common-gray-light rounded w-3/4"></div>
+                  <div className='h-4 bg-common-gray-light rounded w-3/4'></div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    <div className="h-3 bg-common-gray-light rounded w-1/2"></div>
-                    <div className="h-3 bg-common-gray-light rounded w-2/3"></div>
+                  <div className='space-y-2'>
+                    <div className='h-3 bg-common-gray-light rounded w-1/2'></div>
+                    <div className='h-3 bg-common-gray-light rounded w-2/3'></div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : filteredRules.length === 0 ? (
-          <div className="text-center py-12">
-            <Settings className="w-12 h-12 text-common-gray-dark mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-common-gray-dark mb-2">
+          <div className='text-center py-12'>
+            <Settings className='w-12 h-12 text-common-gray-dark mx-auto mb-4' />
+            <h3 className='text-lg font-medium text-common-gray-dark mb-2'>
               {searchQuery ? 'No rules found' : 'No rules created yet'}
             </h3>
-            <p className="text-common-gray-dark mb-4">
+            <p className='text-common-gray-dark mb-4'>
               {searchQuery
                 ? 'Try adjusting your search terms'
                 : 'Create your first rule to automatically organize your transactions'}
@@ -312,16 +319,16 @@ export default function RulesListPage() {
             {!searchQuery && (
               <Button
                 onClick={() => navigate('/rules/create')}
-                className="bg-common-green hover:bg-common-green-dark gap-2"
+                className='bg-common-green hover:bg-common-green-dark gap-2'
               >
-                <Plus className="w-4 h-4" />
+                <Plus className='w-4 h-4' />
                 Create Your First Rule
               </Button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredRules.map((rule) => (
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+            {filteredRules.map(rule => (
               <RuleCard
                 key={rule.id}
                 rule={rule}
@@ -336,11 +343,3 @@ export default function RulesListPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-

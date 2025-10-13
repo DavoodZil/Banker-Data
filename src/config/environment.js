@@ -29,7 +29,7 @@ export const getApiBaseUrl = () => config.api.baseUrl;
 
 const validateEnvironment = () => {
   const required = ['VITE_API_BASE_URL'];
-  const missing = required.filter((key) => !env[key]);
+  const missing = required.filter(key => !env[key]);
 
   if (missing.length > 0 && config.app.isProduction) {
   }

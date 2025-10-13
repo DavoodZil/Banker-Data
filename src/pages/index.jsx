@@ -109,7 +109,7 @@ function _getCurrentPage(url) {
   // Default behavior for other routes
   let urlLastPart = url.split('/').pop();
   const pageName = Object.keys(PAGES).find(
-    (page) => page.toLowerCase() === urlLastPart.toLowerCase()
+    page => page.toLowerCase() === urlLastPart.toLowerCase()
   );
   return pageName || Object.keys(PAGES)[0];
 }
@@ -122,47 +122,47 @@ function PagesContent() {
   return (
     <Layout currentPageName={currentPage}>
       <Routes>
-        <Route path="/" element={<Merchants />} />
+        <Route path='/' element={<Merchants />} />
 
-        <Route path="/Merchants" element={<Merchants />} />
+        <Route path='/Merchants' element={<Merchants />} />
 
-        <Route path="/Reports" element={<Reports />} />
+        <Route path='/Reports' element={<Reports />} />
 
-        <Route path="/Goals" element={<Goals />} />
+        <Route path='/Goals' element={<Goals />} />
 
-        <Route path="/CashFlow" element={<CashFlow />} />
+        <Route path='/CashFlow' element={<CashFlow />} />
 
-        <Route path="/Budget" element={<Budget />} />
+        <Route path='/Budget' element={<Budget />} />
 
-        <Route path="/Tag" element={<Tag />} />
+        <Route path='/Tag' element={<Tag />} />
 
-        <Route path="/Entity" element={<Entity />} />
+        <Route path='/Entity' element={<Entity />} />
 
-        <Route path="/Group" element={<Group />} />
+        <Route path='/Group' element={<Group />} />
 
-        <Route path="/Preferences" element={<Preferences />} />
+        <Route path='/Preferences' element={<Preferences />} />
 
-        <Route path="/Notifications" element={<Notifications />} />
+        <Route path='/Notifications' element={<Notifications />} />
 
-        <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path='/Dashboard' element={<Dashboard />} />
 
-        <Route path="/Accounts" element={<Accounts />} />
+        <Route path='/Accounts' element={<Accounts />} />
 
-        <Route path="/Transactions" element={<Transactions />} />
+        <Route path='/Transactions' element={<Transactions />} />
 
-        <Route path="/Categories" element={<Categories />} />
+        <Route path='/Categories' element={<Categories />} />
 
-        <Route path="/rules" element={<Rules />} />
+        <Route path='/rules' element={<Rules />} />
 
-        <Route path="/rules/list" element={<RulesList />} />
+        <Route path='/rules/list' element={<RulesList />} />
 
-        <Route path="/rules/edit/:id" element={<Rules />} />
+        <Route path='/rules/edit/:id' element={<Rules />} />
 
-        <Route path="/AccountDetails" element={<AccountDetails />} />
+        <Route path='/AccountDetails' element={<AccountDetails />} />
 
-        <Route path="/API" element={<API />} />
+        <Route path='/API' element={<API />} />
 
-        <Route path="/Import" element={<Import />} />
+        <Route path='/Import' element={<Import />} />
       </Routes>
     </Layout>
   );
@@ -175,11 +175,3 @@ export default function Pages() {
     </Router>
   );
 }
-
-
-
-
-
-
-
-
