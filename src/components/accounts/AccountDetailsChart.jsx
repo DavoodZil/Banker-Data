@@ -135,3 +135,11 @@ export default function AccountDetailsChart({ currentBalance, transactions }) {
     </Card>
   );
 }
+
+
+
+
+
+
+
+

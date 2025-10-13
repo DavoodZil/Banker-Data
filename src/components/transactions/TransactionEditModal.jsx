@@ -165,17 +165,17 @@ export default function TransactionEditModal({
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-common-gray-light rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-4 h-4 text-gray-500" />
+                <Calendar className="w-4 h-4 text-common-gray-dark" />
                 <span className="font-medium">
                   {format(new Date(transaction.date), 'MMMM d, yyyy')}
                 </span>
               </div>
               <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="w-4 h-4 text-gray-500" />
+                <DollarSign className="w-4 h-4 text-common-gray-dark" />
                 <span
-                  className={`font-semibold ${transaction.amountAmount > 0 ? 'text-green-600' : 'text-red-600'}`}
+                  className={`font-semibold ${transaction.amountAmount > 0 ? 'text-common-green' : 'text-common-red'}`}
                 >
                   {transaction.amountAmount > 0 ? '+' : ''}$
                   {Math.abs(
@@ -183,7 +183,7 @@ export default function TransactionEditModal({
                   ).toLocaleString()}
                 </span>
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-common-gray-dark">
                 Original:{' '}
                 {transaction.original_description || transaction.description}
               </div>
@@ -233,7 +233,7 @@ export default function TransactionEditModal({
                   <SelectContent className="max-h-80">
                     <div className="sticky top-0 z-10 bg-white p-2 border-b">
                       <div className="relative">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
                         <Input
                           placeholder="Search categories..."
                           value={categorySearch}
@@ -277,7 +277,7 @@ export default function TransactionEditModal({
 
                       {Object.keys(filteredCategories).length === 0 &&
                         categorySearch && (
-                          <div className="text-center py-4 text-gray-500 text-sm">
+                          <div className="text-center py-4 text-common-gray-dark text-sm">
                             No categories found
                           </div>
                         )}
@@ -290,7 +290,7 @@ export default function TransactionEditModal({
               <div className="space-y-2">
                 <Label htmlFor="amount">Amount</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark text-sm">
                     $
                   </span>
                   <Input
@@ -317,7 +317,7 @@ export default function TransactionEditModal({
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-common-green hover:bg-common-green-dark"
                 >
                   Save Changes
                 </Button>
@@ -329,3 +329,11 @@ export default function TransactionEditModal({
     </>
   );
 }
+
+
+
+
+
+
+
+

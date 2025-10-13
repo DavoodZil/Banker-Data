@@ -314,13 +314,13 @@ export default function Transactions() {
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-common-gray-dark">Transactions</h1>
+          <p className="text-common-gray-dark mt-1">
             Review and categorize your financial transactions
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-common-gray-dark">
             Last sync: {format(lastSync, 'MMM d, h:mm a')}
           </div>
 
@@ -386,7 +386,7 @@ export default function Transactions() {
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+                <Search className="w-4 h-4 absolute left-3 top-3 text-common-gray-dark" />
                 <Input
                   placeholder="Search transactions..."
                   value={searchQuery}
@@ -394,7 +394,7 @@ export default function Transactions() {
                   className="pl-10 pr-10"
                 />
                 {isDebouncing && (
-                  <Loader2 className="w-4 h-4 absolute right-3 top-3 text-gray-400 animate-spin" />
+                  <Loader2 className="w-4 h-4 absolute right-3 top-3 text-common-gray-dark animate-spin" />
                 )}
               </div>
             </div>
@@ -426,3 +426,11 @@ export default function Transactions() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

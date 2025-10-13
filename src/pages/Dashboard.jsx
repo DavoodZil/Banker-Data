@@ -114,13 +114,13 @@ export default function Dashboard() {
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-common-gray-dark">Dashboard</h1>
+          <p className="text-common-gray-dark mt-1">
             Welcome back! Here's your financial overview.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-common-gray-dark">
             Last sync: {format(lastSync, 'MMM d, h:mm a')}
           </div>
           <Button
@@ -136,7 +136,7 @@ export default function Dashboard() {
             {isSyncing || isLoading ? 'Syncing...' : 'Sync'}
           </Button>
           <Link to={createPageUrl('Accounts')}>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2">
+            <Button className="bg-common-green hover:bg-common-green-dark gap-2">
               <Plus className="w-4 h-4" />
               Add Account
             </Button>
@@ -155,28 +155,28 @@ export default function Dashboard() {
             <Card className="card-shadow-lg border-0 bg-gradient-to-br from-emerald-50 to-teal-50">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-common-gray-dark">
                     Net Worth
                   </CardTitle>
-                  <div className="p-2 bg-emerald-100 rounded-lg">
-                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  <div className="p-2 bg-common-green-secondary rounded-lg">
+                    <TrendingUp className="w-4 h-4 text-common-green" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl font-bold text-common-gray-dark">
                   {netWorthFormatted}
                 </div>
                 <div className="flex items-center gap-1 mt-1">
                   {netWorthTrend === 'up' ? (
-                    <ArrowUpRight className="w-4 h-4 text-emerald-500" />
+                    <ArrowUpRight className="w-4 h-4 text-common-green" />
                   ) : netWorthTrend === 'down' ? (
-                    <ArrowDownRight className="w-4 h-4 text-red-500" />
+                    <ArrowDownRight className="w-4 h-4 text-common-red" />
                   ) : (
-                    <span className="w-4 h-4 text-gray-400">—</span>
+                    <span className="w-4 h-4 text-common-gray-dark">—</span>
                   )}
                   <span
-                    className={`text-sm font-medium ${netWorthTrend === 'up' ? 'text-emerald-600' : netWorthTrend === 'down' ? 'text-red-600' : 'text-gray-600'}`}
+                    className={`text-sm font-medium ${netWorthTrend === 'up' ? 'text-common-green' : netWorthTrend === 'down' ? 'text-common-red' : 'text-common-gray-dark'}`}
                   >
                     {netWorthChangeText}
                   </span>
@@ -187,28 +187,28 @@ export default function Dashboard() {
             <Card className="card-shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-common-gray-dark">
                     Monthly Income
                   </CardTitle>
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <DollarSign className="w-4 h-4 text-blue-600" />
+                  <div className="p-2 bg-common-blue-secondary rounded-lg">
+                    <DollarSign className="w-4 h-4 text-common-blue" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl font-bold text-common-gray-dark">
                   {monthlyIncomeFormatted}
                 </div>
                 <div className="flex items-center gap-1 mt-1">
                   {monthlyIncomeTrend === 'up' ? (
-                    <ArrowUpRight className="w-4 h-4 text-blue-500" />
+                    <ArrowUpRight className="w-4 h-4 text-common-blue" />
                   ) : monthlyIncomeTrend === 'down' ? (
-                    <ArrowDownRight className="w-4 h-4 text-red-500" />
+                    <ArrowDownRight className="w-4 h-4 text-common-red" />
                   ) : (
-                    <span className="w-4 h-4 text-gray-400">—</span>
+                    <span className="w-4 h-4 text-common-gray-dark">—</span>
                   )}
                   <span
-                    className={`text-sm font-medium ${monthlyIncomeTrend === 'up' ? 'text-blue-600' : monthlyIncomeTrend === 'down' ? 'text-red-600' : 'text-gray-600'}`}
+                    className={`text-sm font-medium ${monthlyIncomeTrend === 'up' ? 'text-common-blue' : monthlyIncomeTrend === 'down' ? 'text-common-red' : 'text-common-gray-dark'}`}
                   >
                     {monthlyIncomeStatus}
                   </span>
@@ -219,28 +219,28 @@ export default function Dashboard() {
             <Card className="card-shadow-lg border-0 bg-gradient-to-br from-orange-50 to-red-50">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-common-gray-dark">
                     Monthly Spending
                   </CardTitle>
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <CreditCard className="w-4 h-4 text-orange-600" />
+                  <div className="p-2 bg-common-orange-secondary rounded-lg">
+                    <CreditCard className="w-4 h-4 text-common-orange" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl font-bold text-common-gray-dark">
                   {monthlySpendingFormatted}
                 </div>
                 <div className="flex items-center gap-1 mt-1">
                   {monthlySpendingTrend === 'up' ? (
-                    <ArrowUpRight className="w-4 h-4 text-red-500" />
+                    <ArrowUpRight className="w-4 h-4 text-common-red" />
                   ) : monthlySpendingTrend === 'down' ? (
-                    <ArrowDownRight className="w-4 h-4 text-orange-500" />
+                    <ArrowDownRight className="w-4 h-4 text-common-orange" />
                   ) : (
-                    <span className="w-4 h-4 text-gray-400">—</span>
+                    <span className="w-4 h-4 text-common-gray-dark">—</span>
                   )}
                   <span
-                    className={`text-sm font-medium ${monthlySpendingTrend === 'up' ? 'text-red-600' : monthlySpendingTrend === 'down' ? 'text-orange-600' : 'text-gray-600'}`}
+                    className={`text-sm font-medium ${monthlySpendingTrend === 'up' ? 'text-common-red' : monthlySpendingTrend === 'down' ? 'text-common-orange' : 'text-common-gray-dark'}`}
                   >
                     {monthlySpendingChangeText}
                   </span>
@@ -251,7 +251,7 @@ export default function Dashboard() {
             <Card className="card-shadow-lg border-0 bg-gradient-to-br from-purple-50 to-pink-50">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-common-gray-dark">
                     Budget Used
                   </CardTitle>
                   <div className="p-2 bg-purple-100 rounded-lg">
@@ -260,7 +260,7 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">—</div>
+                <div className="text-2xl font-bold text-common-gray-dark">—</div>
                 <div className="flex items-center gap-1 mt-1">
                   <Target className="w-4 h-4 text-purple-500" />
                   <span className="text-sm font-medium text-purple-600">
@@ -273,16 +273,16 @@ export default function Dashboard() {
             <Card className="card-shadow-lg border-0 bg-gradient-to-br from-gray-50 to-slate-50">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-common-gray-dark">
                     Total Accounts
                   </CardTitle>
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <PiggyBank className="w-4 h-4 text-gray-600" />
+                  <div className="p-2 bg-common-gray-light rounded-lg">
+                    <PiggyBank className="w-4 h-4 text-common-gray-dark" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl font-bold text-common-gray-dark">
                   {totalAccounts}
                 </div>
                 <div className="flex items-center gap-1 mt-1">
@@ -301,11 +301,19 @@ export default function Dashboard() {
 
       {/* Coming Soon Section */}
       <div className="flex flex-col items-center justify-center py-24">
-        <div className="text-3xl font-bold text-gray-400 mb-2">Coming Soon</div>
-        <div className="text-lg text-gray-500">
+        <div className="text-3xl font-bold text-common-gray-dark mb-2">Coming Soon</div>
+        <div className="text-lg text-common-gray-dark">
           Detailed analytics and charts will be available here soon.
         </div>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
+

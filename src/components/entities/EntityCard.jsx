@@ -38,7 +38,7 @@ export default function EntityCard({ entity, accounts, onEdit }) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-gray-500"
+            className="h-8 w-8 text-common-gray-dark"
             onClick={() => onEdit(entity)}
           >
             <Edit className="w-4 h-4" />
@@ -47,10 +47,10 @@ export default function EntityCard({ entity, accounts, onEdit }) {
       </CardHeader>
       <CardContent>
         {entity.description && (
-          <p className="text-sm text-gray-600 mb-4">{entity.description}</p>
+          <p className="text-sm text-common-gray-dark mb-4">{entity.description}</p>
         )}
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <h4 className="text-sm font-semibold text-common-gray-dark mb-2 flex items-center gap-2">
             <Link2 className="w-4 h-4" /> Linked Accounts
           </h4>
           {accounts.length > 0 ? (
@@ -62,7 +62,7 @@ export default function EntityCard({ entity, accounts, onEdit }) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-common-gray-dark">
               No accounts linked. Go to "Manage Rules" to link accounts.
             </p>
           )}
@@ -76,3 +76,11 @@ export default function EntityCard({ entity, accounts, onEdit }) {
     </Card>
   );
 }
+
+
+
+
+
+
+
+

@@ -21,7 +21,7 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
       <Card className="card-shadow border-0">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-emerald-600" />
+            <TrendingUp className="w-5 h-5 text-common-green" />
             Net Worth Trend
           </CardTitle>
         </CardHeader>
@@ -86,19 +86,19 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             {isPositive ? (
-              <TrendingUp className="w-5 h-5 text-emerald-600" />
+              <TrendingUp className="w-5 h-5 text-common-green" />
             ) : (
-              <TrendingDown className="w-5 h-5 text-red-600" />
+              <TrendingDown className="w-5 h-5 text-common-red" />
             )}
             Net Worth Trend
           </CardTitle>
           <div className="text-right">
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-common-gray-dark">
               ${currentValue.toLocaleString()}
             </div>
             <div
               className={`text-sm font-medium flex items-center gap-1 ${
-                isPositive ? 'text-emerald-600' : 'text-red-600'
+                isPositive ? 'text-common-green' : 'text-common-red'
               }`}
             >
               {isPositive ? '↗' : '↘'} {isPositive ? '+' : ''}
@@ -159,23 +159,23 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
         </ResponsiveContainer>
 
         {/* Additional Stats */}
-        <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-common-gray-light">
           <div className="text-center">
-            <div className="text-sm text-gray-500">Assets</div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-sm text-common-gray-dark">Assets</div>
+            <div className="text-lg font-semibold text-common-gray-dark">
               ${chartData[chartData.length - 1]?.assets.toLocaleString()}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-500">Liabilities</div>
-            <div className="text-lg font-semibold text-red-600">
+            <div className="text-sm text-common-gray-dark">Liabilities</div>
+            <div className="text-lg font-semibold text-common-red">
               ${chartData[chartData.length - 1]?.liabilities.toLocaleString()}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-500">6-Month Change</div>
+            <div className="text-sm text-common-gray-dark">6-Month Change</div>
             <div
-              className={`text-lg font-semibold ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}
+              className={`text-lg font-semibold ${isPositive ? 'text-common-green' : 'text-common-red'}`}
             >
               {isPositive ? '+' : ''}${change.toLocaleString()}
             </div>
@@ -185,3 +185,11 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
     </Card>
   );
 }
+
+
+
+
+
+
+
+

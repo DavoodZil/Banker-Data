@@ -87,10 +87,10 @@ export default function EntityPage() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-common-gray-dark">
             Financial Entities
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-common-gray-dark mt-1">
             Separate and manage finances for your businesses or properties.
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function EntityPage() {
             Manage Rules
           </Button>
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-common-green hover:bg-common-green-dark"
             onClick={() => setShowCreateModal(true)}
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -142,15 +142,15 @@ export default function EntityPage() {
               <Briefcase className="w-10 h-10 text-indigo-500" />
             </div>
             <div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-2xl font-semibold text-common-gray-dark mb-2">
                 Create Your First Financial Entity
               </h3>
-              <p className="text-gray-500 max-w-md mx-auto mb-6">
+              <p className="text-common-gray-dark max-w-md mx-auto mb-6">
                 Separate your finances by creating entities for things like a
                 small business, a rental property, or a personal project.
               </p>
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="bg-common-green hover:bg-common-green-dark"
                 onClick={() => setShowCreateModal(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -189,3 +189,11 @@ export default function EntityPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

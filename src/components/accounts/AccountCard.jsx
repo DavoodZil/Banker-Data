@@ -51,26 +51,26 @@ const AccountCard = React.memo(({ account, showBalance, onUpdate }) => {
     setShowDeleteDialog(true);
   };
 
-  const cardColors = {
-    checking: 'border-blue-200 bg-blue-50',
-    savings: 'border-green-200 bg-green-50',
-    credit: 'border-red-200 bg-red-50',
-    investment: 'border-purple-200 bg-purple-50',
-    loan: 'border-orange-200 bg-orange-50',
-  };
+    const cardColors = {
+      checking: 'border-common-blue bg-common-blue-secondary',
+      savings: 'border-common-green bg-common-green-secondary',
+      credit: 'border-common-red bg-common-red-secondary',
+      investment: 'border-common-violet bg-common-violet-secondary',
+      loan: 'border-common-orange bg-common-orange-secondary',
+    };
 
   const headerColors = {
-    checking: 'text-blue-800',
-    savings: 'text-green-800',
-    credit: 'text-red-800',
+    checking: 'text-common-blue-dark',
+    savings: 'text-common-green-dark',
+    credit: 'text-common-red-dark',
     investment: 'text-purple-800',
-    loan: 'text-orange-800',
+    loan: 'text-common-orange-dark',
   };
 
   return (
     <>
       <Card
-        className={`group card-shadow-lg border-2 transition-all duration-300 hover:border-emerald-400 h-full ${cardColors[account.account_type] || 'border-gray-200'}`}
+          className={`group card-shadow-lg border-2 transition-all duration-300 hover:border-common-green h-full ${cardColors[account.account_type] || 'border-common-gray-light'}`}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <CardTitle
@@ -84,14 +84,14 @@ const AccountCard = React.memo(({ account, showBalance, onUpdate }) => {
             className="h-7 w-7 opacity-0 group-hover:opacity-100"
             onClick={openDeleteDialog}
           >
-            <Trash2 className="w-4 h-4 text-gray-500 hover:text-red-600" />
+            <Trash2 className="w-4 h-4 text-common-gray-dark hover:text-common-red" />
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-baseline justify-between">
             <div>
-              <p className="text-xs text-gray-500">Current Balance</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xs text-common-gray-dark">Current Balance</p>
+              <p className="text-2xl font-bold text-common-gray-dark">
                 {showBalance
                   ? `$${account.available_balance_amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                   : '•••••'}
@@ -100,8 +100,8 @@ const AccountCard = React.memo(({ account, showBalance, onUpdate }) => {
             {account.available_balance !== null &&
               account.available_balance !== account.balance && (
                 <div>
-                  <p className="text-xs text-gray-500 text-right">Available</p>
-                  <p className="text-lg font-semibold text-emerald-700">
+                  <p className="text-xs text-common-gray-dark text-right">Available</p>
+                  <p className="text-lg font-semibold text-common-green-dark">
                     {showBalance
                       ? `$${account.available_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       : '•••••'}
@@ -110,7 +110,7 @@ const AccountCard = React.memo(({ account, showBalance, onUpdate }) => {
               )}
           </div>
 
-          <div className="flex items-center justify-between text-xs text-gray-600 pt-3 border-t">
+          <div className="flex items-center justify-between text-xs text-common-gray-dark pt-3 border-t">
             <span>{account.name}</span>
             <span>•••• {account.account_number_last_four}</span>
           </div>
@@ -121,7 +121,7 @@ const AccountCard = React.memo(({ account, showBalance, onUpdate }) => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+              <AlertTriangle className="w-5 h-5 text-common-red" />
               Remove Account Connection
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -144,7 +144,7 @@ const AccountCard = React.memo(({ account, showBalance, onUpdate }) => {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
+                className="bg-common-red hover:bg-common-red-dark"
             >
               {isDeleting ? 'Removing...' : 'Yes, Remove Connection'}
             </AlertDialogAction>
@@ -158,3 +158,11 @@ const AccountCard = React.memo(({ account, showBalance, onUpdate }) => {
 AccountCard.displayName = 'AccountCard';
 
 export default AccountCard;
+
+
+
+
+
+
+
+

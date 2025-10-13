@@ -148,7 +148,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
                 <PopoverContent className="w-80 p-3" align="start">
                   <div className="space-y-3">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-common-gray-dark" />
                       <Input
                         placeholder="Search emoji..."
                         className="pl-9"
@@ -164,9 +164,9 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
                           <button
                             key={item.emoji}
                             type="button"
-                            className={`p-2 rounded-md border-2 text-lg transition-colors hover:bg-gray-100 ${
+                            className={`p-2 rounded-md border-2 text-lg transition-colors hover:bg-common-gray-light ${
                               formData.emoji === item.emoji
-                                ? 'border-emerald-500 bg-emerald-50'
+                                ? 'border-common-green bg-common-green-secondary'
                                 : 'border-transparent'
                             }`}
                             onClick={() => handleEmojiSelect(item.emoji)}
@@ -176,7 +176,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
                           </button>
                         ))
                       ) : (
-                        <div className="col-span-8 text-center py-4 text-sm text-gray-500">
+                        <div className="col-span-8 text-center py-4 text-sm text-common-gray-dark">
                           {`No emojis found for "${emojiSearch}"`}
                         </div>
                       )}
@@ -202,11 +202,11 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
           </div>
 
           {/* Category Preview */}
-          <div className="p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-            <Label className="text-sm text-gray-600 mb-2 block">Preview</Label>
+          <div className="p-3 bg-common-gray-light rounded-lg border-2 border-dashed border-common-gray-light">
+            <Label className="text-sm text-common-gray-dark mb-2 block">Preview</Label>
             <div className="flex items-center gap-3">
               <span className="text-2xl">{formData.emoji}</span>
-              <span className="font-medium text-gray-800 text-lg">
+              <span className="font-medium text-common-gray-dark text-lg">
                 {formData.name || 'Category Name'}
               </span>
             </div>
@@ -237,12 +237,12 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
           {/* Budget Exclusion Option */}
           <div className="space-y-3">
             <Label>Budget Settings</Label>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-common-gray-light rounded-lg">
               <div>
                 <Label htmlFor="excludeBudget" className="font-medium">
                   Exclude from budget
                 </Label>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-common-gray-dark mt-1">
                   This category won't be included in budget calculations
                 </p>
               </div>
@@ -262,7 +262,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
             </Button>
             <Button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-common-green hover:bg-common-green-dark"
               disabled={!formData.name.trim() || !formData.group}
             >
               Save Category
@@ -273,3 +273,11 @@ export default function CreateCategoryModal({ isOpen, onClose, onSave }) {
     </Dialog>
   );
 }
+
+
+
+
+
+
+
+

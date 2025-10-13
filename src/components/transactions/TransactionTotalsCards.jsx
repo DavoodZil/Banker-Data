@@ -28,12 +28,12 @@ export default function TransactionTotalsCards({ filters }) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="card-shadow border-0">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-common-gray-dark">
               Error
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-sm text-red-600">Failed to load totals</div>
+            <div className="text-sm text-common-red">Failed to load totals</div>
           </CardContent>
         </Card>
       </div>
@@ -58,12 +58,12 @@ export default function TransactionTotalsCards({ filters }) {
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <Card className="card-shadow border-0">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-gray-600">
+          <CardTitle className="text-sm font-medium text-common-gray-dark">
             Total Transactions
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-common-gray-dark">
             {count.toLocaleString()}
           </div>
         </CardContent>
@@ -71,12 +71,12 @@ export default function TransactionTotalsCards({ filters }) {
 
       <Card className="card-shadow border-0">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-gray-600">
+          <CardTitle className="text-sm font-medium text-common-gray-dark">
             Total Income
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-emerald-600">
+          <div className="text-2xl font-bold text-common-green">
             +${credit.toLocaleString()}
           </div>
         </CardContent>
@@ -84,12 +84,12 @@ export default function TransactionTotalsCards({ filters }) {
 
       <Card className="card-shadow border-0">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-gray-600">
+          <CardTitle className="text-sm font-medium text-common-gray-dark">
             Total Spent
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-red-600">
+          <div className="text-2xl font-bold text-common-red">
             -${debit.toLocaleString()}
           </div>
         </CardContent>
@@ -97,13 +97,13 @@ export default function TransactionTotalsCards({ filters }) {
 
       <Card className="card-shadow border-0">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-gray-600">
+          <CardTitle className="text-sm font-medium text-common-gray-dark">
             Net Total
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div
-            className={`text-2xl font-bold ${totalAmount >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+            className={`text-2xl font-bold ${totalAmount >= 0 ? 'text-common-green' : 'text-common-red'}`}
           >
             {totalAmount >= 0 ? '+' : ''}${totalAmount.toLocaleString()}
           </div>
@@ -112,3 +112,11 @@ export default function TransactionTotalsCards({ filters }) {
     </div>
   );
 }
+
+
+
+
+
+
+
+

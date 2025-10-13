@@ -76,7 +76,7 @@ export default function TransactionFilters({
                     {category.parent_name} - {category.name}
                   </span>
                   {category.transactions_count > 0 && (
-                    <span className="text-xs text-gray-500 ml-2">
+                    <span className="text-xs text-common-gray-dark ml-2">
                       ({category.transactions_count})
                     </span>
                   )}
@@ -133,3 +133,11 @@ export default function TransactionFilters({
     </div>
   );
 }
+
+
+
+
+
+
+
+

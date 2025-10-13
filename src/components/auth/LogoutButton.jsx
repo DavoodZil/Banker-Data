@@ -17,7 +17,7 @@ const LogoutButton = () => {
       variant="ghost"
       size="sm"
       onClick={handleLogout}
-      className="text-gray-500 hover:text-gray-900"
+      className="text-common-gray-dark hover:text-common-gray-dark"
     >
       <LogOut className="w-4 h-4 mr-2" />
       Logout
@@ -26,3 +26,11 @@ const LogoutButton = () => {
 };
 
 export default LogoutButton;
+
+
+
+
+
+
+
+

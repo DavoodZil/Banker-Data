@@ -98,11 +98,11 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-gray-900 mb-1">
+            <CardTitle className="text-lg font-semibold text-common-gray-dark mb-1">
               {rule.name}
             </CardTitle>
             {rule.description && (
-              <p className="text-sm text-gray-600">{rule.description}</p>
+              <p className="text-sm text-common-gray-dark">{rule.description}</p>
             )}
           </div>
           <div className="flex items-center gap-2 ml-4">
@@ -118,7 +118,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
               variant="outline"
               size="sm"
               onClick={handleApply}
-              className="h-8 px-2 text-emerald-600 hover:text-emerald-700"
+              className="h-8 px-2 text-common-green hover:text-common-green-dark"
             >
               <Play className="w-4 h-4" />
             </Button>
@@ -127,7 +127,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8 px-2 text-red-600 hover:text-red-700"
+                  className="h-8 px-2 text-common-red hover:text-common-red-dark"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -144,7 +144,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-common-red hover:bg-common-red-dark"
                     disabled={isDeleting}
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
@@ -170,7 +170,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
 
           {/* Basic Rule Info */}
           {(conditions.length > 0 || actions.length > 0) && (
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-common-gray-dark">
               {conditions.length > 0 && (
                 <span>
                   {conditions.length} condition
@@ -187,7 +187,7 @@ const RuleCard = ({ rule, onEdit, onDelete, onApply }) => {
           )}
 
           {conditions.length === 0 && actions.length === 0 && (
-            <p className="text-sm text-gray-500">No rule configuration found</p>
+            <p className="text-sm text-common-gray-dark">No rule configuration found</p>
           )}
         </div>
       </CardContent>
@@ -233,19 +233,19 @@ export default function RulesListPage() {
   if (error) {
     return (
       <div className="p-6 max-w-7xl mx-auto">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Error loading rules: {error.message}</p>
+        <div className="bg-common-red-secondary border border-common-red rounded-lg p-4">
+          <p className="text-common-red-dark">Error loading rules: {error.message}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-gray-50/50">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Rules</h1>
-          <p className="text-gray-600 mt-1">Manage your transaction rules</p>
+          <h1 className="text-2xl font-bold text-common-gray-dark">Rules</h1>
+          <p className="text-common-gray-dark mt-1">Manage your transaction rules</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" onClick={handleApplyAll} className="gap-2">
@@ -254,7 +254,7 @@ export default function RulesListPage() {
           </Button>
           <Button
             onClick={() => navigate('/rules/create')}
-            className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+            className="bg-common-green hover:bg-common-green-dark gap-2"
           >
             <Plus className="w-4 h-4" />
             Create Rule
@@ -263,10 +263,10 @@ export default function RulesListPage() {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200">
+      <div className="bg-white p-4 rounded-lg border border-common-gray-light">
         <div className="flex items-center gap-4">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
             <Input
               placeholder="Search rules..."
               value={searchQuery}
@@ -274,7 +274,7 @@ export default function RulesListPage() {
               className="pl-9"
             />
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-common-gray-dark">
             {filteredRules.length} of {rules?.length || 0} rules
           </div>
         </div>
@@ -287,12 +287,12 @@ export default function RulesListPage() {
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">
                 <CardHeader>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-common-gray-light rounded w-3/4"></div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    <div className="h-3 bg-common-gray-light rounded w-1/2"></div>
+                    <div className="h-3 bg-common-gray-light rounded w-2/3"></div>
                   </div>
                 </CardContent>
               </Card>
@@ -300,11 +300,11 @@ export default function RulesListPage() {
           </div>
         ) : filteredRules.length === 0 ? (
           <div className="text-center py-12">
-            <Settings className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <Settings className="w-12 h-12 text-common-gray-dark mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-common-gray-dark mb-2">
               {searchQuery ? 'No rules found' : 'No rules created yet'}
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-common-gray-dark mb-4">
               {searchQuery
                 ? 'Try adjusting your search terms'
                 : 'Create your first rule to automatically organize your transactions'}
@@ -312,7 +312,7 @@ export default function RulesListPage() {
             {!searchQuery && (
               <Button
                 onClick={() => navigate('/rules/create')}
-                className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+                className="bg-common-green hover:bg-common-green-dark gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Create Your First Rule
@@ -336,3 +336,11 @@ export default function RulesListPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

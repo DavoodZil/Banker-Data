@@ -69,12 +69,6 @@ export default function Accounts() {
     ? Object.values(bankData.data.accounts)
     : [];
 
-  useEffect(() => {}, [accounts]);
-
-  useEffect(() => {
-    if (error) {
-    }
-  }, [error]);
 
   /**
    * Loads and refreshes account data from the API
@@ -262,8 +256,8 @@ export default function Accounts() {
     <div className="p-4 lg:p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Accounts</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-common-gray-dark">Accounts</h1>
+          <p className="text-sm text-common-gray-dark mt-1">
             {accounts.length} connected accounts • Manage your financial
             connections
           </p>
@@ -331,7 +325,7 @@ export default function Accounts() {
           <Button
             onClick={handleAddAccount}
             size="sm"
-            className="bg-emerald-600 hover:bg-emerald-700 gap-2 px-4"
+            className="bg-common-green hover:bg-common-green-dark gap-2 px-4"
           >
             <Plus className="w-4 h-4" />
             Add Account
@@ -342,14 +336,14 @@ export default function Accounts() {
       {accounts.length > 0 && (
         <div className="space-y-6">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-              <div className="p-1.5 rounded-lg bg-blue-100">
-                <CreditCard className="w-4 h-4 text-blue-600" />
+            <div className="flex items-center gap-2 border-b border-common-gray-light pb-2">
+              <div className="p-1.5 rounded-lg bg-common-blue-secondary">
+                <CreditCard className="w-4 h-4 text-common-blue" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-common-gray-dark">
                 Connected Accounts
               </h2>
-              <span className="text-sm text-gray-500">({accounts.length})</span>
+              <span className="text-sm text-common-gray-dark">({accounts.length})</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -359,28 +353,28 @@ export default function Accounts() {
                   key={account.id}
                   className="no-underline"
                 >
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all duration-200">
+                  <div className="bg-white rounded-lg border border-common-gray-light p-4 hover:shadow-md transition-all duration-200">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <CreditCard className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">
+                        <CreditCard className="w-4 h-4 text-common-gray-dark" />
+                        <span className="text-sm font-medium text-common-gray-dark">
                           Account
                         </span>
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
                           account.status === 0
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
+                            ? 'bg-common-green-secondary text-common-green-secondary-foreground'
+                            : 'bg-common-red-secondary text-common-red-secondary-foreground'
                         }`}
                       >
                         {account.status === 0 ? 'Active' : 'Inactive'}
                       </span>
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2 text-sm leading-tight">
+                    <h3 className="font-semibold text-common-gray-dark mb-2 text-sm leading-tight">
                       {account.name}
                     </h3>
-                    <p className="text-xs text-gray-500">ID: {account.id}</p>
+                    <p className="text-xs text-common-gray-dark">ID: {account.id}</p>
                   </div>
                 </Link>
               ))}
@@ -392,14 +386,14 @@ export default function Accounts() {
       {isLoading && (
         <Card className="bg-white card-shadow border-0 text-center py-16">
           <CardContent className="space-y-6">
-            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
-              <RefreshCw className="w-10 h-10 text-blue-400 animate-spin" />
+            <div className="w-20 h-20 bg-common-blue-secondary rounded-full flex items-center justify-center mx-auto">
+              <RefreshCw className="w-10 h-10 text-common-blue-light animate-spin" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-common-gray-dark mb-2">
                 Loading accounts...
               </h3>
-              <p className="text-gray-500">
+              <p className="text-common-gray-dark">
                 Please wait while we fetch your account information.
               </p>
             </div>
@@ -410,20 +404,20 @@ export default function Accounts() {
       {accounts.length === 0 && !isLoading && (
         <Card className="bg-white card-shadow border-0 text-center py-16">
           <CardContent className="space-y-6">
-            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto">
-              <CreditCard className="w-10 h-10 text-emerald-400" />
+            <div className="w-20 h-20 bg-common-green-secondary rounded-full flex items-center justify-center mx-auto">
+              <CreditCard className="w-10 h-10 text-common-green-light" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-common-gray-dark mb-2">
                 No accounts connected
               </h3>
-              <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+              <p className="text-common-gray-dark mb-6 max-w-sm mx-auto">
                 Get started by linking a bank or adding a manual account to see
                 your finances in one place.
               </p>
               <Button
                 onClick={handleAddAccount}
-                className="bg-emerald-600 hover:bg-emerald-700 text-base py-3 px-6 rounded-lg"
+                className="bg-common-green hover:bg-common-green-dark text-base py-3 px-6 rounded-lg"
               >
                 Add Your First Account
               </Button>
@@ -447,18 +441,18 @@ export default function Accounts() {
               className="h-24 flex-col gap-2"
               onClick={handleConnectFlow}
             >
-              <Building className="w-6 h-6 text-emerald-600" />
+              <Building className="w-6 h-6 text-common-green" />
               <span className="font-semibold">Link Bank via Plaid</span>
-              <span className="text-xs text-gray-500">Automatic Sync</span>
+              <span className="text-xs text-common-gray-dark">Automatic Sync</span>
             </Button>
             <Button
               variant="outline"
               className="h-24 flex-col gap-2"
               onClick={handleManualAccount}
             >
-              <Plus className="w-6 h-6 text-blue-600" />
+              <Plus className="w-6 h-6 text-common-blue" />
               <span className="font-semibold">Create Manual Account</span>
-              <span className="text-xs text-gray-500">Cash, Assets, etc.</span>
+              <span className="text-xs text-common-gray-dark">Cash, Assets, etc.</span>
             </Button>
           </div>
         </DialogContent>
@@ -486,7 +480,7 @@ export default function Accounts() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+              <AlertTriangle className="w-5 h-5 text-common-red" />
               Remove All Accounts
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-3">
@@ -521,7 +515,7 @@ export default function Accounts() {
             <AlertDialogAction
               onClick={handleRemoveAll}
               disabled={deleteConfirmationText !== 'DELETE' || isDeletingAll}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-common-red hover:bg-common-red-dark"
             >
               {isDeletingAll ? 'Deleting...' : 'Yes, delete everything'}
             </AlertDialogAction>
@@ -531,3 +525,11 @@ export default function Accounts() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

@@ -90,7 +90,7 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
                   ${amount.toLocaleString()}
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-common-gray-light rounded-full h-2">
                 <div
                   className="h-2 rounded-full transition-all duration-300"
                   style={{
@@ -100,7 +100,7 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
                   }}
                 />
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-common-gray-dark">
                 {percentage.toFixed(1)}% of total spending
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
         })}
 
         {categoryData.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-common-gray-dark">
             No spending data available
           </div>
         )}
@@ -116,3 +116,11 @@ export default function CategoryBreakdown({ transactions, isLoading }) {
     </Card>
   );
 }
+
+
+
+
+
+
+
+

@@ -38,7 +38,7 @@ export default function CategoryCard({
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-gray-100 hover:border-emerald-200 h-full bg-white">
+    <Card className="group hover:shadow-lg transition-all duration-300 border-common-gray-light hover:border-common-green h-full bg-white">
       <CardContent className="p-5 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -53,11 +53,11 @@ export default function CategoryCard({
               {category.icon || category.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-base font-semibold text-gray-900 capitalize leading-tight truncate">
+              <h3 className="text-base font-semibold text-common-gray-dark capitalize leading-tight truncate">
                 {formatCategoryName(category.name)}
               </h3>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-common-gray-dark">
                   {stats.transactionCount} transaction
                   {stats.transactionCount !== 1 ? 's' : ''}
                 </span>
@@ -91,11 +91,11 @@ export default function CategoryCard({
 
         {/* Amount Section */}
         <div className="mb-4">
-          <div className="text-2xl font-bold text-gray-900 mb-1">
+          <div className="text-2xl font-bold text-common-gray-dark mb-1">
             ${stats.totalSpent.toLocaleString()}
           </div>
           {stats.averageAmount > 0 && (
-            <div className="text-sm text-gray-500 flex items-center gap-1">
+            <div className="text-sm text-common-gray-dark flex items-center gap-1">
               <TrendingUp className="w-3 h-3" />$
               {stats.averageAmount.toFixed(0)} avg per transaction
             </div>
@@ -106,9 +106,9 @@ export default function CategoryCard({
         {category.budget_amount && (
           <div className="space-y-3 mt-auto">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Budget Progress</span>
+              <span className="text-common-gray-dark">Budget Progress</span>
               <span
-                className={`font-semibold ${isOverBudget ? 'text-red-600' : 'text-gray-700'}`}
+                className={`font-semibold ${isOverBudget ? 'text-common-red' : 'text-common-gray-dark'}`}
               >
                 ${category.budget_amount.toLocaleString()}
               </span>
@@ -116,10 +116,10 @@ export default function CategoryCard({
 
             {/* Progress Bar */}
             <div className="space-y-2">
-              <div className="w-full bg-gray-100 rounded-full h-2">
+              <div className="w-full bg-common-gray-light rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all duration-500 ${
-                    isOverBudget ? 'bg-red-500' : 'bg-emerald-500'
+                    isOverBudget ? 'bg-common-red-secondary0' : 'bg-common-green-secondary0'
                   }`}
                   style={{
                     width: `${Math.min(100, budgetPercentage)}%`,
@@ -128,17 +128,17 @@ export default function CategoryCard({
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span
-                  className={`font-medium ${isOverBudget ? 'text-red-600' : 'text-emerald-600'}`}
+                  className={`font-medium ${isOverBudget ? 'text-common-red' : 'text-common-green'}`}
                 >
                   {budgetPercentage.toFixed(0)}% used
                 </span>
                 {isOverBudget ? (
-                  <div className="flex items-center gap-1 text-red-600">
+                  <div className="flex items-center gap-1 text-common-red">
                     <AlertTriangle className="w-3 h-3" />
                     <span className="font-medium">Over budget!</span>
                   </div>
                 ) : (
-                  <span className="text-gray-500">
+                  <span className="text-common-gray-dark">
                     $
                     {(
                       category.budget_amount - stats.totalSpent
@@ -153,7 +153,7 @@ export default function CategoryCard({
 
         {/* No Budget/No Spending State */}
         {!category.budget_amount && !hasSpending && (
-          <div className="text-sm text-gray-400 italic flex items-center gap-1 mt-auto">
+          <div className="text-sm text-common-gray-dark italic flex items-center gap-1 mt-auto">
             <Calendar className="w-3 h-3" />
             No recent activity
           </div>
@@ -162,3 +162,11 @@ export default function CategoryCard({
     </Card>
   );
 }
+
+
+
+
+
+
+
+

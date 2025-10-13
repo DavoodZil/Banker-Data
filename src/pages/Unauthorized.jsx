@@ -14,19 +14,19 @@ export default function Unauthorized() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-common-gray-light">
       <div className="max-w-md w-full space-y-6">
         <div className="p-6 bg-white rounded-lg shadow-lg text-center">
-          <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">
+          <AlertCircle size={48} className="mx-auto mb-4 text-common-red" />
+          <h2 className="text-2xl font-bold mb-4 text-common-gray-dark">
             Unauthorized Access
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-common-gray-dark mb-6">
             You need a valid token to access this application.
           </p>
           <Link
             to="/"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-common-green hover:bg-common-green-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-common-green transition-colors"
           >
             Return to Home
           </Link>
@@ -37,3 +37,11 @@ export default function Unauthorized() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

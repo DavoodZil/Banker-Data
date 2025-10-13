@@ -21,7 +21,7 @@ export default function SpendingChart({ transactions, isLoading }) {
       <Card className="card-shadow border-0">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-orange-600" />
+            <CreditCard className="w-5 h-5 text-common-orange" />
             Daily Spending
           </CardTitle>
         </CardHeader>
@@ -69,14 +69,14 @@ export default function SpendingChart({ transactions, isLoading }) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-orange-600" />
+            <CreditCard className="w-5 h-5 text-common-orange" />
             Daily Spending
           </CardTitle>
           <div className="text-right">
-            <div className="text-lg font-bold text-gray-900">
+            <div className="text-lg font-bold text-common-gray-dark">
               ${avgDaily.toFixed(0)}/day avg
             </div>
-            <div className="text-sm text-gray-500">Last 14 days</div>
+            <div className="text-sm text-common-gray-dark">Last 14 days</div>
           </div>
         </div>
       </CardHeader>
@@ -132,22 +132,22 @@ export default function SpendingChart({ transactions, isLoading }) {
         </ResponsiveContainer>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-common-gray-light">
           <div className="text-center">
-            <div className="text-sm text-gray-500">Total Spent</div>
-            <div className="text-lg font-semibold text-orange-600">
+            <div className="text-sm text-common-gray-dark">Total Spent</div>
+            <div className="text-lg font-semibold text-common-orange">
               ${totalSpending.toLocaleString()}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-500">Highest Day</div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-sm text-common-gray-dark">Highest Day</div>
+            <div className="text-lg font-semibold text-common-gray-dark">
               ${Math.max(...chartData.map((d) => d.spending)).toLocaleString()}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-500">Days with Spending</div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-sm text-common-gray-dark">Days with Spending</div>
+            <div className="text-lg font-semibold text-common-gray-dark">
               {chartData.filter((d) => d.spending > 0).length}/14
             </div>
           </div>
@@ -156,3 +156,11 @@ export default function SpendingChart({ transactions, isLoading }) {
     </Card>
   );
 }
+
+
+
+
+
+
+
+

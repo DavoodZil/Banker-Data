@@ -7,8 +7,8 @@ export default function CashFlowPage() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Cash Flow</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-common-gray-dark">Cash Flow</h1>
+          <p className="text-common-gray-dark mt-1">
             Visualize your cash flow to understand your financial health.
           </p>
         </div>
@@ -19,10 +19,10 @@ export default function CashFlowPage() {
             <Waves className="w-10 h-10 text-cyan-500" />
           </div>
           <div>
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-2xl font-semibold text-common-gray-dark mb-2">
               Feature Coming Soon!
             </h3>
-            <p className="text-gray-500 max-w-md mx-auto">
+            <p className="text-common-gray-dark max-w-md mx-auto">
               This section is under construction. Soon you'll be able to see a
               detailed visualization of your income and expenses over time.
             </p>
@@ -32,3 +32,11 @@ export default function CashFlowPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

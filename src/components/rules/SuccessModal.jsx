@@ -8,18 +8,18 @@ export default function SuccessModal({ isOpen, onClose, message }) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-sm text-center">
         <div className="space-y-4 py-4">
-          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-            <CheckCircle className="w-8 h-8 text-emerald-600" />
+          <div className="w-16 h-16 bg-common-green-secondary rounded-full flex items-center justify-center mx-auto">
+            <CheckCircle className="w-8 h-8 text-common-green" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-common-gray-dark mb-2">
               Success!
             </h3>
-            <p className="text-gray-600">{message}</p>
+            <p className="text-common-gray-dark">{message}</p>
           </div>
           <Button
             onClick={onClose}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-common-green hover:bg-common-green-dark"
           >
             Continue
           </Button>
@@ -28,3 +28,11 @@ export default function SuccessModal({ isOpen, onClose, message }) {
     </Dialog>
   );
 }
+
+
+
+
+
+
+
+

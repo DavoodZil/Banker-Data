@@ -23,17 +23,17 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 function getCategoryColor(categoryName, parentName) {
   const colorClasses = [
-    'bg-green-50 text-green-700 border-green-200',
-    'bg-yellow-50 text-yellow-700 border-yellow-200',
-    'bg-blue-50 text-blue-700 border-blue-200',
+    'bg-common-green-secondary text-common-green-dark ',
+    'bg-common-yellow-secondary text-common-yellow-dark ',
+    'bg-common-blue-secondary text-common-blue-dark ',
     'bg-purple-50 text-purple-700 border-purple-200',
-    'bg-red-50 text-red-700 border-red-200',
+    'bg-common-red-secondary text-common-red-dark ',
     'bg-cyan-50 text-cyan-700 border-cyan-200',
     'bg-pink-50 text-pink-700 border-pink-200',
     'bg-lime-50 text-lime-700 border-lime-200',
-    'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'bg-common-green-secondary text-common-green-dark ',
     'bg-indigo-50 text-indigo-700 border-indigo-200',
-    'bg-orange-50 text-orange-700 border-orange-200',
+    'bg-common-orange-secondary text-common-orange-dark ',
     'bg-teal-50 text-teal-700 border-teal-200',
   ];
 
@@ -58,12 +58,12 @@ const DescriptionCellRenderer = ({ data, accounts }) => {
   return (
     <div className="flex items-center gap-2">
       <div
-        className={`p-1 rounded-full ${isPositive ? 'bg-green-100' : 'bg-red-100'}`}
+        className={`p-1 rounded-full ${isPositive ? 'bg-common-green-secondary' : 'bg-common-red-secondary'}`}
       >
         {isPositive ? (
-          <ArrowUpRight className="w-3 h-3 text-green-600" />
+          <ArrowUpRight className="w-3 h-3 text-common-green" />
         ) : (
-          <ArrowDownRight className="w-3 h-3 text-red-600" />
+          <ArrowDownRight className="w-3 h-3 text-common-red" />
         )}
       </div>
       <div>
@@ -73,7 +73,7 @@ const DescriptionCellRenderer = ({ data, accounts }) => {
             'No description'}
         </div>
         {data.merchant_name_custom || data.merchant_name ? (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-common-gray-dark">
             {data.merchant_name_custom || data.merchant_name}
           </div>
         ) : null}
@@ -97,7 +97,7 @@ const AccountCellRenderer = ({ data, accounts }) => {
   return (
     <div>
       <div className="text-sm">{accountName}</div>
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-common-gray-dark">
         {data.bank_account?.institution_name || 'Bank Account'}
       </div>
     </div>
@@ -147,7 +147,7 @@ const AmountCellRenderer = ({ data }) => {
 
   return (
     <div
-      className={`font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}
+      className={`font-semibold ${isPositive ? 'text-common-green' : 'text-common-red'}`}
     >
       {isPositive ? '+' : ''}${Math.abs(data.amountAmount).toLocaleString()}
     </div>
@@ -369,7 +369,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
   const SkeletonTable = () => (
     <div className="w-full space-y-4">
       {/* Header skeleton */}
-      <div className="grid grid-cols-7 gap-4 p-4 bg-gray-50 rounded-t-lg">
+      <div className="grid grid-cols-7 gap-4 p-4 bg-common-gray-light rounded-t-lg">
         {Array.from({ length: 7 }).map((_, i) => (
           <Skeleton key={i} className="h-6 w-full" />
         ))}
@@ -388,7 +388,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
       ))}
 
       {/* Pagination skeleton */}
-      <div className="flex justify-between items-center p-4 bg-gray-50 rounded-b-lg">
+      <div className="flex justify-between items-center p-4 bg-common-gray-light rounded-b-lg">
         <Skeleton className="h-6 w-32" />
         <div className="flex gap-2">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -579,9 +579,9 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
         </div>
 
         {/* Custom Pagination Controls */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+        <div className="flex items-center justify-between p-4 bg-common-gray-light rounded-lg border">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-common-gray-dark">
               Showing {currentPage * pageSize + 1} to{' '}
               {Math.min((currentPage + 1) * pageSize, totalRows)} of {totalRows}{' '}
               entries
@@ -592,7 +592,7 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
                 setPageSize(Number(e.target.value));
                 setCurrentPage(0);
               }}
-              className="px-3 py-1 border border-gray-300 rounded text-sm"
+              className="px-3 py-1 border border-common-gray-light rounded text-sm"
             >
               {[10, 20, 50, 100].map((size) => (
                 <option key={size} value={size}>
@@ -656,3 +656,12 @@ const PaginatedTransactionTable = forwardRef(function PaginatedTransactionTable(
 });
 
 export default PaginatedTransactionTable;
+
+
+
+
+
+
+
+
+

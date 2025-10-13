@@ -192,7 +192,7 @@ export default function AddCategoryModal({
             {/* Parent Category Dropdown */}
             <div className="space-y-2">
               <Label htmlFor="parent_category" className="text-sm font-medium">
-                Parent Category <span className="text-red-500">*</span>
+                Parent Category <span className="text-common-red">*</span>
               </Label>
               <Select
                 value={formData.parent_category}
@@ -207,7 +207,7 @@ export default function AddCategoryModal({
                 <SelectContent className="max-h-80">
                   <div className="sticky top-0 z-10 bg-white p-2 border-b">
                     <div className="relative">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
                       <Input
                         placeholder="Search categories..."
                         value={categorySearch}
@@ -251,7 +251,7 @@ export default function AddCategoryModal({
 
                     {Object.keys(filteredCategories).length === 0 &&
                       categorySearch && (
-                        <div className="text-center py-4 text-gray-500 text-sm">
+                        <div className="text-center py-4 text-common-gray-dark text-sm">
                           No categories found
                         </div>
                       )}
@@ -266,7 +266,7 @@ export default function AddCategoryModal({
                 Monthly Budget (Optional)
               </Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark text-sm">
                   $
                 </span>
                 <Input
@@ -281,7 +281,7 @@ export default function AddCategoryModal({
                   className="pl-7 h-9"
                 />
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-common-gray-dark">
                 Set a monthly spending limit for this category
               </p>
             </div>
@@ -298,7 +298,7 @@ export default function AddCategoryModal({
               </Button>
               <Button
                 type="submit"
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="bg-common-green hover:bg-common-green-dark"
                 size="sm"
                 disabled={isSaving || !formData.parent_category}
               >
@@ -312,3 +312,11 @@ export default function AddCategoryModal({
     </>
   );
 }
+
+
+
+
+
+
+
+

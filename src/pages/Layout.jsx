@@ -110,7 +110,7 @@ export default function Layout({ children, currentPageName }) {
         }
       `}</style>
       <div className="min-h-screen flex flex-col w-full gradient-bg">
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <header className="bg-white/90 backdrop-blur-sm border-b border-common-gray-light sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <nav className="hidden md:flex h-full items-center gap-1 overflow-x-auto">
@@ -121,8 +121,8 @@ export default function Layout({ children, currentPageName }) {
                     className={`h-full flex items-center px-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap
                       ${
                         location.pathname === item.url
-                          ? 'border-emerald-500 text-emerald-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300'
+                          ? 'border-common-green text-common-green'
+                          : 'border-transparent text-common-gray-dark hover:text-common-gray-dark hover:border-common-gray-light'
                       }`}
                   >
                     {item.title}
@@ -133,7 +133,7 @@ export default function Layout({ children, currentPageName }) {
               {/* <div className="flex items-center gap-3">
                  <DropdownMenu>
                    <DropdownMenuTrigger asChild>
-                     <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-500 hover:text-gray-900">
+                     <Button variant="ghost" size="icon" className="h-9 w-9 text-common-gray-dark hover:text-common-gray-dark">
                         <Settings className="h-5 w-5" />
                      </Button>
                    </DropdownMenuTrigger>
@@ -162,7 +162,7 @@ export default function Layout({ children, currentPageName }) {
                      </DropdownMenuItem>
                    </DropdownMenuContent>
                  </DropdownMenu>
-                 <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-semibold text-gray-600">
+                 <div className="w-8 h-8 bg-common-gray-light rounded-full flex items-center justify-center text-sm font-semibold text-common-gray-dark">
                    U
                  </div>
               </div> */}
@@ -175,3 +175,11 @@ export default function Layout({ children, currentPageName }) {
     </>
   );
 }
+
+
+
+
+
+
+
+

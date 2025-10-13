@@ -28,7 +28,7 @@ import { useCallback } from 'react';
 
 function CategoryCardSkeleton() {
   return (
-    <Card className="bg-white border-gray-100 h-full">
+    <Card className="bg-white border-common-gray-light h-full">
       <CardContent className="p-5 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -183,17 +183,17 @@ export default function Categories() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl lg:text-3xl font-bold text-common-gray-dark">
             Categories
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-common-gray-dark mt-1">
             Organize your spending • {allCategories.length} categories
           </p>
         </div>
         <Button
           onClick={handleShowAddModal}
           size="sm"
-          className="bg-emerald-600 hover:bg-emerald-700 gap-2 px-4 py-2 shrink-0"
+          className="bg-common-green hover:bg-common-green-dark gap-2 px-4 py-2 shrink-0"
         >
           <Plus className="w-4 h-4" />
           Add Category
@@ -203,12 +203,12 @@ export default function Categories() {
       {/* Search Bar */}
       <div className="max-w-md">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-common-gray-dark" />
           <Input
             placeholder="Search categories..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-10 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+            className="pl-10 h-10 border-common-gray-light focus:border-common-green focus:ring-common-green"
           />
         </div>
       </div>
@@ -239,16 +239,16 @@ export default function Categories() {
         </div>
       ) : (
         /* Empty State */
-        <Card className="bg-gray-50 border-dashed border-2 border-gray-200 text-center py-12">
+        <Card className="bg-common-gray-light border-dashed border-2 border-common-gray-light text-center py-12">
           <CardContent className="space-y-4">
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
-              <Search className="w-8 h-8 text-gray-400" />
+            <div className="w-16 h-16 bg-common-gray-light rounded-full flex items-center justify-center mx-auto">
+              <Search className="w-8 h-8 text-common-gray-dark" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              <h3 className="text-lg font-semibold text-common-gray-dark mb-2">
                 No categories found
               </h3>
-              <p className="text-sm text-gray-500 mb-4 max-w-sm mx-auto">
+              <p className="text-sm text-common-gray-dark mb-4 max-w-sm mx-auto">
                 {searchQuery
                   ? `No categories match "${searchQuery}"`
                   : 'Create your first category to organize transactions'}
@@ -257,7 +257,7 @@ export default function Categories() {
                 <Button
                   onClick={handleShowAddModal}
                   size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-common-green hover:bg-common-green-dark"
                 >
                   Create Your First Category
                 </Button>
@@ -285,3 +285,11 @@ export default function Categories() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

@@ -12,10 +12,10 @@ export default function AuthTest() {
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-common-gray-dark">
           Authentication Test
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-common-gray-dark mt-1">
           Test the authentication flow and token management
         </p>
       </div>
@@ -24,24 +24,24 @@ export default function AuthTest() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-emerald-600" />
+              <Shield className="w-5 h-5 text-common-green" />
               Authentication Status
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Status:</span>
+                <span className="text-sm text-common-gray-dark">Status:</span>
                 <span
-                  className={`text-sm font-medium ${authenticated ? 'text-emerald-600' : 'text-red-600'}`}
+                  className={`text-sm font-medium ${authenticated ? 'text-common-green' : 'text-common-red'}`}
                 >
                   {authenticated ? 'Authenticated' : 'Not Authenticated'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Token Present:</span>
+                <span className="text-sm text-common-gray-dark">Token Present:</span>
                 <span
-                  className={`text-sm font-medium ${token ? 'text-emerald-600' : 'text-red-600'}`}
+                  className={`text-sm font-medium ${token ? 'text-common-green' : 'text-common-red'}`}
                 >
                   {token ? 'Yes' : 'No'}
                 </span>
@@ -53,20 +53,20 @@ export default function AuthTest() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Key className="w-5 h-5 text-blue-600" />
+              <Key className="w-5 h-5 text-common-blue" />
               Token Info
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Token Length:</span>
+                <span className="text-sm text-common-gray-dark">Token Length:</span>
                 <span className="text-sm font-medium">
                   {token ? token.length : 'N/A'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Token Preview:</span>
+                <span className="text-sm text-common-gray-dark">Token Preview:</span>
                 <span className="text-sm font-medium font-mono">
                   {token ? `${token.substring(0, 10)}...` : 'N/A'}
                 </span>
@@ -85,15 +85,15 @@ export default function AuthTest() {
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Base URL:</span>
+                <span className="text-sm text-common-gray-dark">Base URL:</span>
                 <span className="text-sm font-medium">
                   {baseUrl || 'Default'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">URL Set:</span>
+                <span className="text-sm text-common-gray-dark">URL Set:</span>
                 <span
-                  className={`text-sm font-medium ${baseUrl ? 'text-emerald-600' : 'text-gray-600'}`}
+                  className={`text-sm font-medium ${baseUrl ? 'text-common-green' : 'text-common-text-secondary'}`}
                 >
                   {baseUrl ? 'Yes' : 'No'}
                 </span>
@@ -111,14 +111,14 @@ export default function AuthTest() {
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-medium mb-2">How to Test:</h3>
-              <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
+              <ol className="list-decimal list-inside space-y-1 text-sm text-common-gray-dark">
                 <li>
                   Access the app without a token - you should be redirected to
                   /unauthorized
                 </li>
                 <li>
                   Add a token via URL parameter:{' '}
-                  <code className="bg-gray-100 px-1 rounded">
+                  <code className="bg-common-gray-light px-1 rounded">
                     ?token=your_token_here
                   </code>
                 </li>
@@ -132,10 +132,10 @@ export default function AuthTest() {
             <div>
               <h3 className="text-lg font-medium mb-2">Example URLs:</h3>
               <div className="space-y-1 text-sm">
-                <div className="bg-gray-100 p-2 rounded font-mono">
+                <div className="bg-common-gray-light p-2 rounded font-mono">
                   http://localhost:5173/?token=test_token_123
                 </div>
-                <div className="bg-gray-100 p-2 rounded font-mono">
+                <div className="bg-common-gray-light p-2 rounded font-mono">
                   http://localhost:5173/dashboard?token=test_token_123&baseUrl=https://api.example.com
                 </div>
               </div>
@@ -146,3 +146,11 @@ export default function AuthTest() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

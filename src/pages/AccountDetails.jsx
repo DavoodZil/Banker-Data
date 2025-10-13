@@ -74,7 +74,7 @@ export default function AccountDetailsPage() {
 
   if (!account) {
     return (
-      <div className="p-6 text-center text-gray-500">
+      <div className="p-6 text-center text-common-gray-dark">
         Account not found. Please check the ID or return to the accounts page.
         <Link to={createPageUrl('Accounts')} className="mt-4 inline-block">
           <Button>Back to Accounts</Button>
@@ -91,7 +91,7 @@ export default function AccountDetailsPage() {
         <Button variant="ghost" asChild>
           <Link
             to={createPageUrl('Accounts')}
-            className="flex items-center gap-2 text-gray-600"
+            className="flex items-center gap-2 text-common-gray-dark"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Accounts
@@ -104,14 +104,14 @@ export default function AccountDetailsPage() {
       </div>
 
       <header className="flex items-start gap-4">
-        <div className="p-3 bg-gray-100 rounded-lg">
-          <IconComponent className="w-8 h-8 text-gray-700" />
+        <div className="p-3 bg-common-gray-light rounded-lg">
+          <IconComponent className="w-8 h-8 text-common-gray-dark" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-common-gray-dark">
             {account.account_name}
           </h1>
-          <p className="text-gray-500">
+          <p className="text-common-gray-dark">
             {account.institution_name} •••• {account.account_number_last_four}
           </p>
         </div>
@@ -120,12 +120,12 @@ export default function AccountDetailsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-common-gray-dark">
               Current Balance
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-3xl font-bold text-common-gray-dark">
               $
               {account.balance.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
@@ -137,12 +137,12 @@ export default function AccountDetailsPage() {
         {account.available_balance && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-500">
+              <CardTitle className="text-sm font-medium text-common-gray-dark">
                 Available Balance
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-emerald-600">
+              <p className="text-3xl font-bold text-common-green">
                 $
                 {account.available_balance.toLocaleString('en-US', {
                   minimumFractionDigits: 2,
@@ -154,12 +154,12 @@ export default function AccountDetailsPage() {
         )}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-common-gray-dark">
               Account Type
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-gray-900 capitalize">
+            <p className="text-3xl font-bold text-common-gray-dark capitalize">
               {account.account_type}
             </p>
           </CardContent>
@@ -182,3 +182,11 @@ export default function AccountDetailsPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

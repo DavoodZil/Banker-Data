@@ -6,17 +6,17 @@ import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const categoryColors = {
-  groceries: 'bg-green-50 text-green-700 border-green-200',
-  dining: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  transportation: 'bg-blue-50 text-blue-700 border-blue-200',
+  groceries: 'bg-common-green-secondary text-common-green-dark ',
+  dining: 'bg-common-yellow-secondary text-common-yellow-dark ',
+  transportation: 'bg-common-blue-secondary text-common-blue-dark ',
   entertainment: 'bg-purple-50 text-purple-700 border-purple-200',
-  utilities: 'bg-red-50 text-red-700 border-red-200',
+  utilities: 'bg-common-red-secondary text-common-red-dark ',
   healthcare: 'bg-cyan-50 text-cyan-700 border-cyan-200',
   shopping: 'bg-pink-50 text-pink-700 border-pink-200',
   travel: 'bg-lime-50 text-lime-700 border-lime-200',
-  income: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  income: 'bg-common-green-secondary text-common-green-dark ',
   investments: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  uncategorized: 'bg-gray-50 text-gray-700 border-gray-200',
+  uncategorized: 'bg-common-gray-light text-common-gray-dark border-common-gray-light',
 };
 
 export default function RecentTransactions({ transactions, isLoading }) {
@@ -66,30 +66,30 @@ export default function RecentTransactions({ transactions, isLoading }) {
           {recentTransactions.map((transaction) => (
             <div
               key={transaction.id}
-              className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-smooth"
+              className="flex items-center justify-between p-3 hover:bg-common-gray-light rounded-lg transition-smooth"
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div
-                  className={`p-2 rounded-full flex-shrink-0 ${transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'}`}
+                  className={`p-2 rounded-full flex-shrink-0 ${transaction.amount > 0 ? 'bg-common-green-secondary' : 'bg-common-red-secondary'}`}
                 >
                   {transaction.amount > 0 ? (
-                    <ArrowUpRight className="w-4 h-4 text-green-600" />
+                    <ArrowUpRight className="w-4 h-4 text-common-green" />
                   ) : (
-                    <ArrowDownRight className="w-4 h-4 text-red-600" />
+                    <ArrowDownRight className="w-4 h-4 text-common-red" />
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-gray-900 truncate">
+                  <div className="font-medium text-common-gray-dark truncate">
                     {transaction.custom_description || transaction.description}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-common-gray-dark">
                     {format(new Date(transaction.date), 'MMM d, yyyy')}
                   </div>
                 </div>
               </div>
               <div className="text-right ml-4 flex-shrink-0">
                 <div
-                  className={`font-semibold ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}`}
+                  className={`font-semibold ${transaction.amount > 0 ? 'text-common-green' : 'text-common-red'}`}
                 >
                   {transaction.amount > 0 ? '+' : ''}$
                   {Math.abs(transaction.amount).toLocaleString()}
@@ -106,9 +106,9 @@ export default function RecentTransactions({ transactions, isLoading }) {
         </div>
 
         {transactions.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <ArrowUpRight className="w-6 h-6 text-gray-400" />
+          <div className="text-center py-8 text-common-gray-dark">
+            <div className="w-12 h-12 bg-common-gray-light rounded-full flex items-center justify-center mx-auto mb-3">
+              <ArrowUpRight className="w-6 h-6 text-common-gray-dark" />
             </div>
             <p>No transactions yet</p>
           </div>
@@ -117,3 +117,12 @@ export default function RecentTransactions({ transactions, isLoading }) {
     </Card>
   );
 }
+
+
+
+
+
+
+
+
+

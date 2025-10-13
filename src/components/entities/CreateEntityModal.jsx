@@ -105,7 +105,7 @@ export default function CreateEntityModal({ isOpen, onClose, onSave, entity }) {
             </Button>
             <Button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-common-green hover:bg-common-green-dark"
             >
               {entity ? 'Save Changes' : 'Create Entity'}
             </Button>
@@ -115,3 +115,11 @@ export default function CreateEntityModal({ isOpen, onClose, onSave, entity }) {
     </Dialog>
   );
 }
+
+
+
+
+
+
+
+

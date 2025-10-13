@@ -133,7 +133,7 @@ export default function UploadFlow() {
       case STEPS.SELECT_ACCOUNT:
         return (
           <CardContent className="space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-common-gray-dark">
               Choose the manual account you want to import transactions into.
             </p>
             <Select onValueChange={setSelectedAccountId}>
@@ -161,7 +161,7 @@ export default function UploadFlow() {
           <CardContent className="space-y-4 text-center">
             <div className="mx-auto w-fit">
               <label htmlFor="csv-upload" className="cursor-pointer space-y-2">
-                <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-emerald-500">
+                <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center text-common-gray-dark hover:bg-common-gray-light hover:border-common-green">
                   <FileUp className="w-8 h-8" />
                 </div>
                 <Input
@@ -171,12 +171,12 @@ export default function UploadFlow() {
                   className="hidden"
                   onChange={handleFileChange}
                 />
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-common-gray-dark">
                   {file ? file.name : 'Click to upload a CSV'}
                 </p>
               </label>
             </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-common-red text-sm">{error}</p>}
             <div className="flex justify-between">
               <Button
                 variant="outline"
@@ -197,7 +197,7 @@ export default function UploadFlow() {
       case STEPS.REVIEW:
         return (
           <CardContent>
-            <p className="mb-4 text-sm text-gray-600">
+            <p className="mb-4 text-sm text-common-gray-dark">
               Review the {parsedTransactions.length} transactions found in your
               file.
             </p>
@@ -218,7 +218,7 @@ export default function UploadFlow() {
                       <TableCell>{tx.Description}</TableCell>
                       <TableCell>{tx.Category || 'N/A'}</TableCell>
                       <TableCell
-                        className={`text-right ${tx.Amount > 0 ? 'text-green-600' : 'text-red-600'}`}
+                        className={`text-right ${tx.Amount > 0 ? 'text-common-green' : 'text-common-red'}`}
                       >
                         ${tx.Amount.toFixed(2)}
                       </TableCell>
@@ -228,11 +228,11 @@ export default function UploadFlow() {
               </Table>
             </div>
             {parsedTransactions.length > 10 && (
-              <p className="text-center text-sm text-gray-500 mt-2">
+              <p className="text-center text-sm text-common-gray-dark mt-2">
                 ...and {parsedTransactions.length - 10} more
               </p>
             )}
-            {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+            {error && <p className="text-common-red text-sm mt-4">{error}</p>}
             <div className="flex justify-between mt-4">
               <Button
                 variant="outline"
@@ -253,7 +253,7 @@ export default function UploadFlow() {
       case STEPS.COMPLETE:
         return (
           <CardContent className="text-center space-y-4 py-8">
-            <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto" />
+            <CheckCircle className="w-16 h-16 text-common-green mx-auto" />
             <h3 className="text-xl font-semibold">Import Complete!</h3>
             <p>
               {parsedTransactions.length} transactions have been successfully
@@ -279,3 +279,11 @@ export default function UploadFlow() {
     </Card>
   );
 }
+
+
+
+
+
+
+
+

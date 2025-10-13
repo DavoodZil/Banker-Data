@@ -30,7 +30,7 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Tag className="w-5 h-5 text-emerald-600" />
+            <Tag className="w-5 h-5 text-common-green" />
             Create New Tag
           </DialogTitle>
         </DialogHeader>
@@ -38,7 +38,7 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
           <div className="space-y-2">
             <Label
               htmlFor="tagName"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-common-gray-dark"
             >
               Tag Name
             </Label>
@@ -56,7 +56,7 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
           <div className="space-y-2">
             <Label
               htmlFor="tagDescription"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-common-gray-dark"
             >
               Description (optional)
             </Label>
@@ -76,7 +76,7 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
             </Button>
             <Button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-common-green hover:bg-common-green-dark"
               disabled={!name.trim()}
             >
               Create Tag
@@ -87,3 +87,11 @@ export default function CreateTagModal({ isOpen, onClose, onSave }) {
     </Dialog>
   );
 }
+
+
+
+
+
+
+
+

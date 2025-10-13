@@ -83,12 +83,12 @@ const ShowTokenModal = ({ token, onClose }) => {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Token Generated Successfully</CardTitle>
-          <CardDescription className="text-red-600 font-semibold">
+          <CardDescription className="text-common-red font-semibold">
             Please copy this token now. You will not be able to see it again.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="p-3 bg-gray-100 rounded font-mono break-all relative">
+          <div className="p-3 bg-common-gray-light rounded font-mono break-all relative">
             {token}
             <Button
               size="icon"
@@ -100,7 +100,7 @@ const ShowTokenModal = ({ token, onClose }) => {
             </Button>
           </div>
           {copied && (
-            <p className="text-sm text-green-600 text-center">
+            <p className="text-sm text-common-green text-center">
               Copied to clipboard!
             </p>
           )}
@@ -116,7 +116,7 @@ const ShowTokenModal = ({ token, onClose }) => {
 const TokenList = ({ tokens, onRevoke }) => {
   if (tokens.length === 0) {
     return (
-      <p className="text-center text-gray-500 py-8">
+      <p className="text-center text-common-gray-dark py-8">
         No API tokens generated yet.
       </p>
     );
@@ -127,7 +127,7 @@ const TokenList = ({ tokens, onRevoke }) => {
         <div key={token.id} className="p-4 flex justify-between items-center">
           <div>
             <p className="font-semibold">{token.name}</p>
-            <p className="text-sm text-gray-500 font-mono">
+            <p className="text-sm text-common-gray-dark font-mono">
               {token.token_prefix}... &bull; Created on{' '}
               {new Date(token.created_date).toLocaleDateString()}
             </p>
@@ -172,8 +172,8 @@ export default function APIPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-          <KeyRound className="w-8 h-8 text-emerald-600" />
+        <h1 className="text-3xl font-bold text-common-gray-dark flex items-center gap-3">
+          <KeyRound className="w-8 h-8 text-common-green" />
           API & Integrations
         </h1>
         <Button onClick={() => setShowGenerateModal(true)}>
@@ -206,14 +206,14 @@ export default function APIPage() {
             Use your generated access token in the Authorization header to
             access your data.
           </p>
-          <div className="p-4 bg-gray-900 text-white rounded-lg font-mono text-sm relative">
+          <div className="p-4 bg-common-gray-light text-white rounded-lg font-mono text-sm relative">
             <pre>
               <code>{exampleCurl}</code>
             </pre>
             <Button
               size="icon"
               variant="ghost"
-              className="absolute top-2 right-2 h-8 w-8 text-gray-300 hover:text-white"
+              className="absolute top-2 right-2 h-8 w-8 text-common-gray-dark hover:text-white"
               onClick={() =>
                 navigator.clipboard.writeText(
                   exampleCurl.replace('YOUR_ACCESS_TOKEN', 'YOUR_ACCESS_TOKEN')
@@ -238,3 +238,11 @@ export default function APIPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

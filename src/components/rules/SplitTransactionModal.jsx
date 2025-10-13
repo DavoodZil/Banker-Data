@@ -306,8 +306,8 @@ export default function SplitTransactionModal({
       <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="p-2 bg-emerald-100 rounded-lg">
-              <GitCommitHorizontal className="w-6 h-6 text-emerald-600" />
+            <div className="p-2 bg-common-green-secondary rounded-lg">
+              <GitCommitHorizontal className="w-6 h-6 text-common-green" />
             </div>
             Split Transaction
           </DialogTitle>
@@ -316,15 +316,15 @@ export default function SplitTransactionModal({
         <div className="space-y-6">
           {/* Header Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+            <Card className="bg-gradient-to-r from-blue-50 to-blue-100 ">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-blue-600" />
+                  <DollarSign className="w-5 h-5 text-common-blue" />
                   Original Transaction
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-700">
+                <div className="text-2xl font-bold text-common-blue-dark">
                   ${originalTransactionAmount.toFixed(2)}
                 </div>
                 <div className="flex items-center gap-3 mt-3">
@@ -332,11 +332,11 @@ export default function SplitTransactionModal({
                     id="hide-original"
                     checked={currentHideOriginal}
                     onCheckedChange={setCurrentHideOriginal}
-                    className="data-[state=checked]:bg-blue-600"
+                    className="data-[state=checked]:bg-common-blue-secondary"
                   />
                   <Label
                     htmlFor="hide-original"
-                    className="text-sm text-blue-700"
+                    className="text-sm text-common-blue-dark"
                   >
                     Hide original transaction
                   </Label>
@@ -344,10 +344,10 @@ export default function SplitTransactionModal({
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-emerald-50 to-emerald-100 border-emerald-200">
+            <Card className="bg-gradient-to-r from-emerald-50 to-emerald-100 ">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <GitCommitHorizontal className="w-5 h-5 text-emerald-600" />
+                  <GitCommitHorizontal className="w-5 h-5 text-common-green" />
                   Split Configuration
                 </CardTitle>
               </CardHeader>
@@ -359,14 +359,14 @@ export default function SplitTransactionModal({
                   <TabsList className="grid w-full grid-cols-2 bg-white">
                     <TabsTrigger
                       value="amount"
-                      className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
+                      className="data-[state=active]:bg-common-green-secondary data-[state=active]:text-white"
                     >
                       <DollarSign className="w-4 h-4 mr-2" />
                       Amount
                     </TabsTrigger>
                     <TabsTrigger
                       value="percentage"
-                      className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
+                      className="data-[state=active]:bg-common-green-secondary data-[state=active]:text-white"
                     >
                       <Percent className="w-4 h-4 mr-2" />
                       Percentage
@@ -374,7 +374,7 @@ export default function SplitTransactionModal({
                   </TabsList>
                 </Tabs>
                 <div className="flex justify-between items-center text-sm pt-1">
-                  <span className="text-emerald-700 font-medium">
+                  <span className="text-common-green-dark font-medium">
                     Current Total:
                   </span>
                   <Badge
@@ -387,8 +387,8 @@ export default function SplitTransactionModal({
                       (isInitialized &&
                         currentSplitType === 'percentage' &&
                         Math.abs(getTotalAmount() - 100) < 0.01)
-                        ? 'border-emerald-300 text-emerald-700'
-                        : 'border-red-300 text-red-700'
+                        ? ' text-common-green-dark'
+                        : ' text-common-red-dark'
                     }`}
                   >
                     {currentSplitType === 'amount'
@@ -402,9 +402,9 @@ export default function SplitTransactionModal({
 
           {isInitialized &&
             validationErrors.length > 0 && ( // Only show errors if initialized
-              <Alert variant="destructive" className="bg-red-50 border-red-200">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
-                <AlertDescription className="text-red-800">
+              <Alert variant="destructive" className="bg-common-red-secondary ">
+                <AlertTriangle className="h-4 w-4 text-common-red" />
+                <AlertDescription className="text-common-red-dark">
                   {validationErrors.map((error, index) => (
                     <div key={index} className="mb-1 last:mb-0">
                       • {error}
@@ -417,8 +417,8 @@ export default function SplitTransactionModal({
           {/* Splits Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <GitCommitHorizontal className="w-5 h-5 text-gray-600" />
+              <h3 className="text-lg font-semibold text-common-gray-dark flex items-center gap-2">
+                <GitCommitHorizontal className="w-5 h-5 text-common-gray-dark" />
                 Transaction Splits
                 {isInitialized && (
                   <Badge variant="secondary" className="ml-2">
@@ -431,7 +431,7 @@ export default function SplitTransactionModal({
                   !isInitialized ? initializeSplitData() : addSplit()
                 }
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+                className="bg-common-green hover:bg-common-green-dark gap-2"
               >
                 <Plus className="w-4 h-4" />
                 {!isInitialized ? 'Configure Split' : 'Add Split'}
@@ -439,24 +439,24 @@ export default function SplitTransactionModal({
             </div>
 
             {!isInitialized ? (
-              <Card className="bg-gray-50 border-dashed border-2 border-gray-300">
+              <Card className="bg-common-gray-light border-dashed border-2 border-common-gray-light">
                 <CardContent className="p-8 text-center">
                   <div className="space-y-4">
-                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
-                      <GitCommitHorizontal className="w-8 h-8 text-gray-500" />
+                    <div className="w-16 h-16 bg-common-gray-light rounded-full flex items-center justify-center mx-auto">
+                      <GitCommitHorizontal className="w-8 h-8 text-common-gray-dark" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                      <h3 className="text-lg font-semibold text-common-gray-dark mb-2">
                         Ready to Split Transaction
                       </h3>
-                      <p className="text-gray-500 mb-4 max-w-md mx-auto">
+                      <p className="text-common-gray-dark mb-4 max-w-md mx-auto">
                         Click "Configure Split" to start breaking down this
                         transaction into multiple parts with different
                         categories and amounts.
                       </p>
                       <Button
                         onClick={initializeSplitData}
-                        className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+                        className="bg-common-green hover:bg-common-green-dark gap-2"
                       >
                         <GitCommitHorizontal className="w-4 h-4" />
                         Configure Split
@@ -497,7 +497,7 @@ export default function SplitTransactionModal({
                                       e.target.value
                                     )
                                   }
-                                  className="h-9 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 bg-white"
+                                  className="h-9 border-common-gray-light focus:border-common-green focus: bg-white"
                                 />
                               </div>
 
@@ -508,20 +508,20 @@ export default function SplitTransactionModal({
                                     updateSplit(split.id, 'category', value)
                                   }
                                 >
-                                  <SelectTrigger className="h-9 border-gray-300 focus:border-emerald-500 bg-white">
+                                  <SelectTrigger className="h-9 border-common-gray-light focus:border-common-green bg-white">
                                     <SelectValue placeholder="Select category" />
                                   </SelectTrigger>
                                   <SelectContent className="max-h-80">
                                     <div className="sticky top-0 z-10 bg-white p-2 border-b">
                                       <div className="relative">
-                                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
                                         <Input
                                           placeholder="Search categories..."
                                           value={categorySearch}
                                           onChange={(e) =>
                                             setCategorySearch(e.target.value)
                                           }
-                                          className="pl-9 h-8 border-gray-300"
+                                          className="pl-9 h-8 border-common-gray-light"
                                           onMouseDown={(e) =>
                                             e.stopPropagation()
                                           }
@@ -541,7 +541,7 @@ export default function SplitTransactionModal({
                                           },
                                         ]) => (
                                           <SelectGroup key={category}>
-                                            <SelectLabel className="flex items-center gap-2 px-3 py-2 font-semibold text-gray-700 bg-gray-50">
+                                            <SelectLabel className="flex items-center gap-2 px-3 py-2 font-semibold text-common-gray-dark bg-common-gray-light">
                                               {emoji ? (
                                                 <span className="text-lg">
                                                   {emoji}
@@ -570,7 +570,7 @@ export default function SplitTransactionModal({
                                     <div className="sticky bottom-0 bg-white border-t p-2">
                                       <Button
                                         variant="outline"
-                                        className="w-full h-8 text-sm gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                                        className="w-full h-8 text-sm gap-2  text-common-green-dark hover:bg-common-green-secondary"
                                         onClick={onCreateCategory}
                                         onMouseDown={(e) => e.stopPropagation()}
                                       >
@@ -584,7 +584,7 @@ export default function SplitTransactionModal({
 
                               <div className="relative">
                                 {currentSplitType === 'amount' && (
-                                  <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                  <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
                                 )}
                                 <Input
                                   type="number"
@@ -604,10 +604,10 @@ export default function SplitTransactionModal({
                                       e.target.value
                                     )
                                   }
-                                  className={`h-9 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 bg-white ${currentSplitType === 'amount' ? 'pl-8' : 'pr-8'}`}
+                                  className={`h-9 border-common-gray-light focus:border-common-green focus: bg-white ${currentSplitType === 'amount' ? 'pl-8' : 'pr-8'}`}
                                 />
                                 {currentSplitType === 'percentage' && (
-                                  <Percent className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                  <Percent className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
                                 )}
                               </div>
                             </div>
@@ -635,7 +635,7 @@ export default function SplitTransactionModal({
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => removeSplit(split.id)}
-                                  className="h-8 w-8 text-slate-500 hover:text-red-500 transition-colors"
+                                  className="h-8 w-8 text-slate-500 hover:text-common-red transition-colors"
                                   title="Delete this split"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -656,7 +656,7 @@ export default function SplitTransactionModal({
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                   {/* Tags Section */}
                                   <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-gray-700">
+                                    <Label className="text-sm font-medium text-common-gray-dark">
                                       Tags
                                     </Label>
                                     <TagSelector
@@ -673,7 +673,7 @@ export default function SplitTransactionModal({
 
                                   {/* Review Status Section */}
                                   <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-gray-700">
+                                    <Label className="text-sm font-medium text-common-gray-dark">
                                       Review Status
                                     </Label>
                                     <div className="space-y-2">
@@ -687,7 +687,7 @@ export default function SplitTransactionModal({
                                           )
                                         }
                                       >
-                                        <SelectTrigger className="border-gray-300 focus:border-emerald-500 bg-white">
+                                        <SelectTrigger className="border-common-gray-light focus:border-common-green bg-white">
                                           <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -715,7 +715,7 @@ export default function SplitTransactionModal({
                                             )
                                           }
                                         >
-                                          <SelectTrigger className="border-gray-300 focus:border-emerald-500 bg-white">
+                                          <SelectTrigger className="border-common-gray-light focus:border-common-green bg-white">
                                             <SelectValue placeholder="Assign reviewer" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -746,12 +746,12 @@ export default function SplitTransactionModal({
           </div>
         </div>
 
-        <DialogFooter className="pt-6 border-t mt-6 bg-gray-50 -mx-6 -mb-6 px-6 pb-4 rounded-b-lg">
+        <DialogFooter className="pt-6 border-t mt-6 bg-common-gray-light -mx-6 -mb-6 px-6 pb-4 rounded-b-lg">
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border-gray-300 bg-white"
+            className="border-common-gray-light bg-white"
           >
             Cancel
           </Button>
@@ -759,8 +759,8 @@ export default function SplitTransactionModal({
             onClick={handleSave}
             className={`text-white transition-all ${
               isValidConfiguration()
-                ? 'bg-emerald-600 hover:bg-emerald-700'
-                : 'bg-gray-400 cursor-not-allowed'
+                ? 'bg-common-green hover:bg-common-green-dark'
+                : 'bg-common-gray-light cursor-not-allowed'
             }`}
             disabled={!isValidConfiguration()}
           >
@@ -773,3 +773,12 @@ export default function SplitTransactionModal({
     </Dialog>
   );
 }
+
+
+
+
+
+
+
+
+

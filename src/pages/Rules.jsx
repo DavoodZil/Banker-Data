@@ -70,9 +70,9 @@ import {
  * @returns {JSX.Element} The rendered criteria block
  */
 const CriteriaBlock = ({ title, isEnabled, onToggle, children }) => (
-  <div className="bg-white rounded-lg border border-gray-200">
+  <div className="bg-white rounded-lg border border-common-gray-light">
     <div className="flex items-center justify-between p-4">
-      <h3 className="font-semibold text-gray-800">{title}</h3>
+      <h3 className="font-semibold text-common-gray-dark">{title}</h3>
       <Switch checked={isEnabled} onCheckedChange={onToggle} />
     </div>
     {isEnabled && (
@@ -97,8 +97,8 @@ const ActionRow = ({ label, icon: Icon, isEnabled, onToggle, children }) => (
   <div className="space-y-3">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <Icon className="w-5 h-5 text-gray-500" />
-        <Label className="font-medium text-gray-800">{label}</Label>
+        <Icon className="w-5 h-5 text-common-gray-dark" />
+        <Label className="font-medium text-common-gray-dark">{label}</Label>
       </div>
       <Switch checked={isEnabled} onCheckedChange={onToggle} />
     </div>
@@ -611,8 +611,8 @@ export default function RulesPage() {
       <div className="p-6 max-w-7xl mx-auto">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading rule...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-common-green mx-auto mb-4"></div>
+            <p className="text-common-gray-dark">Loading rule...</p>
           </div>
         </div>
       </div>
@@ -648,7 +648,7 @@ export default function RulesPage() {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-gray-50/50">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50">
       <style>{`
           .switch-orange[data-state='checked'] { background-color: #f97316; }
           .category-header { font-weight: 600; color: #374151; padding: 8px 12px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; }
@@ -660,14 +660,14 @@ export default function RulesPage() {
           .data-[state=checked] { background-color: var(--color-primary) !important; border-color: var(--color-primary) !important; color: white; }
         `}</style>
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-common-gray-dark">
           {isEditing ? 'Edit Rule' : 'Create Rule'}
         </h1>
       </div>
 
-      <div className="bg-white p-6 rounded-lg border border-gray-200 space-y-4">
+      <div className="bg-white p-6 rounded-lg border border-common-gray-light space-y-4">
         <Input
-          className="text-lg font-semibold border-gray-300"
+          className="text-lg font-semibold border-common-gray-light"
           placeholder="Enter Rule Name"
           value={rule.name}
           onChange={(e) => setRule({ ...rule, name: e.target.value })}
@@ -681,7 +681,7 @@ export default function RulesPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <h2 className="font-semibold text-lg text-gray-800">
+          <h2 className="font-semibold text-lg text-common-gray-dark">
             If a transaction matches...
           </h2>
           <div className="space-y-4">
@@ -709,15 +709,15 @@ export default function RulesPage() {
                 {rule.conditions.merchants.matchers.map((group, groupIndex) => (
                   <React.Fragment key={groupIndex}>
                     {groupIndex > 0 && (
-                      <p className="text-sm font-semibold text-gray-600 text-center py-2">
+                      <p className="text-sm font-semibold text-common-gray-dark text-center py-2">
                         OR
                       </p>
                     )}
-                    <div className="p-4 border rounded-md bg-gray-50 space-y-3">
+                    <div className="p-4 border rounded-md bg-common-gray-light space-y-3">
                       {group.map((matcher, matcherIndex) => (
                         <div key={matcherIndex} className="space-y-2">
                           {matcherIndex > 0 && (
-                            <p className="text-xs font-semibold text-gray-500 pl-1">
+                            <p className="text-xs font-semibold text-common-gray-dark pl-1">
                               AND
                             </p>
                           )}
@@ -767,7 +767,7 @@ export default function RulesPage() {
                                   groupIndex === 0 &&
                                   matcherIndex === 0 &&
                                   merchantNameError
-                                    ? 'border-red-500'
+                                    ? 'border-common-red'
                                     : ''
                                 }
                               />
@@ -780,7 +780,7 @@ export default function RulesPage() {
                                 }
                                 title="Remove condition"
                               >
-                                <MinusCircle className="w-5 h-5 text-gray-400 hover:text-red-500" />
+                                <MinusCircle className="w-5 h-5 text-common-gray-dark hover:text-common-red" />
                               </button>
                             ) : (
                               <div className="w-5 h-5" />
@@ -789,10 +789,10 @@ export default function RulesPage() {
                         </div>
                       ))}
 
-                      <div className="flex items-center justify-start gap-4 pt-2 border-t border-gray-200">
+                      <div className="flex items-center justify-start gap-4 pt-2 border-t border-common-gray-light">
                         <button
                           onClick={() => addAndMatcher(groupIndex)}
-                          className="flex items-center gap-1.5 bg-emerald-100 text-emerald-800 font-medium hover:bg-emerald-200 px-3 py-1 rounded-md transition-colors text-sm"
+                          className="flex items-center gap-1.5 bg-common-green-secondary text-common-green-dark font-medium hover:bg-common-green-secondary px-3 py-1 rounded-md transition-colors text-sm"
                           title="Add AND condition"
                         >
                           <Plus className="w-4 h-4" />
@@ -802,7 +802,7 @@ export default function RulesPage() {
                           rule.conditions.merchants.matchers.length - 1 && (
                           <button
                             onClick={addOrGroup}
-                            className="flex items-center gap-1.5 bg-blue-100 text-blue-800 font-medium hover:bg-blue-200 px-3 py-1 rounded-md transition-colors text-sm"
+                            className="flex items-center gap-1.5 bg-common-blue-secondary text-common-blue-dark font-medium hover:bg-common-blue-secondary px-3 py-1 rounded-md transition-colors text-sm"
                             title="Add OR condition"
                           >
                             <PlusCircle className="w-4 h-4" />
@@ -857,7 +857,7 @@ export default function RulesPage() {
               {rule.conditions.amount.operator === 'between' ? (
                 <div className="flex items-center gap-3">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark">
                       $
                     </span>
                     <Input
@@ -870,9 +870,9 @@ export default function RulesPage() {
                       className="pl-6"
                     />
                   </div>
-                  <ArrowRight className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                  <ArrowRight className="w-5 h-5 text-common-gray-dark flex-shrink-0" />
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark">
                       $
                     </span>
                     <Input
@@ -888,7 +888,7 @@ export default function RulesPage() {
                 </div>
               ) : (
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark">
                     $
                   </span>
                   <Input
@@ -931,7 +931,7 @@ export default function RulesPage() {
                 <SelectContent className="max-h-80">
                   <div className="category-search">
                     <div className="relative">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
                       <Input
                         placeholder="Search categories..."
                         value={categorySearch}
@@ -971,7 +971,7 @@ export default function RulesPage() {
                               <div className="flex items-center justify-between w-full">
                                 <span>{subcategory.name}</span>
                                 {subcategory.isUserCategory && (
-                                  <span className="text-xs text-gray-500 ml-2">
+                                  <span className="text-xs text-common-gray-dark ml-2">
                                     (custom)
                                   </span>
                                 )}
@@ -983,7 +983,7 @@ export default function RulesPage() {
                     )}
 
                     {Object.keys(filteredCategories).length === 0 && (
-                      <div className="text-center py-4 text-gray-500 text-sm">
+                      <div className="text-center py-4 text-common-gray-dark text-sm">
                         No categories found
                       </div>
                     )}
@@ -1099,12 +1099,12 @@ export default function RulesPage() {
         </div>
 
         <div className="space-y-4">
-          <h2 className="font-semibold text-lg text-gray-800">
+          <h2 className="font-semibold text-lg text-common-gray-dark">
             {rule.actions.split_transaction.enabled
               ? 'Then split the transaction...'
               : 'Then apply these updates...'}
           </h2>
-          <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+          <div className="bg-white rounded-lg border border-common-gray-light p-4 space-y-4">
             {!rule.actions.split_transaction.enabled && (
               <>
                 <ActionRow
@@ -1159,7 +1159,7 @@ export default function RulesPage() {
                     <SelectContent className="max-h-80">
                       <div className="category-search">
                         <div className="relative">
-                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
                           <Input
                             placeholder="Search categories..."
                             value={categorySearch}
@@ -1199,7 +1199,7 @@ export default function RulesPage() {
                                   <div className="flex items-center justify-between w-full">
                                     <span>{subcategory.name}</span>
                                     {subcategory.isUserCategory && (
-                                      <span className="text-xs text-gray-500 ml-2">
+                                      <span className="text-xs text-common-gray-dark ml-2">
                                         (custom)
                                       </span>
                                     )}
@@ -1211,7 +1211,7 @@ export default function RulesPage() {
                         )}
 
                         {Object.keys(filteredCategories).length === 0 && (
-                          <div className="text-center py-4 text-gray-500 text-sm">
+                          <div className="text-center py-4 text-common-gray-dark text-sm">
                             No categories found
                           </div>
                         )}
@@ -1288,7 +1288,7 @@ export default function RulesPage() {
                     {rule.actions.mark_for_review.review_status ===
                       'needs_review' && (
                       <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        <Label className="text-sm font-medium text-common-gray-dark mb-2 block">
                           Assign To
                         </Label>
                         <Select
@@ -1345,7 +1345,7 @@ export default function RulesPage() {
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="p-2 text-sm text-gray-500 text-center">
+                        <div className="p-2 text-sm text-common-gray-dark text-center">
                           No goals available
                         </div>
                       )}
@@ -1357,14 +1357,14 @@ export default function RulesPage() {
             )}
           </div>
           <div className="flex items-center my-6">
-            <div className="flex-grow border-t border-gray-300" />
-            <span className="mx-4 text-gray-500 font-semibold">OR</span>
-            <div className="flex-grow border-t border-gray-300" />
+            <div className="flex-grow border-t border-common-gray-light" />
+            <span className="mx-4 text-common-gray-dark font-semibold">OR</span>
+            <div className="flex-grow border-t border-common-gray-light" />
           </div>
 
           {/* OR separator and Split transaction option in a separate card */}
           <div className="mt-8" />
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="bg-white rounded-lg border border-common-gray-light p-4">
             <ActionRow
               label="Split transaction"
               icon={GitCommitHorizontal}
@@ -1372,7 +1372,7 @@ export default function RulesPage() {
               onToggle={() => handleToggle('actions', 'split_transaction')}
             >
               <div className="space-y-3">
-                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="p-3 bg-common-gray-light rounded-lg border border-common-gray-light">
                   {rule.actions.split_transaction.splits.length > 0 ? (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
@@ -1386,7 +1386,7 @@ export default function RulesPage() {
                             : ''}
                         </Badge>
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-common-gray-dark">
                         Type:{' '}
                         <span className="capitalize">
                           {rule.actions.split_transaction.splitType}
@@ -1397,7 +1397,7 @@ export default function RulesPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-common-gray-dark">
                       No split configuration set
                     </div>
                   )}
@@ -1424,7 +1424,7 @@ export default function RulesPage() {
           Cancel
         </Button>
         <Button
-          className="bg-emerald-600 hover:bg-emerald-700"
+          className="bg-common-green hover:bg-common-green-dark"
           onClick={handleSaveRule}
         >
           {isEditing ? 'Update Rule' : 'Save Rule'}
@@ -1467,3 +1467,11 @@ export default function RulesPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

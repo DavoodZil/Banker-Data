@@ -42,12 +42,12 @@ const TagCard = ({ tag, onEdit, onDelete }) => {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-gray-600" />
+            <CardTitle className="text-lg font-semibold text-common-gray-dark mb-1 flex items-center gap-2">
+              <Tag className="w-4 h-4 text-common-gray-dark" />
               {tag.name}
             </CardTitle>
             {tag.description && (
-              <p className="text-sm text-gray-600">{tag.description}</p>
+              <p className="text-sm text-common-gray-dark">{tag.description}</p>
             )}
           </div>
           <div className="flex items-center gap-2 ml-4">
@@ -63,7 +63,7 @@ const TagCard = ({ tag, onEdit, onDelete }) => {
               variant="outline"
               size="sm"
               onClick={() => setShowDeleteDialog(true)}
-              className="h-8 px-2 text-red-600 hover:text-red-700"
+              className="h-8 px-2 text-common-red hover:text-common-red-dark"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -71,7 +71,7 @@ const TagCard = ({ tag, onEdit, onDelete }) => {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        {/* <div className="flex items-center gap-2 text-xs text-gray-500">
+        {/* <div className="flex items-center gap-2 text-xs text-common-gray-dark">
           <Hash className="w-3 h-3" />
           <span>ID: {tag.id}</span>
         </div> */}
@@ -93,7 +93,7 @@ const TagCard = ({ tag, onEdit, onDelete }) => {
                 onDelete(tag.id);
                 setShowDeleteDialog(false);
               }}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-common-red hover:bg-common-red-dark"
             >
               Delete
             </AlertDialogAction>
@@ -185,10 +185,10 @@ const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
                   setFormData({ ...formData, name: e.target.value })
                 }
                 placeholder="Enter tag name"
-                className={errors.name ? 'border-red-500' : ''}
+                className={errors.name ? 'border-common-red' : ''}
               />
               {errors.name && (
-                <p className="text-xs text-red-500">{errors.name}</p>
+                <p className="text-xs text-common-red">{errors.name}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -211,7 +211,7 @@ const TagFormModal = ({ isOpen, onClose, tag = null, onSave }) => {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-common-green hover:bg-common-green-dark"
             >
               {isSubmitting ? 'Saving...' : tag ? 'Update Tag' : 'Create Tag'}
             </Button>
@@ -296,15 +296,15 @@ export default function TagsListPage() {
   }, [error, toast]);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-gray-50/50">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-common-gray-light/50">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Tags</h1>
-          <p className="text-gray-600 mt-1">Manage your transaction tags</p>
+          <h1 className="text-2xl font-bold text-common-gray-dark">Tags</h1>
+          <p className="text-common-gray-dark mt-1">Manage your transaction tags</p>
         </div>
         <Button
           onClick={handleCreate}
-          className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+          className="bg-common-green hover:bg-common-green-dark gap-2"
         >
           <Plus className="w-4 h-4" />
           Create Tag
@@ -312,10 +312,10 @@ export default function TagsListPage() {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200">
+      <div className="bg-white p-4 rounded-lg border border-common-gray-light">
         <div className="flex items-center gap-4">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-common-gray-dark" />
             <Input
               placeholder="Search tags..."
               value={searchQuery}
@@ -323,7 +323,7 @@ export default function TagsListPage() {
               className="pl-9"
             />
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-common-gray-dark">
             {filteredTags.length} of {tags?.length || 0} tags
           </div>
         </div>
@@ -336,12 +336,12 @@ export default function TagsListPage() {
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">
                 <CardHeader>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-common-gray-light rounded w-3/4"></div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    <div className="h-3 bg-common-gray-light rounded w-1/2"></div>
+                    <div className="h-3 bg-common-gray-light rounded w-2/3"></div>
                   </div>
                 </CardContent>
               </Card>
@@ -349,11 +349,11 @@ export default function TagsListPage() {
           </div>
         ) : filteredTags.length === 0 ? (
           <div className="text-center py-12">
-            <Tag className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <Tag className="w-12 h-12 text-common-gray-dark mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-common-gray-dark mb-2">
               {searchQuery ? 'No tags found' : 'No tags created yet'}
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-common-gray-dark mb-4">
               {searchQuery
                 ? 'Try adjusting your search terms'
                 : 'Create your first tag to organize your transactions'}
@@ -361,7 +361,7 @@ export default function TagsListPage() {
             {!searchQuery && (
               <Button
                 onClick={handleCreate}
-                className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+                className="bg-common-green hover:bg-common-green-dark gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Create Your First Tag
@@ -395,3 +395,11 @@ export default function TagsListPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+

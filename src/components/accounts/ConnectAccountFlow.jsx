@@ -22,31 +22,31 @@ const StatusDisplay = ({ step, error, isReady }) => (
     <div
       className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto transition-colors ${
         step === 'success' || (step === 'ready' && isReady)
-          ? 'bg-emerald-100'
+          ? 'bg-common-green-secondary'
           : step === 'error'
-            ? 'bg-red-100'
-            : 'bg-gray-100'
+            ? 'bg-common-red-secondary'
+            : 'bg-common-gray-light'
       }`}
     >
       {step === 'loading' && (
-        <Loader2 className="w-8 h-8 text-gray-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-common-gray-dark animate-spin" />
       )}
       {step === 'ready' && isReady && (
-        <ShieldCheck className="w-8 h-8 text-emerald-600" />
+        <ShieldCheck className="w-8 h-8 text-common-green" />
       )}
       {step === 'success' && (
-        <CheckCircle className="w-8 h-8 text-emerald-600" />
+        <CheckCircle className="w-8 h-8 text-common-green" />
       )}
-      {step === 'error' && <AlertTriangle className="w-8 h-8 text-red-600" />}
+      {step === 'error' && <AlertTriangle className="w-8 h-8 text-common-red" />}
     </div>
     <div className="space-y-1">
-      <h3 className="text-lg font-semibold text-gray-900">
+      <h3 className="text-lg font-semibold text-common-gray-dark">
         {step === 'loading' && 'Preparing secure connection...'}
         {step === 'ready' && 'Ready to Connect'}
         {step === 'success' && 'Connection Successful!'}
         {step === 'error' && 'Connection Failed'}
       </h3>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-common-gray-dark">
         {step === 'loading' && 'Please wait a moment.'}
         {step === 'ready' && 'Click below to securely open the Plaid window.'}
         {step === 'success' && 'Your account is linked and will sync shortly.'}
@@ -226,8 +226,8 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="p-2 bg-emerald-100 rounded-lg">
-              <Landmark className="w-6 h-6 text-emerald-600" />
+            <div className="p-2 bg-common-green-secondary rounded-lg">
+              <Landmark className="w-6 h-6 text-common-green" />
             </div>
             Connect Bank Account
           </DialogTitle>
@@ -243,7 +243,7 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
           {step === 'success' ? (
             <Button
               onClick={handleClose}
-              className="w-full bg-emerald-600 hover:bg-emerald-700"
+              className="w-full bg-common-green hover:bg-common-green-dark"
             >
               Done
             </Button>
@@ -251,7 +251,7 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
             <Button
               onClick={handleOpenPlaid}
               disabled={!isReady}
-              className="w-full h-11 text-base bg-emerald-600 hover:bg-emerald-700"
+              className="w-full h-11 text-base bg-common-green hover:bg-common-green-dark"
             >
               {step === 'loading' && <Loader2 className="animate-spin" />}
               {step !== 'loading' && 'Continue Securely'}
@@ -262,3 +262,11 @@ export default function ConnectAccountFlow({ isOpen, onClose, onAddSuccess }) {
     </Dialog>
   );
 }
+
+
+
+
+
+
+
+

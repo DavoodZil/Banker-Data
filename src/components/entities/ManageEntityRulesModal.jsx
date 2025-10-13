@@ -99,7 +99,7 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
           <Card>
             <CardContent className="pt-6 space-y-4">
               <h3 className="font-semibold text-lg flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-emerald-600" /> Create a New
+                <PlusCircle className="w-5 h-5 text-common-green" /> Create a New
                 Rule
               </h3>
               <div className="space-y-2">
@@ -191,7 +191,7 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
                     selectedAccounts.length === 0 ||
                     !targetEntity
                   }
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-common-green hover:bg-common-green-dark"
                 >
                   Add Rule
                 </Button>
@@ -205,18 +205,18 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
             {isLoading ? (
               <p>Loading rules...</p>
             ) : rules.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center py-4">
+              <p className="text-sm text-common-gray-dark text-center py-4">
                 No rules created yet.
               </p>
             ) : (
               rules.map((rule) => (
-                <Card key={rule.id} className="bg-gray-50">
+                <Card key={rule.id} className="bg-common-gray-light">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div>
                       <p className="font-semibold">{rule.name}</p>
-                      <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">
+                      <div className="text-sm text-common-gray-dark flex items-center gap-2 flex-wrap">
                         <div className="flex flex-col items-start">
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-common-gray-dark">
                             FROM ACCOUNTS
                           </span>
                           <div className="flex gap-1 flex-wrap">
@@ -227,9 +227,9 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
                             ))}
                           </div>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-gray-400 shrink-0" />
+                        <ArrowRight className="w-4 h-4 text-common-gray-dark shrink-0" />
                         <div className="flex flex-col items-start">
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-common-gray-dark">
                             TO ENTITY
                           </span>
                           <Badge variant="outline" className="bg-white">
@@ -243,7 +243,7 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
                       size="icon"
                       onClick={() => handleDeleteRule(rule.id)}
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <Trash2 className="w-4 h-4 text-common-red" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -258,3 +258,11 @@ export default function ManageEntityRulesModal({ isOpen, onClose }) {
     </Dialog>
   );
 }
+
+
+
+
+
+
+
+

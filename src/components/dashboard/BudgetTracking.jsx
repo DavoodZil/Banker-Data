@@ -16,7 +16,7 @@ export default function BudgetTracking({
       <Card className="card-shadow border-0">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-emerald-600" />
+            <Target className="w-5 h-5 text-common-green" />
             Budget Tracking
           </CardTitle>
         </CardHeader>
@@ -94,18 +94,18 @@ export default function BudgetTracking({
       <Card className="card-shadow border-0">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-emerald-600" />
+            <Target className="w-5 h-5 text-common-green" />
             Budget Tracking
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center py-6">
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Target className="w-6 h-6 text-gray-400" />
+          <div className="w-12 h-12 bg-common-gray-light rounded-full flex items-center justify-center mx-auto mb-3">
+            <Target className="w-6 h-6 text-common-gray-dark" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-common-gray-dark mb-2">
             No Budgets Set
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-common-gray-dark">
             Create category budgets to track your spending goals
           </p>
         </CardContent>
@@ -118,7 +118,7 @@ export default function BudgetTracking({
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-emerald-600" />
+            <Target className="w-5 h-5 text-common-green" />
             Budget Tracking
           </CardTitle>
           <Badge
@@ -133,37 +133,37 @@ export default function BudgetTracking({
         {/* Overall Budget Summary - Compact */}
         <div className="p-3 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-lg border">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-common-gray-dark">
               Total Budget
             </span>
-            <span className="text-sm font-bold text-gray-900">
+            <span className="text-sm font-bold text-common-gray-dark">
               ${totalSpent.toLocaleString()} / ${totalBudget.toLocaleString()}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+          <div className="w-full bg-common-gray-light rounded-full h-2 mb-2">
             <div
               className={`h-2 rounded-full transition-all duration-500 ${
                 overallPercentage > 100
-                  ? 'bg-red-500'
+                  ? 'bg-common-red-secondary0'
                   : overallPercentage > 80
-                    ? 'bg-yellow-500'
-                    : 'bg-emerald-500'
+                    ? 'bg-common-yellow-secondary0'
+                    : 'bg-common-green-secondary0'
               }`}
               style={{ width: `${Math.min(100, overallPercentage)}%` }}
             />
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-600">
+            <span className="text-common-gray-dark">
               ${Math.max(0, totalBudget - totalSpent).toLocaleString()}{' '}
               remaining
             </span>
             <span
               className={`font-medium ${
                 overallPercentage > 100
-                  ? 'text-red-600'
+                  ? 'text-common-red'
                   : overallPercentage > 80
-                    ? 'text-yellow-600'
-                    : 'text-emerald-600'
+                    ? 'text-common-yellow'
+                    : 'text-common-green'
               }`}
             >
               {overallPercentage > 100
@@ -183,32 +183,32 @@ export default function BudgetTracking({
                     className="w-2 h-2 rounded-full flex-shrink-0"
                     style={{ backgroundColor: category.color || '#6b7280' }}
                   />
-                  <span className="text-sm font-medium capitalize text-gray-900 truncate">
+                  <span className="text-sm font-medium capitalize text-common-gray-dark truncate">
                     {category.name}
                   </span>
                   {category.isOverBudget && (
-                    <AlertTriangle className="w-3 h-3 text-red-500 flex-shrink-0" />
+                    <AlertTriangle className="w-3 h-3 text-common-red flex-shrink-0" />
                   )}
                 </div>
                 <div className="text-right ml-2">
-                  <div className="text-xs font-semibold text-gray-900">
+                  <div className="text-xs font-semibold text-common-gray-dark">
                     ${category.spent.toLocaleString()}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-common-gray-dark">
                     of ${category.budget.toLocaleString()}
                   </div>
                 </div>
               </div>
 
               {/* Horizontal Progress Bar */}
-              <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div className="w-full bg-common-gray-light rounded-full h-1.5">
                 <div
                   className={`h-1.5 rounded-full transition-all duration-500 ${
                     category.isOverBudget
-                      ? 'bg-red-500'
+                      ? 'bg-common-red-secondary0'
                       : category.percentage > 80
-                        ? 'bg-yellow-500'
-                        : 'bg-emerald-500'
+                        ? 'bg-common-yellow-secondary0'
+                        : 'bg-common-green-secondary0'
                   }`}
                   style={{
                     width: `${Math.min(100, category.percentage)}%`,
@@ -219,7 +219,7 @@ export default function BudgetTracking({
           ))}
 
           {budgetedCategories.length > 6 && (
-            <div className="text-center text-xs text-gray-500 pt-2 border-t">
+            <div className="text-center text-xs text-common-gray-dark pt-2 border-t">
               +{budgetedCategories.length - 6} more categories
             </div>
           )}
@@ -228,3 +228,11 @@ export default function BudgetTracking({
     </Card>
   );
 }
+
+
+
+
+
+
+
+

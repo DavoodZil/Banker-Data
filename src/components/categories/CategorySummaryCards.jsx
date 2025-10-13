@@ -10,7 +10,7 @@ export default function CategorySummaryCards({ filters = {} }) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <Card key={index} className="bg-white border-gray-100">
+          <Card key={index} className="bg-white border-common-gray-light">
             <CardContent className="p-4">
               <Skeleton className="h-3 w-20 mb-2" />
               <Skeleton className="h-8 w-16" />
@@ -24,12 +24,12 @@ export default function CategorySummaryCards({ filters = {} }) {
   if (error) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white border-gray-100">
+        <Card className="bg-white border-common-gray-light">
           <CardContent className="p-4">
-            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+            <div className="text-xs font-medium text-common-gray-dark uppercase tracking-wide mb-1">
               Error
             </div>
-            <div className="text-sm text-red-600">Failed to load summary</div>
+            <div className="text-sm text-common-red">Failed to load summary</div>
           </CardContent>
         </Card>
       </div>
@@ -52,45 +52,45 @@ export default function CategorySummaryCards({ filters = {} }) {
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
+      <Card className="bg-white border-common-gray-light hover:shadow-md transition-shadow">
         <CardContent className="p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+          <div className="text-xs font-medium text-common-gray-dark uppercase tracking-wide mb-1">
             Total Categories
           </div>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-common-gray-dark">
             {totalCategories.toLocaleString()}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
+      <Card className="bg-white border-common-gray-light hover:shadow-md transition-shadow">
         <CardContent className="p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+          <div className="text-xs font-medium text-common-gray-dark uppercase tracking-wide mb-1">
             Total Spent
           </div>
-          <div className="text-2xl font-bold text-red-600">
+          <div className="text-2xl font-bold text-common-red">
             ${totalSpent.toLocaleString()}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
+      <Card className="bg-white border-common-gray-light hover:shadow-md transition-shadow">
         <CardContent className="p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+          <div className="text-xs font-medium text-common-gray-dark uppercase tracking-wide mb-1">
             Active Categories
           </div>
-          <div className="text-2xl font-bold text-emerald-600">
+          <div className="text-2xl font-bold text-common-green">
             {activeCategories.toLocaleString()}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white border-gray-100 hover:shadow-md transition-shadow">
+      <Card className="bg-white border-common-gray-light hover:shadow-md transition-shadow">
         <CardContent className="p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+          <div className="text-xs font-medium text-common-gray-dark uppercase tracking-wide mb-1">
             Avg per Category
           </div>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-common-gray-dark">
             ${avgPerCategory.toLocaleString()}
           </div>
         </CardContent>
@@ -98,3 +98,11 @@ export default function CategorySummaryCards({ filters = {} }) {
     </div>
   );
 }
+
+
+
+
+
+
+
+
