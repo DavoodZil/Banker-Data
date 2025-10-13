@@ -45,12 +45,10 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
       return sum + account.balance;
     }, 0);
 
-    // Generate historical data (mock data for demonstration)
     const data = [];
     for (let i = 5; i >= 0; i--) {
       const date = startOfMonth(subMonths(currentDate, i));
 
-      // Mock historical net worth with some realistic variation
       let netWorth;
       if (i === 0) {
         netWorth = currentNetWorth;
@@ -65,8 +63,8 @@ export default function NetWorthChart({ accounts, transactions, isLoading }) {
       data.push({
         date: format(date, 'MMM yyyy'),
         netWorth: Math.round(netWorth),
-        assets: Math.round(netWorth * 1.3), // Mock assets value
-        liabilities: Math.round(netWorth * 0.3), // Mock liabilities value
+        assets: Math.round(netWorth * 1.3),
+        liabilities: Math.round(netWorth * 0.3),
       });
     }
 

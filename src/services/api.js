@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getAuthToken, getBaseUrl } from '@/utils/auth';
-import { config, debugLog } from '@/config/environment';
+import { config } from '@/config/environment';
 
 // Create axios instance with base configuration
 const api = axios.create({
@@ -9,13 +9,6 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-});
-
-// Log API configuration in development
-debugLog('API Service initialized:', {
-  baseURL: config.api.baseUrl,
-  useMockData: config.api.useMockData,
-  timeout: config.api.timeout,
 });
 
 // Request interceptor to add authentication token
@@ -33,14 +26,6 @@ api.interceptors.request.use(
     if (token) {
       request.headers.Authorization = `Bearer ${token}`;
     }
-
-    // Log request details in debug mode
-    debugLog('API Request:', {
-      method: request.method,
-      url: request.url,
-      baseURL: request.baseURL,
-      hasAuth: !!token,
-    });
 
     return request;
   },
@@ -101,13 +86,6 @@ const getErrorMessage = (error) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    debugLog('API Error:', {
-      status: error.response?.status,
-      message: error.message,
-      url: error.config?.url,
-      method: error.config?.method,
-    });
-
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
       // Clear authentication data and redirect to unauthorized page
