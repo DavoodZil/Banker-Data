@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { accessTokenApi } from '@/api/client';
-import { useApiCall } from './useApiCall';
 
 export const useAccessTokens = () => {
   const [tokens, setTokens] = useState([]);

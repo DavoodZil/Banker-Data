@@ -17,7 +17,7 @@ export function useAccounts() {
 
   // Fetch all accounts
   const fetchAccounts = useCallback(
-    async (params = {}) => {
+    async () => {
       setLoading(true);
       setError(null);
       try {

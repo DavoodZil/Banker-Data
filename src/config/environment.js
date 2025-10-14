@@ -32,6 +32,7 @@ const validateEnvironment = () => {
   const missing = required.filter(key => !env[key]);
 
   if (missing.length > 0 && config.app.isProduction) {
+    // Handle missing environment variables in production
   }
 };
 

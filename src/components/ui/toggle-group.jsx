@@ -21,7 +21,7 @@ const ToggleGroup = React.forwardRef(
         {children}
       </ToggleGroupContext.Provider>
     </ToggleGroupPrimitive.Root>
-  )
+  ),
 );
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName;
@@ -38,14 +38,14 @@ const ToggleGroupItem = React.forwardRef(
             variant: context.variant || variant,
             size: context.size || size,
           }),
-          className
+          className,
         )}
         {...props}
       >
         {children}
       </ToggleGroupPrimitive.Item>
     );
-  }
+  },
 );
 
 ToggleGroupItem.displayName = ToggleGroupPrimitive.Item.displayName;

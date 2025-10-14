@@ -1,29 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useCategories } from '@/hooks/api';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Plus,
   Search,
-  TrendingUp,
-  TrendingDown,
-  Target,
-  MoreHorizontal,
-  Loader2,
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import CategoryCard from '../components/categories/CategoryCard';
 import AddCategoryModal from '../components/categories/AddCategoryModal';
-import CategorySummaryCards from '../components/categories/CategorySummaryCards';
+import CategorySummaryCards from 
+  '../components/categories/CategorySummaryCards';
 import { useCallback } from 'react';
 
 function CategoryCardSkeleton() {
@@ -42,7 +31,7 @@ function CategoryCardSkeleton() {
           <Skeleton className='w-8 h-8 rounded' />
         </div>
 
-        {/* Amount Section */}
+        {/* Amount Section*/}
         <div className='mb-4'>
           <Skeleton className='h-8 w-20 mb-1' />
           <Skeleton className='h-4 w-32' />
@@ -74,17 +63,15 @@ export default function Categories() {
   const {
     categories,
     loading: isLoading,
-    error,
     fetchCategories: refetchCategories,
     createCategory,
     updateCategory,
   } = useCategories();
 
-  useEffect(() => {}, []);
 
   /**
    * Loads category data from the API
-   * @description Fetches the latest category data and updates the component state
+   * @description Fetches the latest category data and updates the component
    * @returns {Promise<void>}
    */
   const loadData = async () => {
@@ -108,7 +95,8 @@ export default function Categories() {
       await createCategory(cleanedData);
       loadData();
       setShowAddModal(false);
-    } catch (error) {
+    } catch {
+      // Error creating category
     } finally {
       setIsSaving(false);
     }
@@ -139,7 +127,8 @@ export default function Categories() {
       await updateCategory(categoryId, cleanedUpdates);
       loadData();
       setEditingCategory(null);
-    } catch (error) {
+    } catch {
+      // Error updating category
     } finally {
       setIsSaving(false);
     }
@@ -148,7 +137,7 @@ export default function Categories() {
   /**
    * Gets statistics for a category
    * @param {Object} category - The category object
-   * @returns {Object} Category statistics including transaction count and spending
+   * @returns {Object} Category statistics including transaction count
    */
   const getCategoryStats = category => {
     return {
@@ -181,7 +170,8 @@ export default function Categories() {
   return (
     <div className='p-4 lg:p-6 space-y-6 max-w-7xl mx-auto'>
       {/* Header Section */}
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
+      <div className='flex flex-col sm:flex-row justify-between items-start 
+        sm:items-center gap-4'>
         <div>
           <h1 className='text-2xl lg:text-3xl font-bold text-common-gray-dark'>
             Categories
@@ -193,7 +183,8 @@ export default function Categories() {
         <Button
           onClick={handleShowAddModal}
           size='sm'
-          className='bg-common-green hover:bg-common-green-dark gap-2 px-4 py-2 shrink-0'
+          className='bg-common-green hover:bg-common-green-dark gap-2 px-4 
+            py-2 shrink-0'
         >
           <Plus className='w-4 h-4' />
           Add Category
@@ -203,12 +194,14 @@ export default function Categories() {
       {/* Search Bar */}
       <div className='max-w-md'>
         <div className='relative'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-common-gray-dark' />
+          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 
+            text-common-gray-dark' />
           <Input
             placeholder='Search categories...'
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className='pl-10 h-10 border-common-gray-light focus:border-common-green focus:ring-common-green'
+            className='pl-10 h-10 border-common-gray-light 
+              focus:border-common-green focus:ring-common-green'
           />
         </div>
       </div>
@@ -218,13 +211,15 @@ export default function Categories() {
 
       {/* Categories Grid */}
       {isLoading ? (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 
+          xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
           {Array.from({ length: 8 }).map((_, index) => (
-            <CategoryCardSkeleton key={index} />
+            <CategoryCardSkeleton key={`skeleton-${index}`} />
           ))}
         </div>
       ) : filteredCategories.length > 0 ? (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 
+          xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
           {categoriesWithSpending.map((category, index) => (
             <CategoryCard
               key={
@@ -239,16 +234,19 @@ export default function Categories() {
         </div>
       ) : (
         /* Empty State */
-        <Card className='bg-common-gray-light border-dashed border-2 border-common-gray-light text-center py-12'>
+        <Card className='bg-common-gray-light border-dashed border-2 
+          border-common-gray-light text-center py-12'>
           <CardContent className='space-y-4'>
-            <div className='w-16 h-16 bg-common-gray-light rounded-full flex items-center justify-center mx-auto'>
+            <div className='w-16 h-16 bg-common-gray-light rounded-full flex 
+              items-center justify-center mx-auto'>
               <Search className='w-8 h-8 text-common-gray-dark' />
             </div>
             <div>
               <h3 className='text-lg font-semibold text-common-gray-dark mb-2'>
                 No categories found
               </h3>
-              <p className='text-sm text-common-gray-dark mb-4 max-w-sm mx-auto'>
+              <p className='text-sm text-common-gray-dark mb-4 max-w-sm 
+                mx-auto'>
                 {searchQuery
                   ? `No categories match "${searchQuery}"`
                   : 'Create your first category to organize transactions'}

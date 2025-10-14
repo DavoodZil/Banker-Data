@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { entityApi } from '@/api/client';
-import { useApiCall } from './useApiCall';
 
 export const useEntities = () => {
   const [entities, setEntities] = useState([]);

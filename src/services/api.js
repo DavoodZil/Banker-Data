@@ -30,6 +30,7 @@ api.interceptors.request.use(
   }
 );
 
+/*
 const getErrorMessage = error => {
   if (error.response?.data?.errorMsg) {
     return error.response.data.errorMsg;
@@ -76,6 +77,7 @@ const getErrorMessage = error => {
       return error.message || 'An unexpected error occurred.';
   }
 };
+*/
 
 api.interceptors.response.use(
   response => response,

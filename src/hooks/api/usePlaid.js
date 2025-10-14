@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { plaidApi } from '@/api/client';
-import { useApiCall } from './useApiCall';
 
 export const usePlaidLink = () => {
   const [linkToken, setLinkToken] = useState(null);
@@ -53,7 +52,7 @@ export const usePlaidLink = () => {
 };
 
 export const usePlaidAccounts = () => {
-  const [accounts, setAccounts] = useState([]);
+  const [accounts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 

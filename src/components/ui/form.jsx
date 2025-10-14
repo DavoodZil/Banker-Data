@@ -121,7 +121,7 @@ const FormMessage = React.forwardRef(
         {body}
       </p>
     );
-  }
+  },
 );
 FormMessage.displayName = 'FormMessage';
 

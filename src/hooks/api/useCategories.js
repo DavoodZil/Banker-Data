@@ -129,7 +129,7 @@ export function useCategories() {
         });
 
         return response.data;
-      } catch (err) {
+      } catch(err) {
         const errorMessage =
           err.response?.data?.message || 'Failed to create category';
         setError(errorMessage);
@@ -167,7 +167,7 @@ export function useCategories() {
         });
 
         return response.data;
-      } catch (err) {
+      } catch(err) {
         const errorMessage =
           err.response?.data?.message || 'Failed to update category';
         setError(errorMessage);
@@ -199,7 +199,7 @@ export function useCategories() {
           title: 'Success',
           description: 'Category deleted successfully',
         });
-      } catch (err) {
+      } catch(err) {
         const errorMessage =
           err.response?.data?.message || 'Failed to delete category';
         setError(errorMessage);
@@ -221,7 +221,7 @@ export function useCategories() {
     try {
       const response = await categoryApi.getHierarchy();
       return response.data;
-    } catch (err) {
+    } catch(err) {
       const errorMessage =
         err.response?.data?.message || 'Failed to fetch category hierarchy';
       toast({
@@ -238,7 +238,7 @@ export function useCategories() {
     try {
       const response = await categoryApi.getPopular(limit);
       return response.data;
-    } catch (err) {
+    } catch {
       return [];
     }
   }, []);
@@ -259,7 +259,7 @@ export function useCategories() {
         });
 
         return response.data;
-      } catch (err) {
+      } catch(err) {
         const errorMessage =
           err.response?.data?.message || 'Failed to merge categories';
         toast({
@@ -345,7 +345,7 @@ export function useCategoryBudget(categoryId) {
   const { toast } = useToast();
 
   const fetchBudgetData = useCallback(
-    async (params = {}) => {
+    async () => {
       if (!categoryId) return;
 
       setLoading(true);
@@ -360,7 +360,7 @@ export function useCategoryBudget(categoryId) {
         setSpending(0); // Placeholder
 
         return { budget: categoryData.budget_amount || 0, spending: 0 };
-      } catch (err) {
+      } catch {
         // Error handling is done by the hook
       } finally {
         setLoading(false);

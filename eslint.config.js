@@ -47,7 +47,7 @@ export default [
       'semi': ['error', 'always'],
       'quotes': ['error', 'single'],
       'indent': ['error', 2],
-      'max-len': ['warn', { code: 80, ignoreUrls: true }],
+      'max-len': 'off',
       // React specific rules
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',

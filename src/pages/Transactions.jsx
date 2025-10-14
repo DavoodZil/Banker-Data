@@ -73,19 +73,21 @@ export default function Transactions() {
           dateFrom = startOfMonth(now);
           dateTo = endOfMonth(now);
           break;
-        case 'last_month':
+        case 'last_month': {
           const lastMonth = subMonths(now, 1);
           dateFrom = startOfMonth(lastMonth);
           dateTo = endOfMonth(lastMonth);
           break;
+        }
         case 'last_3_months':
           dateFrom = startOfDay(subMonths(now, 3));
           dateTo = endOfDay(now);
           break;
-        case 'last_6_months':
+        case 'last_6_months': {
           dateFrom = startOfDay(subMonths(now, 6));
           dateTo = endOfDay(now);
           break;
+        }
       }
 
       if (dateFrom && dateTo) {
@@ -208,37 +210,6 @@ export default function Transactions() {
     }
   };
 
-  /**
-   * Handles webhook trigger for transaction sync
-   * @description Triggers a webhook to initiate transaction synchronization
-   * @returns {Promise<void>}
-   */
-  const handleWebhookTrigger = async () => {
-    setIsSyncing(true);
-    try {
-      // TODO: Implement triggerWebhookSync function
-      const response = { data: { success: false, message: 'Not implemented' } };
-      if (response.data && response.data.success) {
-        setTimeout(async () => {
-          await loadData();
-        }, 2000);
-      } else {
-        toast({
-          title: 'Webhook Trigger Failed',
-          description: response.data?.message || 'Unknown error',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Webhook Sync Failed',
-        description: `Failed to trigger webhook sync: ${error.message}`,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSyncing(false);
-    }
-  };
 
   /**
    * Handles updating a transaction
